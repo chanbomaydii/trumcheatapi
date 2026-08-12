@@ -6,11 +6,11 @@ Sub2API is an AI API Gateway Platform for distributing and managing AI product s
 
 ```bash
 docker run -d \
-  --name sub2api \
+  --name trumcheatapi \
   -p 8080:8080 \
-  -e DATABASE_URL="postgres://user:pass@host:5432/sub2api" \
+  -e DATABASE_URL="postgres://user:pass@host:5432/trumcheat" \
   -e REDIS_URL="redis://host:6379" \
-  weishaw/sub2api:latest
+  ghcr.io/chanbomaydii/trumcheatapi:latest
 ```
 
 ## Docker Compose
@@ -19,12 +19,12 @@ docker run -d \
 version: '3.8'
 
 services:
-  sub2api:
-    image: weishaw/sub2api:latest
+  trumcheatapi:
+    image: ghcr.io/chanbomaydii/trumcheatapi:latest
     ports:
       - "8080:8080"
     environment:
-      - DATABASE_URL=postgres://postgres:postgres@db:5432/sub2api?sslmode=disable
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/trumcheat?sslmode=disable
       - REDIS_URL=redis://redis:6379
     depends_on:
       - db
@@ -35,18 +35,18 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=sub2api
+      - POSTGRES_DB=trumcheat
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - trumcheat_postgres_data:/var/lib/postgresql/data
 
   redis:
     image: redis:7-alpine
     volumes:
-      - redis_data:/data
+      - trumcheat_redis_data:/data
 
 volumes:
-  postgres_data:
-  redis_data:
+  trumcheat_postgres_data:
+  trumcheat_redis_data:
 ```
 
 ## Environment Variables

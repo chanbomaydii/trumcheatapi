@@ -4,7 +4,7 @@
 # Quick Start:
 #   1. Copy .env.example to .env and configure
 #   2. docker-compose up -d
-#   3. Check logs: docker-compose logs -f sub2api
+#   3. Check logs: docker-compose logs -f trumcheatapi
 #   4. Access: http://localhost:8080
 #
 # All configuration is done via environment variables.
@@ -15,9 +15,9 @@ services:
   # ===========================================================================
   # Sub2API Application
   # ===========================================================================
-  sub2api:
-    image: weishaw/sub2api:latest
-    container_name: sub2api
+  trumcheatapi:
+    image: ghcr.io/chanbomaydii/trumcheatapi
+    container_name: trumcheatapi
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -29,7 +29,7 @@ services:
       - "${BIND_HOST:-0.0.0.0}:${SERVER_PORT:-8080}:8080"
     volumes:
       # Data persistence (config.yaml will be auto-generated here)
-      - sub2api_data:/app/data
+      - trumcheatapi_data:/app/data
       # Optional: Mount custom config.yaml (uncomment and create the file first)
       # Copy config.example.yaml to config.yaml, modify it, then uncomment:
       # - ./config.yaml:/app/data/config.yaml
@@ -59,9 +59,9 @@ services:
       # =======================================================================
       - DATABASE_HOST=postgres
       - DATABASE_PORT=5432
-      - DATABASE_USER=${POSTGRES_USER:-sub2api}
+      - DATABASE_USER=${POSTGRES_USER:-trumcheat}
       - DATABASE_PASSWORD=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
-      - DATABASE_DBNAME=${POSTGRES_DB:-sub2api}
+      - DATABASE_DBNAME=${POSTGRES_DB:-trumcheat}
       - DATABASE_SSLMODE=disable
       - DATABASE_MAX_OPEN_CONNS=${DATABASE_MAX_OPEN_CONNS:-50}
       - DATABASE_MAX_IDLE_CONNS=${DATABASE_MAX_IDLE_CONNS:-10}
@@ -83,7 +83,7 @@ services:
       # =======================================================================
       # Admin Account (auto-created on first run)
       # =======================================================================
-      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@sub2api.local}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@soncms.net}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
 
       # =======================================================================
@@ -118,9 +118,9 @@ services:
       # - Usage statistics "today" boundary
       # - Subscription expiry times
       # - Log timestamps
-      # Common values: Asia/Shanghai, America/New_York, Europe/London, UTC
+      # Common values: Asia/Ho_Chi_Minh, America/New_York, Europe/London, UTC
       # =======================================================================
-      - TZ=${TZ:-Asia/Shanghai}
+      - TZ=${TZ:-Asia/Ho_Chi_Minh}
 
       # =======================================================================
       # Gemini OAuth Configuration (for Gemini accounts)
@@ -181,7 +181,7 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - sub2api-network
+      - trumcheat-network
     healthcheck:
       test:
         [
@@ -204,7 +204,7 @@ services:
   # ===========================================================================
   postgres:
     image: postgres:18-alpine
-    container_name: sub2api-postgres
+    container_name: trumcheat-postgres
     restart: unless-stopped
     ulimits:
       nofile:
@@ -220,23 +220,23 @@ services:
       -c effective_cache_size=${POSTGRES_EFFECTIVE_CACHE_SIZE:-4GB}
       -c maintenance_work_mem=${POSTGRES_MAINTENANCE_WORK_MEM:-64MB}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - trumcheat_postgres_data:/var/lib/postgresql/data
     environment:
       # postgres:18-alpine 默认 PGDATA=/var/lib/postgresql/18/docker（位于镜像声明的匿名卷 /var/lib/postgresql 内）。
       # 若不显式设置 PGDATA，则即使挂载了 postgres_data 到 /var/lib/postgresql/data，数据也不会落盘到该命名卷，
       # docker compose down/up 后会触发 initdb 重新初始化，导致用户/密码等数据丢失。
       - PGDATA=/var/lib/postgresql/data
-      - POSTGRES_USER=${POSTGRES_USER:-sub2api}
+      - POSTGRES_USER=${POSTGRES_USER:-trumcheat}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
-      - POSTGRES_DB=${POSTGRES_DB:-sub2api}
-      - TZ=${TZ:-Asia/Shanghai}
+      - POSTGRES_DB=${POSTGRES_DB:-trumcheat}
+      - TZ=${TZ:-Asia/Ho_Chi_Minh}
     networks:
-      - sub2api-network
+      - trumcheat-network
     healthcheck:
       test:
         [
           "CMD-SHELL",
-          "pg_isready -U ${POSTGRES_USER:-sub2api} -d ${POSTGRES_DB:-sub2api}",
+          "pg_isready -U ${POSTGRES_USER:-trumcheat} -d ${POSTGRES_DB:-trumcheat}",
         ]
       interval: 10s
       timeout: 5s
@@ -250,14 +250,14 @@ services:
   # ===========================================================================
   redis:
     image: redis:8-alpine
-    container_name: sub2api-redis
+    container_name: trumcheat-redis
     restart: unless-stopped
     ulimits:
       nofile:
         soft: 100000
         hard: 100000
     volumes:
-      - redis_data:/data
+      - trumcheat_redis_data:/data
     # The command is one quoted script for the inner `sh -c`. Compose keeps
     # the newlines inside the quoted string, so every line needs a trailing
     # `\` — without it, `redis-server` on the first line runs with no flags
@@ -270,11 +270,11 @@ services:
         --appendfsync everysec \
         ${REDIS_PASSWORD:+--requirepass "$REDIS_PASSWORD"}'
     environment:
-      - TZ=${TZ:-Asia/Shanghai}
+      - TZ=${TZ:-Asia/Ho_Chi_Minh}
       # REDISCLI_AUTH is used by redis-cli for authentication (safer than -a flag)
       - REDISCLI_AUTH=${REDIS_PASSWORD:-}
     networks:
-      - sub2api-network
+      - trumcheat-network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -287,16 +287,16 @@ services:
 # Volumes
 # =============================================================================
 volumes:
-  sub2api_data:
+  trumcheatapi_data:
     driver: local
-  postgres_data:
+  trumcheat_postgres_data:
     driver: local
-  redis_data:
+  trumcheat_redis_data:
     driver: local
 
 # =============================================================================
 # Networks
 # =============================================================================
 networks:
-  sub2api-network:
+  trumcheat-network:
     driver: bridge
