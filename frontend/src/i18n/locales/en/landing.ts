@@ -68,7 +68,7 @@ export default {
       },
       step3: {
         title: 'Change one line',
-        desc: 'Point base_url to TrumCheat. SDK, tool calls and streaming stay the same.'
+        desc: 'Point base_url to {siteName}. SDK, tool calls and streaming stay the same.'
       },
       code: {
         comment: '# Keep the OpenAI SDK, change exactly 2 lines',
@@ -128,9 +128,6 @@ export default {
         title: 'Email',
         desc: 'Custom limits, contracts, VAT invoices and shared team accounts.',
         note: '● For business inquiries'
-      },
-      sla: {
-        statusPage: 'Public status page · incident history'
       }
     },
     cta: {
@@ -139,7 +136,7 @@ export default {
       button: 'Get API key →'
     },
     footer: {
-      copyright: '© {year} TrumCheat API',
+      copyright: '© {year} {siteName}',
       links: 'Docs · Status · Terms · Telegram'
     }
   },

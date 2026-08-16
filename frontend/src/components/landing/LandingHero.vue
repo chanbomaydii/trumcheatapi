@@ -32,9 +32,16 @@
             >
               {{ t('landing.hero.ctaPrimary') }}
             </router-link>
+            <!--
+              "See pricing ↓" scrolls to the board. Hidden when the board has
+              no rows: an arrow pointing down at nothing is worse than no
+              button at all.
+            -->
             <a
-              href="#"
+              v-if="props.hasPricing"
+              href="#board"
               class="lp-mono inline-block rounded-[3px] border border-[var(--lp-line)] px-[26px] py-[15px] text-[13px] uppercase tracking-[0.1em] text-[var(--lp-dim)]"
+              @click.prevent="scrollToSection('board')"
             >
               {{ t('landing.hero.ctaSecondary') }}
             </a>
@@ -54,6 +61,7 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import { scrollToSection } from '@/utils/landingScroll'
 
 const { t } = useI18n()
 
@@ -69,11 +77,16 @@ const { t } = useI18n()
 // a later task wires in from the public-status endpoint (Tasks 1-5). A fake
 // clock value is worse than no clock at all, so with updatedAt absent the
 // whole clock block (not just the number) is omitted.
-const props = defineProps<{
-  savingPct?: number | null
-  modelCount?: number | null
-  updatedAt?: string | null
-}>()
+const props = withDefaults(
+  defineProps<{
+    savingPct?: number | null
+    modelCount?: number | null
+    updatedAt?: string | null
+    /** Whether the pricing board rendered rows worth scrolling to. */
+    hasPricing?: boolean
+  }>(),
+  { savingPct: null, modelCount: null, updatedAt: null, hasPricing: false }
+)
 
 // NOTE ON REQUIREMENT B: unlike LandingNav, this component does not read
 // appStore.cachedPublicSettings. The approved mockup's <header> block (and

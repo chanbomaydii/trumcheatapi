@@ -1,6 +1,7 @@
 <template>
   <!-- Mockup source: <section> headed "03 / HỎI ĐÁP" -->
-  <section class="lp-root border-t border-[var(--lp-line)] py-16 sm:py-24">
+  <!-- id is the nav's scroll target (landing.nav.faq); scroll-mt clears the strip. -->
+  <section id="faq" class="lp-root scroll-mt-4 border-t border-[var(--lp-line)] py-16 sm:py-24">
     <div class="mx-auto max-w-[1200px] px-6 sm:px-10">
       <div class="mb-[52px] flex flex-wrap items-baseline gap-5">
         <span class="lp-mono whitespace-nowrap text-[11px] tracking-[0.24em] text-[var(--lp-accent)]">

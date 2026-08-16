@@ -7,7 +7,17 @@
     shell with nothing underneath it, so the whole section is gated on
     `rows.length > 0` with a single v-if.
   -->
-  <section v-if="rows.length > 0" class="lp-root border-t border-[var(--lp-line)] py-16 sm:py-24">
+  <!--
+    id is the scroll target for the nav's model-board and pricing links and for
+    the hero's "see pricing ↓" button. Those affordances are themselves hidden
+    when there are no rows (LandingDefault passes hasPricing), so the anchor and
+    the links that point at it appear and disappear together.
+  -->
+  <section
+    v-if="rows.length > 0"
+    id="board"
+    class="lp-root scroll-mt-4 border-t border-[var(--lp-line)] py-16 sm:py-24"
+  >
     <div class="mx-auto max-w-[1200px] px-6 sm:px-10">
       <div
         class="overflow-hidden rounded border border-[var(--lp-board-line)] bg-[var(--lp-board-bg)] text-[var(--lp-board-ink)]"

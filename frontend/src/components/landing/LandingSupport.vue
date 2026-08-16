@@ -17,7 +17,7 @@
             {{ t('landing.support.telegram.channel') }}
           </div>
           <h4 class="mb-2 mt-3 text-2xl font-semibold uppercase tracking-[0.02em]">
-            {{ t('landing.support.telegram.title') }} <span class="text-[var(--lp-accent)]">↗</span>
+            {{ t('landing.support.telegram.title') }}
           </h4>
           <p class="text-[15px] font-normal leading-[1.55] text-[var(--lp-mute)]">{{ t('landing.support.telegram.desc') }}</p>
           <span class="lp-mono mt-4 block text-[11px] uppercase tracking-[0.12em] text-[var(--lp-ok)]">
@@ -30,7 +30,7 @@
             {{ t('landing.support.zalo.channel') }}
           </div>
           <h4 class="mb-2 mt-3 text-2xl font-semibold uppercase tracking-[0.02em]">
-            {{ t('landing.support.zalo.title') }} <span class="text-[var(--lp-accent)]">↗</span>
+            {{ t('landing.support.zalo.title') }}
           </h4>
           <p class="text-[15px] font-normal leading-[1.55] text-[var(--lp-mute)]">{{ t('landing.support.zalo.desc') }}</p>
           <span class="lp-mono mt-4 block text-[11px] uppercase tracking-[0.12em] text-[var(--lp-ok)]">
@@ -43,7 +43,7 @@
             {{ t('landing.support.email.channel') }}
           </div>
           <h4 class="mb-2 mt-3 text-2xl font-semibold uppercase tracking-[0.02em]">
-            {{ t('landing.support.email.title') }} <span class="text-[var(--lp-accent)]">↗</span>
+            {{ t('landing.support.email.title') }}
           </h4>
           <p class="text-[15px] font-normal leading-[1.55] text-[var(--lp-mute)]">{{ t('landing.support.email.desc') }}</p>
           <span class="lp-mono mt-4 block text-[11px] uppercase tracking-[0.12em] text-[var(--lp-ok)]">
@@ -53,18 +53,19 @@
       </div>
 
       <!--
-        The mockup's uptime/incident-count/last-updated figures here were
-        invented (hardcoded "99,98%" / "0" bypassing i18n entirely, plus a
-        fake "cập nhật 04:12" timestamp). None of them have a real source
-        wired into this component, so per the fix-round-2 ruling they are
-        removed rather than kept as fabricated numbers -- only the
-        status-page pointer survives.
+        The mockup's SLA bar is gone entirely. Its uptime/incident-count/
+        last-updated figures were invented (hardcoded "99,98%" / "0" bypassing
+        i18n, plus a fake "cập nhật 04:12" timestamp) and were removed in an
+        earlier round; the "public status page · incident history" pointer that
+        survived them advertised something that does not exist either. There is
+        no status page and no incident history to link to, so the claim goes
+        with the numbers rather than sitting here as the last unbacked line on
+        the section.
+
+        The three cards above are plain <div>s and carry no href, so they no
+        longer render an "↗" external-link glyph: an affordance that looks
+        clickable and is not is a false promise, however small.
       -->
-      <div
-        class="lp-mono border border-t-0 border-[var(--lp-line)] bg-[var(--lp-panel)] px-[26px] py-5 text-xs uppercase tracking-[0.12em] text-[var(--lp-dim)]"
-      >
-        {{ t('landing.support.sla.statusPage') }}
-      </div>
     </div>
   </section>
 </template>

@@ -68,7 +68,7 @@ export default {
       },
       step3: {
         title: 'Đổi một dòng',
-        desc: 'Trỏ base_url về TrumCheat. SDK, tool call, streaming giữ nguyên.'
+        desc: 'Trỏ base_url về {siteName}. SDK, tool call, streaming giữ nguyên.'
       },
       code: {
         comment: '# Giữ nguyên SDK OpenAI, đổi đúng 2 dòng',
@@ -128,9 +128,6 @@ export default {
         title: 'Email',
         desc: 'Hạn mức riêng, hợp đồng, xuất hoá đơn VAT và tài khoản dùng chung cho đội.',
         note: '● Dành cho yêu cầu doanh nghiệp'
-      },
-      sla: {
-        statusPage: 'Trang trạng thái công khai · lịch sử sự cố'
       }
     },
     cta: {
@@ -139,7 +136,7 @@ export default {
       button: 'Lấy API key →'
     },
     footer: {
-      copyright: '© {year} TrumCheat API',
+      copyright: '© {year} {siteName}',
       links: 'Tài liệu · Trạng thái · Điều khoản · Telegram'
     }
   },

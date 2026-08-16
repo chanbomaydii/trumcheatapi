@@ -66,7 +66,7 @@ export default {
       },
       step3: {
         title: '修改一行代码',
-        desc: '将 base_url 指向 TrumCheat，SDK、工具调用和流式传输保持不变。'
+        desc: '将 base_url 指向 {siteName}，SDK、工具调用和流式传输保持不变。'
       },
       code: {
         comment: '# 保留 OpenAI SDK，只修改 2 行',
@@ -126,9 +126,6 @@ export default {
         title: 'Email',
         desc: '定制额度、合同、增值税发票及团队共享账户。',
         note: '● 面向企业需求'
-      },
-      sla: {
-        statusPage: '公开状态页 · 事件历史'
       }
     },
     cta: {
@@ -137,7 +134,7 @@ export default {
       button: '获取 API key →'
     },
     footer: {
-      copyright: '© {year} TrumCheat API',
+      copyright: '© {year} {siteName}',
       links: '文档 · 状态 · 条款 · Telegram'
     }
   },

@@ -12,15 +12,31 @@
       </div>
 
       <div class="hidden items-center gap-[34px] text-[15px] uppercase tracking-[0.12em] text-[var(--lp-dim)] md:flex">
-        <a href="#" class="text-[var(--lp-ink)]">{{ t('landing.nav.modelBoard') }}</a>
-        <a href="#">{{ t('landing.nav.pricing') }}</a>
+        <!--
+          The board is the target for both of these: it IS the model board and
+          it IS the pricing table. Rendered only when it has rows, exactly like
+          the docs link is rendered only when a doc URL is configured — a nav
+          entry that scrolls to a section which is not on the page is the
+          `href="#"` bug in a slower form.
+        -->
+        <a
+          v-if="hasPricing"
+          href="#board"
+          class="text-[var(--lp-ink)]"
+          @click.prevent="scrollToSection('board')"
+        >{{ t('landing.nav.modelBoard') }}</a>
+        <a
+          v-if="hasPricing"
+          href="#board"
+          @click.prevent="scrollToSection('board')"
+        >{{ t('landing.nav.pricing') }}</a>
         <a
           v-if="docUrl"
           :href="docUrl"
           target="_blank"
           rel="noopener noreferrer"
         >{{ t('landing.nav.docs') }}</a>
-        <a href="#">{{ t('landing.nav.faq') }}</a>
+        <a href="#faq" @click.prevent="scrollToSection('faq')">{{ t('landing.nav.faq') }}</a>
       </div>
 
       <div class="flex items-center gap-3">
@@ -57,9 +73,16 @@ import { useI18n } from 'vue-i18n'
 import LocaleSwitcher from '@/components/common/LocaleSwitcher.vue'
 import { useAppStore } from '@/stores/app'
 import { sanitizeUrl } from '@/utils/url'
+import { scrollToSection } from '@/utils/landingScroll'
 
 const { t } = useI18n()
 const appStore = useAppStore()
+
+// Whether the pricing board rendered any rows. LandingDefault owns the fetch
+// and therefore owns the answer; the nav only decides whether to offer a link
+// to it. Login and "get API key" are already router-links to the real /login
+// and /register routes and need no gate.
+withDefaults(defineProps<{ hasPricing?: boolean }>(), { hasPricing: false })
 
 // Site identity, read from public settings exactly like HomeView.vue does.
 // sanitizeUrl() is load-bearing here: an admin-supplied javascript: URL in

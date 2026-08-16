@@ -30,8 +30,8 @@
 from openai import OpenAI
 
 client = OpenAI(
-    <span class="text-[var(--lp-accent)]">base_url</span>=<span class="text-[var(--lp-ok)]">"https://api.trumcheat.dev/v1"</span>,
-    <span class="text-[var(--lp-accent)]">api_key</span>=<span class="text-[var(--lp-ok)]">"tc-•••••••••••••••"</span>,
+    <span class="text-[var(--lp-accent)]">base_url</span>=<span class="text-[var(--lp-ok)]">"{{ baseUrl }}"</span>,
+    <span class="text-[var(--lp-accent)]">api_key</span>=<span class="text-[var(--lp-ok)]">"{{ apiKeyPlaceholder }}"</span>,
 )
 
 resp = client.chat.completions.create(
@@ -48,8 +48,35 @@ resp = client.chat.completions.create(
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import FlapText from './FlapText.vue'
+import { useAppStore } from '@/stores/app'
 
 const { t } = useI18n()
+const appStore = useAppStore()
+
+// The snippet is copy-pasteable instructions, so a wrong concrete value is
+// worse than no value: this is an open-source gateway other people deploy, and
+// the hardcoded "https://api.trumcheat.dev/v1" was wrong for every deployment
+// but one. api_base_url is the operator-configured public gateway URL (same
+// source KeysView.vue uses for its usage-endpoint snippet); the browser's own
+// origin is the correct fallback because the page is being served from the
+// gateway the visitor would call.
+const baseUrl = computed(() => {
+  const configured = appStore.cachedPublicSettings?.api_base_url || appStore.apiBaseUrl || ''
+  const origin = (configured || window.location.origin).replace(/\/+$/, '')
+  return `${origin}/v1`
+})
+
+// The repo's configured default key prefix (config.go: default.api_key_prefix,
+// setup.go's generated config). Operators can change it, but "sk-" is what a
+// stock deployment actually issues — "tc-" was issued by nothing.
+const apiKeyPlaceholder = 'sk-•••••••••••••••'
+
+// Same source and same fallback chain as LandingNav's <b>{{ siteName }}</b>:
+// step 3's copy names the gateway, and hardcoding one deployment's brand into
+// an open-source landing page is the footer's bug in a second place.
+const siteName = computed(
+  () => appStore.cachedPublicSettings?.site_name || appStore.siteName || 'Sub2API'
+)
 
 // Step 2's copy repeats the hero's "N models" claim. Same rule as the hero:
 // the real count is a later task's job to wire in from live data; without it
@@ -66,6 +93,6 @@ const steps = computed(() => [
         ? t('landing.steps.step2.descWithCount', { count: props.modelCount })
         : t('landing.steps.step2.descPlain')
   },
-  { num: '03', title: t('landing.steps.step3.title'), desc: t('landing.steps.step3.desc') }
+  { num: '03', title: t('landing.steps.step3.title'), desc: t('landing.steps.step3.desc', { siteName: siteName.value }) }
 ])
 </script>

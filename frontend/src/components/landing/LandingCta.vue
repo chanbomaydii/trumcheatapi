@@ -17,7 +17,7 @@
 
   <footer class="lp-root lp-mono py-[34px] text-[11px] uppercase tracking-[0.14em] text-[var(--lp-dim)]">
     <div class="mx-auto flex max-w-[1200px] flex-col gap-2 px-6 sm:flex-row sm:justify-between sm:px-10">
-      <div>{{ t('landing.footer.copyright', { year: currentYear }) }}</div>
+      <div>{{ t('landing.footer.copyright', { year: currentYear, siteName }) }}</div>
       <div>{{ t('landing.footer.links') }}</div>
     </div>
   </footer>
@@ -26,8 +26,17 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useAppStore } from '@/stores/app'
 
 const { t } = useI18n()
+const appStore = useAppStore()
 
 const currentYear = computed(() => new Date().getFullYear())
+
+// Same source and fallback chain as LandingNav's masthead. The copyright line
+// used to hardcode "TrumCheat API", which is wrong for every other deployment
+// of an open-source gateway.
+const siteName = computed(
+  () => appStore.cachedPublicSettings?.site_name || appStore.siteName || 'Sub2API'
+)
 </script>

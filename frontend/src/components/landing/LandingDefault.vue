@@ -1,8 +1,13 @@
 <template>
   <div class="lp-root flex min-h-screen flex-col">
     <LandingStatusStrip :uptime-text="uptimeText" :ttft-text="ttftText" :status-level="statusLevel" />
-    <LandingNav />
-    <LandingHero :saving-pct="savingPct" :model-count="modelCount" :updated-at="updatedAt" />
+    <LandingNav :has-pricing="hasPricing" />
+    <LandingHero
+      :saving-pct="savingPct"
+      :model-count="modelCount"
+      :updated-at="updatedAt"
+      :has-pricing="hasPricing"
+    />
     <LandingPriceBoard :rows="rows" :using-fallback="usingFallback" />
     <!--
       LandingPriceBoard carries its own `mx-auto max-w-[1200px] px-6 sm:px-10`
@@ -59,6 +64,12 @@ const { uptimeText, ttftText, statusLevel, load: loadStatus } = useLandingStatus
 // Formatted clock for the hero. null whenever the prices on screen are not
 // demonstrably live — a "last updated" clock above canned data is a false claim.
 const updatedAt = ref<string | null>(null)
+
+// LandingPriceBoard hides itself when it has no rows, taking the #board anchor
+// with it. The nav's model-board/pricing entries and the hero's "see pricing ↓"
+// button all scroll there, so they are gated on the same condition: a link to a
+// section that is not on the page is the `href="#"` dead end in a slower form.
+const hasPricing = computed(() => rows.value.length > 0)
 
 const savingPct = computed<number | null>(() => {
   // Fallback rows are canned reference data. A headline saving derived from them
