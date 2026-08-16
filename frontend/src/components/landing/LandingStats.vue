@@ -7,6 +7,7 @@
     count therefore follows however many tiles survive, not a fixed four.
   -->
   <div
+    v-if="tiles.length >= 2"
     class="lp-root grid border border-t-0 border-[var(--lp-line)]"
     :style="{ gridTemplateColumns: `repeat(${tiles.length}, minmax(0, 1fr))` }"
   >

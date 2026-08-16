@@ -34,10 +34,19 @@ describe('LandingStats', () => {
     expect(w.text()).not.toContain('0%')
   })
 
-  it('hides the model tile when the count is unknown', () => {
+  it('hides the entire strip when only one tile would survive', () => {
     const w = mount(LandingStats, {
       props: { modelCount: null, uptimeText: null, ttftText: null }
     })
-    expect(w.findAll('[data-testid="stat-tile"]')).toHaveLength(1)
+    expect(w.findAll('[data-testid="stat-tile"]')).toHaveLength(0)
+    expect(w.find('.lp-root').exists()).toBe(false)
+  })
+
+  it('shows the strip with two tiles when exactly two metrics survive', () => {
+    const w = mount(LandingStats, {
+      props: { modelCount: 41, uptimeText: null, ttftText: null }
+    })
+    expect(w.findAll('[data-testid="stat-tile"]')).toHaveLength(2)
+    expect(w.find('.lp-root').exists()).toBe(true)
   })
 })
