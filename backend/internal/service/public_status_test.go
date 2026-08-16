@@ -8,13 +8,13 @@ import (
 	"time"
 )
 
-type stubSettingRepo struct {
+type stubPublicStatusSettingRepo struct {
 	SettingRepository
 	vals map[string]string
 	err  error
 }
 
-func (s *stubSettingRepo) GetMultiple(_ context.Context, keys []string) (map[string]string, error) {
+func (s *stubPublicStatusSettingRepo) GetMultiple(_ context.Context, keys []string) (map[string]string, error) {
 	if s.err != nil {
 		return nil, s.err
 	}
@@ -26,7 +26,7 @@ func (s *stubSettingRepo) GetMultiple(_ context.Context, keys []string) (map[str
 }
 
 func TestGetPublicStatusRuntime_EnabledWhenTrue(t *testing.T) {
-	s := &SettingService{settingRepo: &stubSettingRepo{vals: map[string]string{
+	s := &SettingService{settingRepo: &stubPublicStatusSettingRepo{vals: map[string]string{
 		SettingKeyPublicStatusEnabled: "true",
 	}}}
 	if got := s.GetPublicStatusRuntime(context.Background()); !got.Enabled {
@@ -35,14 +35,14 @@ func TestGetPublicStatusRuntime_EnabledWhenTrue(t *testing.T) {
 }
 
 func TestGetPublicStatusRuntime_FailClosedOnRepoError(t *testing.T) {
-	s := &SettingService{settingRepo: &stubSettingRepo{err: errors.New("db down")}}
+	s := &SettingService{settingRepo: &stubPublicStatusSettingRepo{err: errors.New("db down")}}
 	if got := s.GetPublicStatusRuntime(context.Background()); got.Enabled {
 		t.Fatalf("want fail-closed Enabled=false, got %+v", got)
 	}
 }
 
 func TestGetPublicStatusRuntime_DisabledWhenUnset(t *testing.T) {
-	s := &SettingService{settingRepo: &stubSettingRepo{vals: map[string]string{}}}
+	s := &SettingService{settingRepo: &stubPublicStatusSettingRepo{vals: map[string]string{}}}
 	if got := s.GetPublicStatusRuntime(context.Background()); got.Enabled {
 		t.Fatalf("want Enabled=false when key missing, got %+v", got)
 	}
