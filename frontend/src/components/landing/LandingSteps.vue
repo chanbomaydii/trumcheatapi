@@ -20,8 +20,8 @@
           >
             <span class="shrink-0"><FlapText :text="step.num" /></span>
             <div>
-              <h3 class="text-2xl font-semibold uppercase tracking-[0.02em]">{{ t(step.titleKey) }}</h3>
-              <p class="mt-1.5 text-base font-normal leading-[1.5] text-[var(--lp-mute)]">{{ t(step.descKey) }}</p>
+              <h3 class="text-2xl font-semibold uppercase tracking-[0.02em]">{{ step.title }}</h3>
+              <p class="mt-1.5 text-base font-normal leading-[1.5] text-[var(--lp-mute)]">{{ step.desc }}</p>
             </div>
           </div>
         </div>
@@ -45,14 +45,27 @@ resp = client.chat.completions.create(
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import FlapText from './FlapText.vue'
 
 const { t } = useI18n()
 
-const steps = [
-  { num: '01', titleKey: 'landing.steps.step1.title', descKey: 'landing.steps.step1.desc' },
-  { num: '02', titleKey: 'landing.steps.step2.title', descKey: 'landing.steps.step2.desc' },
-  { num: '03', titleKey: 'landing.steps.step3.title', descKey: 'landing.steps.step3.desc' }
-]
+// Step 2's copy repeats the hero's "N models" claim. Same rule as the hero:
+// the real count is a later task's job to wire in from live data; without it
+// this renders non-numeric phrasing instead of a stale/invented figure.
+const props = defineProps<{ modelCount?: number | null }>()
+
+const steps = computed(() => [
+  { num: '01', title: t('landing.steps.step1.title'), desc: t('landing.steps.step1.desc') },
+  {
+    num: '02',
+    title: t('landing.steps.step2.title'),
+    desc:
+      props.modelCount != null
+        ? t('landing.steps.step2.descWithCount', { count: props.modelCount })
+        : t('landing.steps.step2.descPlain')
+  },
+  { num: '03', title: t('landing.steps.step3.title'), desc: t('landing.steps.step3.desc') }
+])
 </script>

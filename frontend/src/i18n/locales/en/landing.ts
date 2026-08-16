@@ -12,8 +12,10 @@ export default {
       referenceLabel: 'Reference pricing board'
     },
     strip: {
-      status: 'All systems operational · 99.98% uptime',
-      latency: 'Hanoi ⇄ us-east · 11ms gateway latency'
+      status: 'All systems operational',
+      statusUptime: '{uptime} uptime',
+      latency: 'Hanoi ⇄ us-east',
+      latencyTtft: '{ttft} gateway latency'
     },
     nav: {
       modelBoard: 'Model board',
@@ -24,7 +26,8 @@ export default {
       getApiKey: 'Get API key'
     },
     hero: {
-      eyebrow: 'Unified API gateway · 41 models live',
+      eyebrow: 'Unified API gateway',
+      eyebrowModelCount: '{count} models live',
       titleLine1: 'Every model.',
       titleLine2: 'One {emphasis}.',
       titleLine3: '{pct}% cheaper.',
@@ -43,7 +46,8 @@ export default {
       },
       step2: {
         title: 'Create an API key',
-        desc: 'One key unlocks all 41 models. Set a spending limit per key.'
+        descWithCount: 'One key unlocks all {count} models. Set a spending limit per key.',
+        descPlain: 'One key unlocks every supported model. Set a spending limit per key.'
       },
       step3: {
         title: 'Change one line',
@@ -68,7 +72,7 @@ export default {
       },
       q2: {
         question: 'Can a key get locked mid-session?',
-        answer: 'The pool auto-rotates across 128 accounts. If one account has an issue, the request fails over to another account within the same session — you see no interruption.'
+        answer: 'The account pool auto-rotates. If one account has an issue, the request fails over to another account within the same session — you see no interruption.'
       },
       q3: {
         question: 'How is billing calculated?',
@@ -94,25 +98,22 @@ export default {
         channel: 'Main channel',
         title: 'Telegram',
         desc: 'Technical support group, maintenance notices and new model updates.',
-        responseTime: '● Avg. response in 4 minutes'
+        note: '● Monitored directly by the technical team'
       },
       zalo: {
         channel: 'Domestic',
         title: 'Zalo',
         desc: 'Support for top-ups, invoices and payment issues in Vietnamese.',
-        hours: '● 08:00 – 24:00 daily'
+        note: '● Support available throughout the day'
       },
       email: {
         channel: 'Business',
         title: 'Email',
         desc: 'Custom limits, contracts, VAT invoices and shared team accounts.',
-        responseTime: '● Response within 12 hours'
+        note: '● For business inquiries'
       },
       sla: {
-        statusPage: 'Public status page · 12-month incident history',
-        uptimeLabel: '30-day uptime',
-        incidentsLabel: 'critical incidents',
-        updatedLabel: 'updated 04:12'
+        statusPage: 'Public status page · incident history'
       }
     },
     cta: {

@@ -5,9 +5,11 @@
       <div>
         <span
           class="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-[var(--lp-ok)] align-middle shadow-[0_0_10px_var(--lp-ok)]"
-        ></span>{{ t('landing.strip.status') }}
+        ></span>{{ t('landing.strip.status') }}<template v-if="uptimeText"> · {{ t('landing.strip.statusUptime', { uptime: uptimeText }) }}</template>
       </div>
-      <div>{{ t('landing.strip.latency') }}</div>
+      <div>
+        {{ t('landing.strip.latency') }}<template v-if="ttftText"> · {{ t('landing.strip.latencyTtft', { ttft: ttftText }) }}</template>
+      </div>
     </div>
   </div>
 </template>
@@ -16,4 +18,12 @@
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
+
+// Uptime/latency figures must come from the public-status endpoint (Tasks
+// 1-5) built specifically so this page never has to invent them -- a made-up
+// number here would sit directly above the live pricing board's genuine
+// per-model figures and contradict it on the same screen. No caller supplies
+// these yet (a later task wires them in), so the numberless variant is what
+// actually renders today.
+defineProps<{ uptimeText?: string | null; ttftText?: string | null }>()
 </script>

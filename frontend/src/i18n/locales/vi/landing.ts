@@ -12,8 +12,10 @@ export default {
       referenceLabel: 'Bảng giá tham khảo'
     },
     strip: {
-      status: 'Tất cả hệ thống hoạt động · uptime 99.98%',
-      latency: 'hà nội ⇄ us-east · độ trễ cổng 11ms'
+      status: 'Tất cả hệ thống hoạt động',
+      statusUptime: 'uptime {uptime}',
+      latency: 'hà nội ⇄ us-east',
+      latencyTtft: 'độ trễ cổng {ttft}'
     },
     nav: {
       modelBoard: 'Bảng model',
@@ -24,7 +26,8 @@ export default {
       getApiKey: 'Lấy API key'
     },
     hero: {
-      eyebrow: 'Cổng API hợp nhất · 41 model đang phục vụ',
+      eyebrow: 'Cổng API hợp nhất',
+      eyebrowModelCount: '{count} model đang phục vụ',
       titleLine1: 'Mọi model.',
       titleLine2: 'Một {emphasis}.',
       titleLine3: 'Rẻ hơn {pct}%.',
@@ -43,7 +46,8 @@ export default {
       },
       step2: {
         title: 'Tạo API key',
-        desc: 'Một key duy nhất mở toàn bộ 41 model. Đặt hạn mức chi tiêu theo key.'
+        descWithCount: 'Một key duy nhất mở toàn bộ {count} model. Đặt hạn mức chi tiêu theo key.',
+        descPlain: 'Một key duy nhất mở toàn bộ model đang hỗ trợ. Đặt hạn mức chi tiêu theo key.'
       },
       step3: {
         title: 'Đổi một dòng',
@@ -68,7 +72,7 @@ export default {
       },
       q2: {
         question: 'Key có bị khoá giữa chừng không?',
-        answer: 'Pool có 128 tài khoản xoay vòng tự động. Một tài khoản gặp sự cố, request được chuyển sang tài khoản khác trong cùng phiên — bạn không thấy gián đoạn.'
+        answer: 'Pool tài khoản xoay vòng tự động. Một tài khoản gặp sự cố, request được chuyển sang tài khoản khác trong cùng phiên — bạn không thấy gián đoạn.'
       },
       q3: {
         question: 'Tính tiền như thế nào?',
@@ -94,25 +98,22 @@ export default {
         channel: 'Kênh chính',
         title: 'Telegram',
         desc: 'Nhóm hỗ trợ kỹ thuật, thông báo bảo trì và cập nhật model mới.',
-        responseTime: '● Phản hồi trung bình 4 phút'
+        note: '● Đội ngũ kỹ thuật theo dõi và phản hồi trực tiếp'
       },
       zalo: {
         channel: 'Trong nước',
         title: 'Zalo',
         desc: 'Hỗ trợ nạp tiền, hoá đơn và các vướng mắc thanh toán bằng tiếng Việt.',
-        hours: '● 08:00 – 24:00 mỗi ngày'
+        note: '● Hỗ trợ liên tục trong ngày'
       },
       email: {
         channel: 'Doanh nghiệp',
         title: 'Email',
         desc: 'Hạn mức riêng, hợp đồng, xuất hoá đơn VAT và tài khoản dùng chung cho đội.',
-        responseTime: '● Phản hồi trong 12 giờ'
+        note: '● Dành cho yêu cầu doanh nghiệp'
       },
       sla: {
-        statusPage: 'Trang trạng thái công khai · lịch sử sự cố 12 tháng',
-        uptimeLabel: 'uptime 30 ngày',
-        incidentsLabel: 'sự cố nghiêm trọng',
-        updatedLabel: 'cập nhật 04:12'
+        statusPage: 'Trang trạng thái công khai · lịch sử sự cố'
       }
     },
     cta: {

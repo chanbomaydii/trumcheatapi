@@ -3,7 +3,7 @@
   <header class="lp-root">
     <div class="mx-auto max-w-[1200px] px-6 pb-[46px] pt-[76px] sm:px-10">
       <div class="lp-mono mb-[26px] text-[11px] uppercase tracking-[0.34em] text-[var(--lp-accent)]">
-        {{ t('landing.hero.eyebrow') }}
+        {{ t('landing.hero.eyebrow') }}<template v-if="props.modelCount != null"> · {{ t('landing.hero.eyebrowModelCount', { count: props.modelCount }) }}</template>
       </div>
 
       <div class="flex flex-col-reverse items-start justify-between gap-[60px] lg:flex-row lg:items-end">
@@ -41,8 +41,8 @@
           </div>
         </div>
 
-        <div class="shrink-0 text-right">
-          <div class="lp-mono text-[44px] tracking-[-0.02em]">04:12:38</div>
+        <div v-if="props.updatedAt" class="shrink-0 text-right">
+          <div class="lp-mono text-[44px] tracking-[-0.02em]">{{ props.updatedAt }}</div>
           <div class="lp-mono mt-2 text-[10px] uppercase tracking-[0.28em] text-[var(--lp-dim)]">
             {{ t('landing.hero.clockLabel') }}
           </div>
@@ -64,7 +64,16 @@ const { t } = useI18n()
 // supplies this yet (a later task wires it from the board's data), so the
 // non-numeric fallback line is what actually renders today -- that is
 // correct, not a placeholder bug.
-const props = defineProps<{ savingPct?: number | null }>()
+//
+// modelCount and updatedAt are the same pattern: real per-deployment figures
+// a later task wires in from the public-status endpoint (Tasks 1-5). A fake
+// clock value is worse than no clock at all, so with updatedAt absent the
+// whole clock block (not just the number) is omitted.
+const props = defineProps<{
+  savingPct?: number | null
+  modelCount?: number | null
+  updatedAt?: string | null
+}>()
 
 // NOTE ON REQUIREMENT B: unlike LandingNav, this component does not read
 // appStore.cachedPublicSettings. The approved mockup's <header> block (and

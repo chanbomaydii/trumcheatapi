@@ -21,7 +21,7 @@
           </h4>
           <p class="text-[15px] font-normal leading-[1.55] text-[var(--lp-mute)]">{{ t('landing.support.telegram.desc') }}</p>
           <span class="lp-mono mt-4 block text-[11px] uppercase tracking-[0.12em] text-[var(--lp-ok)]">
-            {{ t('landing.support.telegram.responseTime') }}
+            {{ t('landing.support.telegram.note') }}
           </span>
         </div>
 
@@ -34,7 +34,7 @@
           </h4>
           <p class="text-[15px] font-normal leading-[1.55] text-[var(--lp-mute)]">{{ t('landing.support.zalo.desc') }}</p>
           <span class="lp-mono mt-4 block text-[11px] uppercase tracking-[0.12em] text-[var(--lp-ok)]">
-            {{ t('landing.support.zalo.hours') }}
+            {{ t('landing.support.zalo.note') }}
           </span>
         </div>
 
@@ -47,22 +47,23 @@
           </h4>
           <p class="text-[15px] font-normal leading-[1.55] text-[var(--lp-mute)]">{{ t('landing.support.email.desc') }}</p>
           <span class="lp-mono mt-4 block text-[11px] uppercase tracking-[0.12em] text-[var(--lp-ok)]">
-            {{ t('landing.support.email.responseTime') }}
+            {{ t('landing.support.email.note') }}
           </span>
         </div>
       </div>
 
+      <!--
+        The mockup's uptime/incident-count/last-updated figures here were
+        invented (hardcoded "99,98%" / "0" bypassing i18n entirely, plus a
+        fake "cập nhật 04:12" timestamp). None of them have a real source
+        wired into this component, so per the fix-round-2 ruling they are
+        removed rather than kept as fabricated numbers -- only the
+        status-page pointer survives.
+      -->
       <div
-        class="lp-mono flex flex-col gap-2 border border-t-0 border-[var(--lp-line)] bg-[var(--lp-panel)] px-[26px] py-5 text-xs uppercase tracking-[0.12em] text-[var(--lp-dim)] sm:flex-row sm:items-center sm:justify-between"
+        class="lp-mono border border-t-0 border-[var(--lp-line)] bg-[var(--lp-panel)] px-[26px] py-5 text-xs uppercase tracking-[0.12em] text-[var(--lp-dim)]"
       >
-        <div>{{ t('landing.support.sla.statusPage') }}</div>
-        <div>
-          <b class="font-medium text-[var(--lp-ink)]">99,98%</b> {{ t('landing.support.sla.uptimeLabel') }}
-          &nbsp;·&nbsp;
-          <b class="font-medium text-[var(--lp-ink)]">0</b> {{ t('landing.support.sla.incidentsLabel') }}
-          &nbsp;·&nbsp;
-          {{ t('landing.support.sla.updatedLabel') }}
-        </div>
+        {{ t('landing.support.sla.statusPage') }}
       </div>
     </div>
   </section>

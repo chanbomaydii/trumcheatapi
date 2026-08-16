@@ -12,8 +12,10 @@ export default {
       referenceLabel: '参考价格看板'
     },
     strip: {
-      status: '所有系统正常运行 · 正常运行率 99.98%',
-      latency: '河内 ⇄ us-east · 网关延迟 11ms'
+      status: '所有系统正常运行',
+      statusUptime: '正常运行率 {uptime}',
+      latency: '河内 ⇄ us-east',
+      latencyTtft: '网关延迟 {ttft}'
     },
     nav: {
       modelBoard: '模型看板',
@@ -24,7 +26,8 @@ export default {
       getApiKey: '获取 API key'
     },
     hero: {
-      eyebrow: '统一 API 网关 · 41 个模型在线',
+      eyebrow: '统一 API 网关',
+      eyebrowModelCount: '{count} 个模型在线',
       titleLine1: '全部模型。',
       titleLine2: '一个 {emphasis}。',
       titleLine3: '便宜 {pct}%。',
@@ -43,7 +46,8 @@ export default {
       },
       step2: {
         title: '创建 API key',
-        desc: '一个 key 即可解锁全部 41 个模型，可为每个 key 设置消费限额。'
+        descWithCount: '一个 key 即可解锁全部 {count} 个模型，可为每个 key 设置消费限额。',
+        descPlain: '一个 key 即可解锁全部已支持模型，可为每个 key 设置消费限额。'
       },
       step3: {
         title: '修改一行代码',
@@ -68,7 +72,7 @@ export default {
       },
       q2: {
         question: 'Key 会不会中途被锁？',
-        answer: '账号池由 128 个账号自动轮换。某个账号出问题时，请求会在同一会话内切换到其他账号 — 你不会感知到中断。'
+        answer: '账号池自动轮换。某个账号出问题时，请求会在同一会话内切换到其他账号 — 你不会感知到中断。'
       },
       q3: {
         question: '如何计费？',
@@ -94,25 +98,22 @@ export default {
         channel: '主要渠道',
         title: 'Telegram',
         desc: '技术支持群，维护通知与新模型更新。',
-        responseTime: '● 平均 4 分钟回复'
+        note: '● 由技术团队直接跟进回复'
       },
       zalo: {
         channel: '国内',
         title: 'Zalo',
         desc: '以越南语提供充值、发票和支付问题支持。',
-        hours: '● 每天 08:00 – 24:00'
+        note: '● 全天候提供支持'
       },
       email: {
         channel: '企业',
         title: 'Email',
         desc: '定制额度、合同、增值税发票及团队共享账户。',
-        responseTime: '● 12 小时内回复'
+        note: '● 面向企业需求'
       },
       sla: {
-        statusPage: '公开状态页 · 12 个月事件历史',
-        uptimeLabel: '30 天可用率',
-        incidentsLabel: '次重大故障',
-        updatedLabel: '更新于 04:12'
+        statusPage: '公开状态页 · 事件历史'
       }
     },
     cta: {
