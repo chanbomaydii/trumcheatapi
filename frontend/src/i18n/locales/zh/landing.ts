@@ -9,7 +9,17 @@ export default {
     },
     board: {
       liveLabel: '实时价格看板 — 每 60 秒更新',
-      referenceLabel: '参考价格看板'
+      referenceLabel: '参考价格看板',
+      unit: 'USD / 1M Token',
+      columns: {
+        model: 'Model',
+        provider: '服务商',
+        input: '输入价',
+        output: '输出价',
+        // 必须明确写出"输出价" — savingPct 只根据输出价计算，
+        // 若只写"节省"会被误读为整行的比较，而输入侧的节省幅度可能并不相同。
+        savingOutput: '输出价节省'
+      }
     },
     strip: {
       status: '所有系统正常运行',

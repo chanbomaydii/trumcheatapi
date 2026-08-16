@@ -9,7 +9,18 @@ export default {
     },
     board: {
       liveLabel: 'Bảng giá trực tiếp — cập nhật mỗi 60 giây',
-      referenceLabel: 'Bảng giá tham khảo'
+      referenceLabel: 'Bảng giá tham khảo',
+      unit: 'USD / 1 triệu token',
+      columns: {
+        model: 'Model',
+        provider: 'Nhà cung cấp',
+        input: 'Giá vào',
+        output: 'Giá ra',
+        // Must name "giá ra" (output price) explicitly — savingPct is computed
+        // from the output price only, and a bare "Tiết kiệm" would read as a
+        // claim about the whole row when the input-side saving can differ.
+        savingOutput: 'Tiết kiệm giá ra'
+      }
     },
     strip: {
       status: 'Tất cả hệ thống hoạt động',

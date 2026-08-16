@@ -9,7 +9,18 @@ export default {
     },
     board: {
       liveLabel: 'Live pricing board — updated every 60s',
-      referenceLabel: 'Reference pricing board'
+      referenceLabel: 'Reference pricing board',
+      unit: 'USD / 1M tokens',
+      columns: {
+        model: 'Model',
+        provider: 'Provider',
+        input: 'Input price',
+        output: 'Output price',
+        // Must name the output price explicitly — savingPct is computed from
+        // the output price only, and a bare "Saving" would read as a claim
+        // about the whole row when the input-side saving can differ.
+        savingOutput: 'Output saving'
+      }
     },
     strip: {
       status: 'All systems operational',
