@@ -457,6 +457,11 @@ const (
 	// the Model Plaza page (global pricing notes, exchange rate, promotions, ...).
 	SettingKeyModelPlazaDescription = "model_plaza_description"
 
+	// SettingKeyPublicStatusEnabled is a DB-backed soft switch for the public
+	// status endpoint (GET /api/v1/public/status) used by the landing page.
+	// Opt-in: unknown or unset means disabled.
+	SettingKeyPublicStatusEnabled = "public_status_enabled"
+
 	// SettingKeyUpstreamBillingProbeSettings stores the global enable switch and interval
 	// for probing remote Sub2API API-key billing metadata.
 	SettingKeyUpstreamBillingProbeSettings = "upstream_billing_probe_settings"

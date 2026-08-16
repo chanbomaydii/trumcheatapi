@@ -513,6 +513,22 @@ func (s *SettingService) GetModelPlazaRuntime(ctx context.Context) ModelPlazaRun
 	}
 }
 
+// PublicStatusRuntime carries the public status endpoint feature switch.
+type PublicStatusRuntime struct {
+	Enabled bool
+}
+
+// GetPublicStatusRuntime reads the public-status feature switch directly from
+// the settings store. Fail-closed: on error returns Enabled=false, matching the
+// opt-in default (unknown ↔ disabled).
+func (s *SettingService) GetPublicStatusRuntime(ctx context.Context) PublicStatusRuntime {
+	vals, err := s.settingRepo.GetMultiple(ctx, []string{SettingKeyPublicStatusEnabled})
+	if err != nil {
+		return PublicStatusRuntime{Enabled: false}
+	}
+	return PublicStatusRuntime{Enabled: vals[SettingKeyPublicStatusEnabled] == "true"}
+}
+
 // IsUserErrorViewAllowed reads the user-facing error-requests visibility switch
 // directly from the settings store. Fail-closed: on error returns false (opt-in default).
 func (s *SettingService) IsUserErrorViewAllowed(ctx context.Context) bool {
