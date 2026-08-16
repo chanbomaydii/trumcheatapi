@@ -1,4 +1,18 @@
 export default {
+  // New landing page (stats strip + pricing departure board)
+  landing: {
+    stats: {
+      models: 'Models served',
+      uptime: '30-day uptime',
+      ttft: '24h median TTFT',
+      formats: 'Compatible API formats'
+    },
+    board: {
+      liveLabel: 'Live pricing board — updated every 60s',
+      referenceLabel: 'Reference pricing board'
+    }
+  },
+
   batchImageGuide: {
     title: 'Batch Image Generation',
     description: 'Submit multiple prompts in one job and download the generated images when complete'

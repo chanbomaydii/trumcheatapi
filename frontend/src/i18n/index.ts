@@ -1,19 +1,20 @@
 import { createI18n } from 'vue-i18n'
 
-type LocaleCode = 'en' | 'zh'
+type LocaleCode = 'en' | 'zh' | 'vi'
 
 type LocaleMessages = Record<string, any>
 
 const LOCALE_KEY = 'sub2api_locale'
-const DEFAULT_LOCALE: LocaleCode = 'en'
+const DEFAULT_LOCALE: LocaleCode = 'vi'
 
 const localeLoaders: Record<LocaleCode, () => Promise<{ default: LocaleMessages }>> = {
   en: () => import('./locales/en'),
-  zh: () => import('./locales/zh')
+  zh: () => import('./locales/zh'),
+  vi: () => import('./locales/vi')
 }
 
 function isLocaleCode(value: string): value is LocaleCode {
-  return value === 'en' || value === 'zh'
+  return value === 'en' || value === 'zh' || value === 'vi'
 }
 
 function getDefaultLocale(): LocaleCode {
@@ -33,7 +34,12 @@ function getDefaultLocale(): LocaleCode {
 export const i18n = createI18n({
   legacy: false,
   locale: getDefaultLocale(),
-  fallbackLocale: DEFAULT_LOCALE,
+  // DEFAULT_LOCALE is 'vi', but the vi locale intentionally covers only
+  // customer-facing namespaces (see locales/vi/index.ts). Falling back to
+  // DEFAULT_LOCALE would surface untranslated admin keys as raw dotted key
+  // paths (e.g. "admin.settings.title"). Fall back to English instead so
+  // any missing key degrades to a real English string.
+  fallbackLocale: 'en',
   messages: {},
   // 禁用 HTML 消息警告 - 引导步骤使用富文本内容（driver.js 支持 HTML）
   // 这些内容是内部定义的，不存在 XSS 风险
@@ -92,6 +98,7 @@ export function getLocale(): LocaleCode {
 }
 
 export const availableLocales = [
+  { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
   { code: 'en', name: 'English', flag: '🇺🇸' },
   { code: 'zh', name: '中文', flag: '🇨🇳' }
 ] as const

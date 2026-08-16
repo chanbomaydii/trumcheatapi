@@ -1,4 +1,18 @@
 export default {
+  // 新版首页（数据统计条 + 价格公示牌）
+  landing: {
+    stats: {
+      models: '在线模型数',
+      uptime: '30 天可用率',
+      ttft: '24 小时 TTFT 中位数',
+      formats: '兼容 API 格式'
+    },
+    board: {
+      liveLabel: '实时价格看板 — 每 60 秒更新',
+      referenceLabel: '参考价格看板'
+    }
+  },
+
   batchImageGuide: {
     title: '图片批量生成',
     description: '一次提交多条提示词，任务完成后可统一下载图片结果'
