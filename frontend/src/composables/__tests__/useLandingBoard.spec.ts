@@ -45,7 +45,12 @@ describe('useLandingBoard', () => {
   it('prefers the per-user rate over the group rate', async () => {
     vi.mocked(api.getModelPlaza).mockResolvedValue({
       description: '',
-      groups: [group({ rate_multiplier: 0.28, user_rate_multiplier: 0.2, models: [model('m', 10, 10)] })]
+      groups: [group({
+        rate_multiplier: 0.28, user_rate_multiplier: 0.2,
+        // Official pricing must be coherent with our own base price (10):
+        // an operator does not set their base price at a fraction of list.
+        models: [model('m', 10, 10, { input_price: 10, output_price: 10, cache_write_price: null, cache_read_price: null })]
+      })]
     } as any)
     const b = useLandingBoard()
     await b.load()
@@ -84,7 +89,9 @@ describe('useLandingBoard', () => {
   })
 
   it('drops image-billed models because their multiplier differs', async () => {
-    const imageModel = model('gemini-3-pro-image', 1, 1)
+    // Official pricing coherent with base price (1) even though this row is
+    // dropped before pricing comparison ever runs, for the image-billed check.
+    const imageModel = model('gemini-3-pro-image', 1, 1, { input_price: 1, output_price: 1, cache_write_price: null, cache_read_price: null })
     imageModel.pricing.image_output_price = 0.05
     vi.mocked(api.getModelPlaza).mockResolvedValue({
       description: '',
@@ -132,6 +139,24 @@ describe('useLandingBoard', () => {
     await b.load()
     expect(b.usingFallback.value).toBe(true)
     expect(b.rows.value.length).toBeGreaterThan(0)
+  })
+
+  it('computes saving against official price, not against our own base price', async () => {
+    // Base output price (150) is deliberately different from the vendor's
+    // list price (75). At rate 0.5 the customer actually pays 75 — exactly
+    // list price, i.e. 0% real saving — even though `1 - rate` would report
+    // a misleading 50%. A 0% saving falls below the plausibility floor, so
+    // the row must be dropped entirely.
+    vi.mocked(api.getModelPlaza).mockResolvedValue({
+      description: '',
+      groups: [group({
+        rate_multiplier: 0.5,
+        models: [model('mismatched', 150, 150, { input_price: 75, output_price: 75, cache_write_price: null, cache_read_price: null })]
+      })]
+    } as any)
+    const b = useLandingBoard()
+    await b.load()
+    expect(b.rows.value.map(r => r.name)).not.toContain('mismatched')
   })
 
   it('honours the row limit', async () => {

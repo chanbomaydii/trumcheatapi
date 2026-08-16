@@ -48,17 +48,17 @@ function toRow(g: ModelPlazaGroup, m: PlazaModel): BoardRow | null {
   const inputOfficial = m.official_pricing?.input_price ?? null
   const outputOfficial = m.official_pricing?.output_price ?? null
 
-  // Saving is the discount our multiplier represents off the vendor's list
-  // price. Our channel price is the same model at the vendor's own rate
-  // before the multiplier is applied, so (1 - rate) is the real saving —
-  // dividing the scaled price back by the official price would double-count
-  // any pre-existing gap between our base price and the vendor's list price.
+  // Saving is what the customer actually pays us versus what the vendor
+  // charges on their own public list — NOT a function of our multiplier
+  // alone. An operator's base price need not equal the vendor's list price,
+  // so (1 - rate) would silently ignore any gap between the two and publish
+  // a number that has nothing to do with what the customer really saves.
   // Gated on official_pricing being present: with nothing to compare against,
   // the comparison itself is meaningless (rule 4), even though the actual
   // price above is still true and still shown.
   let savingPct: number | null = null
   if (outputOfficial != null && outputOfficial > 0) {
-    savingPct = Math.round((1 - rate) * 100)
+    savingPct = Math.round((1 - outputActual / outputOfficial) * 100)
     if (savingPct < MIN_PLAUSIBLE_SAVING || savingPct > MAX_PLAUSIBLE_SAVING) return null
   }
 
