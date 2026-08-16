@@ -10,6 +10,118 @@ export default {
     board: {
       liveLabel: 'Bảng giá trực tiếp — cập nhật mỗi 60 giây',
       referenceLabel: 'Bảng giá tham khảo'
+    },
+    strip: {
+      status: 'Tất cả hệ thống hoạt động · uptime 99.98%',
+      latency: 'hà nội ⇄ us-east · độ trễ cổng 11ms'
+    },
+    nav: {
+      modelBoard: 'Bảng model',
+      pricing: 'Bảng giá',
+      docs: 'Tài liệu',
+      faq: 'Hỏi đáp',
+      login: 'Đăng nhập',
+      getApiKey: 'Lấy API key'
+    },
+    hero: {
+      eyebrow: 'Cổng API hợp nhất · 41 model đang phục vụ',
+      titleLine1: 'Mọi model.',
+      titleLine2: 'Một {emphasis}.',
+      titleLine3: 'Rẻ hơn 72%.',
+      subtitle: 'Claude, GPT và Gemini chạy trên pool tài khoản subscription thật. Giữ nguyên SDK bạn đang dùng — đổi đúng một dòng {code}.',
+      ctaPrimary: 'Lấy API key miễn phí',
+      ctaSecondary: 'Xem bảng giá ↓',
+      clockLabel: 'Cập nhật giá gần nhất'
+    },
+    steps: {
+      secnum: '01 / CÁCH DÙNG',
+      heading: 'Ba bước, xong trong hai phút',
+      step1: {
+        title: 'Tạo tài khoản',
+        desc: 'Đăng ký bằng email hoặc Google. Nhận ngay credit dùng thử, không cần thẻ.'
+      },
+      step2: {
+        title: 'Tạo API key',
+        desc: 'Một key duy nhất mở toàn bộ 41 model. Đặt hạn mức chi tiêu theo key.'
+      },
+      step3: {
+        title: 'Đổi một dòng',
+        desc: 'Trỏ base_url về TrumCheat. SDK, tool call, streaming giữ nguyên.'
+      },
+      code: {
+        comment: '# Giữ nguyên SDK OpenAI, đổi đúng 2 dòng',
+        greeting: 'Chào!'
+      }
+    },
+    compat: {
+      secnum: '02 / TƯƠNG THÍCH',
+      heading: 'Nói đúng thứ tiếng SDK bạn đang dùng',
+      badge: 'Tương thích'
+    },
+    faq: {
+      secnum: '03 / HỎI ĐÁP',
+      heading: 'Hỏi nhanh, đáp thẳng',
+      q1: {
+        question: 'Vì sao rẻ hơn giá gốc tới 72%?',
+        answer: 'Hệ thống chạy trên pool tài khoản subscription trả theo tháng, không mua token lẻ theo giá niêm yết. Phần chênh lệch được chia lại cho bạn.'
+      },
+      q2: {
+        question: 'Key có bị khoá giữa chừng không?',
+        answer: 'Pool có 128 tài khoản xoay vòng tự động. Một tài khoản gặp sự cố, request được chuyển sang tài khoản khác trong cùng phiên — bạn không thấy gián đoạn.'
+      },
+      q3: {
+        question: 'Tính tiền như thế nào?',
+        answer: 'Theo token thực dùng, đo ngay tại cổng. Trừ thẳng vào số dư, xem chi tiết từng request trong mục Thống kê. Không phí ẩn, không phí duy trì.'
+      },
+      q4: {
+        question: 'Nạp tiền bằng cách nào?',
+        answer: 'Chuyển khoản ngân hàng nội địa, ví điện tử, hoặc mã redeem. Số dư vào tài khoản ngay sau khi xác nhận.'
+      },
+      q5: {
+        question: 'Có giới hạn tốc độ không?',
+        answer: 'Không giới hạn cứng. Mỗi khoá tự đặt được hạn mức chi tiêu riêng để tránh vỡ ngân sách khi chạy agent.'
+      },
+      q6: {
+        question: 'Nội dung request có bị lưu lại không?',
+        answer: 'Mặc định chỉ ghi lại số token và metadata để tính cước. Nội dung prompt và phản hồi không được lưu trữ.'
+      }
+    },
+    support: {
+      secnum: '04 / HỖ TRỢ',
+      heading: 'Người thật, trả lời thật',
+      telegram: {
+        channel: 'Kênh chính',
+        title: 'Telegram',
+        desc: 'Nhóm hỗ trợ kỹ thuật, thông báo bảo trì và cập nhật model mới.',
+        responseTime: '● Phản hồi trung bình 4 phút'
+      },
+      zalo: {
+        channel: 'Trong nước',
+        title: 'Zalo',
+        desc: 'Hỗ trợ nạp tiền, hoá đơn và các vướng mắc thanh toán bằng tiếng Việt.',
+        hours: '● 08:00 – 24:00 mỗi ngày'
+      },
+      email: {
+        channel: 'Doanh nghiệp',
+        title: 'Email',
+        desc: 'Hạn mức riêng, hợp đồng, xuất hoá đơn VAT và tài khoản dùng chung cho đội.',
+        responseTime: '● Phản hồi trong 12 giờ'
+      },
+      sla: {
+        statusPage: 'Trang trạng thái công khai · lịch sử sự cố 12 tháng',
+        uptimeLabel: 'uptime 30 ngày',
+        incidentsLabel: 'sự cố nghiêm trọng',
+        updatedLabel: 'cập nhật 04:12'
+      }
+    },
+    cta: {
+      heading: 'Bắt đầu trong 60 giây',
+      subtitle: 'Không cần thẻ · Credit dùng thử miễn phí · Huỷ bất cứ lúc nào',
+      button: 'Lấy API key →'
+    },
+    footer: {
+      copyright: '© {year} TrumCheat API',
+      links: 'Tài liệu · Trạng thái · Điều khoản · Telegram'
     }
   },
 

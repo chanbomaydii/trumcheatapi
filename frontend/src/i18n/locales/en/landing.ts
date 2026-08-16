@@ -10,6 +10,118 @@ export default {
     board: {
       liveLabel: 'Live pricing board — updated every 60s',
       referenceLabel: 'Reference pricing board'
+    },
+    strip: {
+      status: 'All systems operational · 99.98% uptime',
+      latency: 'Hanoi ⇄ us-east · 11ms gateway latency'
+    },
+    nav: {
+      modelBoard: 'Model board',
+      pricing: 'Pricing',
+      docs: 'Docs',
+      faq: 'FAQ',
+      login: 'Log in',
+      getApiKey: 'Get API key'
+    },
+    hero: {
+      eyebrow: 'Unified API gateway · 41 models live',
+      titleLine1: 'Every model.',
+      titleLine2: 'One {emphasis}.',
+      titleLine3: '72% cheaper.',
+      subtitle: 'Claude, GPT and Gemini run on real subscription account pools. Keep the SDK you already use — change exactly one line: {code}.',
+      ctaPrimary: 'Get a free API key',
+      ctaSecondary: 'See pricing ↓',
+      clockLabel: 'Last price update'
+    },
+    steps: {
+      secnum: '01 / HOW IT WORKS',
+      heading: 'Three steps, done in two minutes',
+      step1: {
+        title: 'Create an account',
+        desc: 'Sign up with email or Google. Get trial credit instantly, no card required.'
+      },
+      step2: {
+        title: 'Create an API key',
+        desc: 'One key unlocks all 41 models. Set a spending limit per key.'
+      },
+      step3: {
+        title: 'Change one line',
+        desc: 'Point base_url to TrumCheat. SDK, tool calls and streaming stay the same.'
+      },
+      code: {
+        comment: '# Keep the OpenAI SDK, change exactly 2 lines',
+        greeting: 'Hi!'
+      }
+    },
+    compat: {
+      secnum: '02 / COMPATIBILITY',
+      heading: 'Speaks the exact SDK language you already use',
+      badge: 'Compatible'
+    },
+    faq: {
+      secnum: '03 / FAQ',
+      heading: 'Quick questions, straight answers',
+      q1: {
+        question: 'Why is it up to 72% cheaper than list price?',
+        answer: 'The system runs on a pool of monthly subscription accounts instead of buying tokens at list price. The difference is passed back to you.'
+      },
+      q2: {
+        question: 'Can a key get locked mid-session?',
+        answer: 'The pool auto-rotates across 128 accounts. If one account has an issue, the request fails over to another account within the same session — you see no interruption.'
+      },
+      q3: {
+        question: 'How is billing calculated?',
+        answer: 'By actual tokens used, measured right at the gateway. Deducted straight from your balance; see per-request detail in Usage. No hidden fees, no maintenance fees.'
+      },
+      q4: {
+        question: 'How do I top up?',
+        answer: 'Domestic bank transfer, e-wallet, or a redeem code. Balance lands in your account right after confirmation.'
+      },
+      q5: {
+        question: 'Is there a rate limit?',
+        answer: 'No hard limit. Each key can set its own spending cap to avoid blowing the budget when running agents.'
+      },
+      q6: {
+        question: 'Is request content stored?',
+        answer: 'By default only token counts and metadata are logged for billing. Prompt and response content is never stored.'
+      }
+    },
+    support: {
+      secnum: '04 / SUPPORT',
+      heading: 'Real people, real answers',
+      telegram: {
+        channel: 'Main channel',
+        title: 'Telegram',
+        desc: 'Technical support group, maintenance notices and new model updates.',
+        responseTime: '● Avg. response in 4 minutes'
+      },
+      zalo: {
+        channel: 'Domestic',
+        title: 'Zalo',
+        desc: 'Support for top-ups, invoices and payment issues in Vietnamese.',
+        hours: '● 08:00 – 24:00 daily'
+      },
+      email: {
+        channel: 'Business',
+        title: 'Email',
+        desc: 'Custom limits, contracts, VAT invoices and shared team accounts.',
+        responseTime: '● Response within 12 hours'
+      },
+      sla: {
+        statusPage: 'Public status page · 12-month incident history',
+        uptimeLabel: '30-day uptime',
+        incidentsLabel: 'critical incidents',
+        updatedLabel: 'updated 04:12'
+      }
+    },
+    cta: {
+      heading: 'Get started in 60 seconds',
+      subtitle: 'No card required · Free trial credit · Cancel anytime',
+      button: 'Get API key →'
+    },
+    footer: {
+      copyright: '© {year} TrumCheat API',
+      links: 'Docs · Status · Terms · Telegram'
     }
   },
 
