@@ -27,7 +27,8 @@ export default {
       eyebrow: '统一 API 网关 · 41 个模型在线',
       titleLine1: '全部模型。',
       titleLine2: '一个 {emphasis}。',
-      titleLine3: '便宜 72%。',
+      titleLine3: '便宜 {pct}%。',
+      titleLine3Plain: '便宜好几倍。',
       subtitle: 'Claude、GPT 和 Gemini 运行在真实订阅账号池上。保留你现在使用的 SDK — 只需修改一行 {code}。',
       ctaPrimary: '免费获取 API key',
       ctaSecondary: '查看价格 ↓',
@@ -62,7 +63,7 @@ export default {
       secnum: '03 / 常见问题',
       heading: '快问快答',
       q1: {
-        question: '为什么能比原价便宜多达 72%？',
+        question: '为什么比原价便宜？',
         answer: '系统运行在按月付费的订阅账号池上，而不是按牌价购买 token。差价直接返还给你。'
       },
       q2: {

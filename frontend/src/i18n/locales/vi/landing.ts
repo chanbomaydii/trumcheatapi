@@ -27,7 +27,8 @@ export default {
       eyebrow: 'Cổng API hợp nhất · 41 model đang phục vụ',
       titleLine1: 'Mọi model.',
       titleLine2: 'Một {emphasis}.',
-      titleLine3: 'Rẻ hơn 72%.',
+      titleLine3: 'Rẻ hơn {pct}%.',
+      titleLine3Plain: 'Rẻ hơn nhiều lần.',
       subtitle: 'Claude, GPT và Gemini chạy trên pool tài khoản subscription thật. Giữ nguyên SDK bạn đang dùng — đổi đúng một dòng {code}.',
       ctaPrimary: 'Lấy API key miễn phí',
       ctaSecondary: 'Xem bảng giá ↓',
@@ -62,7 +63,7 @@ export default {
       secnum: '03 / HỎI ĐÁP',
       heading: 'Hỏi nhanh, đáp thẳng',
       q1: {
-        question: 'Vì sao rẻ hơn giá gốc tới 72%?',
+        question: 'Vì sao rẻ hơn giá gốc?',
         answer: 'Hệ thống chạy trên pool tài khoản subscription trả theo tháng, không mua token lẻ theo giá niêm yết. Phần chênh lệch được chia lại cho bạn.'
       },
       q2: {

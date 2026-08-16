@@ -27,7 +27,8 @@ export default {
       eyebrow: 'Unified API gateway · 41 models live',
       titleLine1: 'Every model.',
       titleLine2: 'One {emphasis}.',
-      titleLine3: '72% cheaper.',
+      titleLine3: '{pct}% cheaper.',
+      titleLine3Plain: 'Dramatically cheaper.',
       subtitle: 'Claude, GPT and Gemini run on real subscription account pools. Keep the SDK you already use — change exactly one line: {code}.',
       ctaPrimary: 'Get a free API key',
       ctaSecondary: 'See pricing ↓',
@@ -62,7 +63,7 @@ export default {
       secnum: '03 / FAQ',
       heading: 'Quick questions, straight answers',
       q1: {
-        question: 'Why is it up to 72% cheaper than list price?',
+        question: 'Why is it cheaper than list price?',
         answer: 'The system runs on a pool of monthly subscription accounts instead of buying tokens at list price. The difference is passed back to you.'
       },
       q2: {

@@ -13,7 +13,10 @@
             <i18n-t keypath="landing.hero.titleLine2" tag="span" scope="global">
               <template #emphasis><em class="not-italic text-[var(--lp-accent)]">endpoint</em></template>
             </i18n-t><br />
-            {{ t('landing.hero.titleLine3') }}
+            <i18n-t v-if="props.savingPct != null" keypath="landing.hero.titleLine3" tag="span" scope="global">
+              <template #pct>{{ props.savingPct }}</template>
+            </i18n-t>
+            <template v-else>{{ t('landing.hero.titleLine3Plain') }}</template>
           </h1>
 
           <p class="mt-[22px] max-w-[56ch] text-xl font-normal leading-[1.55] text-[var(--lp-mute)]">
@@ -53,6 +56,15 @@
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
+
+// The headline's saving claim must be driven by real per-deployment pricing
+// (rate_multiplier), never a fixed number: the live pricing board renders
+// directly beneath this headline with genuine per-model percentages, and an
+// invented figure here could contradict it on the same screen. No caller
+// supplies this yet (a later task wires it from the board's data), so the
+// non-numeric fallback line is what actually renders today -- that is
+// correct, not a placeholder bug.
+const props = defineProps<{ savingPct?: number | null }>()
 
 // NOTE ON REQUIREMENT B: unlike LandingNav, this component does not read
 // appStore.cachedPublicSettings. The approved mockup's <header> block (and
