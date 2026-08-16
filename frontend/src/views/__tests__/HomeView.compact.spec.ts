@@ -46,6 +46,12 @@ function mountHome(settings: Record<string, unknown> = {}) {
         RouterLink: RouterLinkStub,
         LocaleSwitcher: { template: '<div data-testid="locale-switcher" />' },
         Icon: { template: '<span data-testid="icon" />' },
+        // HomeView is a three-mode dispatcher; these specs cover which mode it
+        // picks, not what the default landing page renders. The real
+        // LandingDefault pulls in the whole landing tree (pinia stores plus
+        // live /model-plaza and /public/status calls), none of which this
+        // suite installs — stubbing it keeps the assertions on the dispatch.
+        LandingDefault: { template: '<div data-testid="landing-default" />' },
       },
     },
   })
@@ -97,7 +103,10 @@ describe('HomeView compact mode', () => {
     const wrapper = mountHome(settings)
 
     expect(wrapper.find('[data-testid="compact-home"]').exists()).toBe(false)
-    expect(wrapper.find('.terminal-container').exists()).toBe(true)
+    // Was `.terminal-container`, an incidental class on the old default home
+    // markup that this redesign removed. Same assertion, now against the
+    // default mode's component rather than one of its stylistic details.
+    expect(wrapper.find('[data-testid="landing-default"]').exists()).toBe(true)
   })
 
   it('links unauthenticated visitors to login', () => {
