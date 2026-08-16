@@ -19,11 +19,11 @@ func NewPublicStatusRepository(db *sql.DB) service.PublicStatusRepository {
 }
 
 // bucket_date is indexed, so this stays an index range scan over at most 30
-// days of pre-aggregated rows.
+// days of pre-aggregated rows. bucket_date 需要 ::date 转型保证与 DATE 列一致比较。
 const publicStatusUptimeSQL = `
 SELECT COALESCE(SUM(ok_count), 0), COALESCE(SUM(total_checks), 0)
 FROM channel_monitor_daily_rollups
-WHERE bucket_date >= $1`
+WHERE bucket_date >= $1::date`
 
 func (r *publicStatusRepository) UptimeRatio(ctx context.Context, since time.Time) (int64, int64, error) {
 	if r == nil || r.db == nil {
