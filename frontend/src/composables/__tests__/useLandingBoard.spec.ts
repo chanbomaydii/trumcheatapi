@@ -159,6 +159,66 @@ describe('useLandingBoard', () => {
     expect(b.rows.value.map(r => r.name)).not.toContain('mismatched')
   })
 
+  it('counts distinct model names BEFORE the row filtering', async () => {
+    // 'keeper' survives; the image-billed model and the unpriced model are both
+    // dropped from `rows`. All three are still part of the catalogue, so
+    // modelCount must not shrink to match the rendered rows.
+    const imageModel = model('image-model', 1, 1, { input_price: 1, output_price: 1, cache_write_price: null, cache_read_price: null })
+    imageModel.pricing.image_output_price = 0.05
+    vi.mocked(api.getModelPlaza).mockResolvedValue({
+      description: '',
+      groups: [group({
+        rate_multiplier: 0.28,
+        models: [
+          model('keeper', 15, 75),
+          imageModel,
+          { name: 'unpriced', platform: 'x', pricing: null, official_pricing: null }
+        ]
+      })]
+    } as any)
+    const b = useLandingBoard()
+    await b.load()
+    expect(b.rows.value).toHaveLength(1)
+    expect(b.modelCount.value).toBe(3)
+  })
+
+  it('deduplicates the model count by name across groups', async () => {
+    vi.mocked(api.getModelPlaza).mockResolvedValue({
+      description: '',
+      groups: [
+        group({ id: 1, rate_multiplier: 0.5, models: [model('dup', 15, 75), model('solo', 15, 75)] }),
+        group({ id: 2, rate_multiplier: 0.28, models: [model('dup', 15, 75)] })
+      ]
+    } as any)
+    const b = useLandingBoard()
+    await b.load()
+    expect(b.modelCount.value).toBe(2)
+  })
+
+  it('reports an unknown model count as null, never 0', async () => {
+    // Endpoint off: the fallback rows are canned data and say nothing about
+    // this deployment's catalogue, so the count is unknown rather than zero.
+    vi.mocked(api.getModelPlaza).mockRejectedValue(new Error('404'))
+    const failed = useLandingBoard()
+    await failed.load()
+    expect(failed.modelCount.value).toBeNull()
+
+    // Endpoint on but nothing configured: still unknown, still not 0.
+    vi.mocked(api.getModelPlaza).mockResolvedValue({ description: '', groups: [] } as any)
+    const empty = useLandingBoard()
+    await empty.load()
+    expect(empty.modelCount.value).toBeNull()
+
+    // Groups exist but contain no models at all.
+    vi.mocked(api.getModelPlaza).mockResolvedValue({
+      description: '',
+      groups: [group({ models: [] })]
+    } as any)
+    const noModels = useLandingBoard()
+    await noModels.load()
+    expect(noModels.modelCount.value).toBeNull()
+  })
+
   it('honours the row limit', async () => {
     vi.mocked(api.getModelPlaza).mockResolvedValue({
       description: '',

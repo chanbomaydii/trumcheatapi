@@ -77,12 +77,29 @@ export function useLandingBoard(limit = 5) {
   const rows: Ref<BoardRow[]> = ref([])
   const loading = ref(false)
   const usingFallback = ref(false)
+  /**
+   * Distinct model names in the RAW response, counted before any of the
+   * filtering that produces `rows` (image-billed, unpriced, implausible
+   * saving). `rows.length` is a strict undercount of the catalogue and must
+   * never be used as "how many models we serve".
+   *
+   * null means "unknown" — a failed request, a switched-off endpoint, or a
+   * response with no models at all. Never 0: callers drop the figure entirely
+   * rather than claim a catalogue of zero.
+   */
+  const modelCount = ref<number | null>(null)
 
   async function load(): Promise<void> {
     loading.value = true
     try {
       const data = await getModelPlaza()
       const groups = data?.groups ?? []
+
+      const names = new Set<string>()
+      for (const g of groups) {
+        for (const m of g.models ?? []) names.add(m.name)
+      }
+      modelCount.value = names.size > 0 ? names.size : null
 
       // An empty group list means the endpoint has nothing configured —
       // that is "nothing usable", same as a network failure below.
@@ -115,10 +132,13 @@ export function useLandingBoard(limit = 5) {
     } catch {
       rows.value = FALLBACK_ROWS.slice(0, limit)
       usingFallback.value = true
+      // The fallback rows are canned demo data, so their names say nothing
+      // about this deployment's catalogue.
+      modelCount.value = null
     } finally {
       loading.value = false
     }
   }
 
-  return { rows, loading, usingFallback, load }
+  return { rows, loading, usingFallback, modelCount, load }
 }

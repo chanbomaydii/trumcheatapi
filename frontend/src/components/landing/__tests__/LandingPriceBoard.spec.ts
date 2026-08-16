@@ -1,9 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { mount, flushPromises } from '@vue/test-utils'
+import { describe, it, expect, vi } from 'vitest'
+import { mount } from '@vue/test-utils'
 import LandingPriceBoard from '../LandingPriceBoard.vue'
-import * as api from '@/api/modelPlaza'
-
-vi.mock('@/api/modelPlaza')
+import type { BoardRow } from '@/composables/useLandingBoard'
 
 // LandingPriceBoard calls useI18n() directly (matching the other landing/*
 // components), which requires an installed i18n plugin unless the module
@@ -23,27 +21,31 @@ const mountOpts = {
   }
 }
 
+// The component is purely presentational now — LandingDefault owns the fetch and
+// passes rows down — so these specs supply BoardRow values directly instead of
+// mocking /model-plaza. The price maths that produces those values (rate
+// multipliers, saving percentage, filtering, fallback) is covered end to end by
+// composables/__tests__/useLandingBoard.spec.ts; nothing is lost by not routing
+// this component's rendering assertions through it.
+function row(overrides: Partial<BoardRow> = {}): BoardRow {
+  return {
+    name: 'claude-opus-5',
+    platform: 'anthropic',
+    inputOfficial: 15,
+    inputActual: 4.2,
+    outputOfficial: 75,
+    outputActual: 21,
+    savingPct: 72,
+    ...overrides
+  }
+}
+
 describe('LandingPriceBoard', () => {
-  beforeEach(() => vi.resetAllMocks())
-
-  it('renders a row per model with both prices, name uppercased via FlapText', async () => {
-    vi.mocked(api.getModelPlaza).mockResolvedValue({
-      description: '',
-      groups: [{
-        id: 1, name: 'g', description: '', platform: 'anthropic', subscription_type: 'standard',
-        rate_multiplier: 0.28, peak_rate_enabled: false, peak_start: '', peak_end: '',
-        peak_rate_multiplier: 1, is_exclusive: false, image_rate_independent: false,
-        image_rate_multiplier: 1,
-        models: [{
-          name: 'claude-opus-5', platform: 'anthropic',
-          pricing: { billing_mode: 'token', input_price: 15, output_price: 75, cache_write_price: null, cache_read_price: null, image_input_price: null, image_output_price: null, per_request_price: null, intervals: [] },
-          official_pricing: { input_price: 15, output_price: 75, cache_write_price: null, cache_read_price: null }
-        }]
-      }]
-    } as any)
-
-    const w = mount(LandingPriceBoard, mountOpts)
-    await flushPromises()
+  it('renders a row per model with both prices, name uppercased via FlapText', () => {
+    const w = mount(LandingPriceBoard, {
+      ...mountOpts,
+      props: { rows: [row()], usingFallback: false }
+    })
 
     // Names are routed through FlapText uppercased, so assert the uppercase form.
     expect(w.text()).toContain('CLAUDE-OPUS-5')
@@ -51,52 +53,43 @@ describe('LandingPriceBoard', () => {
     expect(w.text()).toContain('72')
   })
 
-  it('flags the board as reference data when the endpoint is off', async () => {
-    vi.mocked(api.getModelPlaza).mockRejectedValue(new Error('404'))
-    const w = mount(LandingPriceBoard, mountOpts)
-    await flushPromises()
+  it('labels the board as live data when the rows came from the endpoint', () => {
+    const w = mount(LandingPriceBoard, {
+      ...mountOpts,
+      props: { rows: [row()], usingFallback: false }
+    })
+    expect(w.html()).toContain('landing.board.liveLabel')
+    expect(w.html()).not.toContain('landing.board.referenceLabel')
+  })
+
+  it('flags the board as reference data when the endpoint is off', () => {
+    const w = mount(LandingPriceBoard, {
+      ...mountOpts,
+      props: { rows: [row()], usingFallback: true }
+    })
     expect(w.html()).toContain('landing.board.referenceLabel')
     expect(w.html()).not.toContain('landing.board.liveLabel')
   })
 
-  it('hides the saving badge when official pricing is missing, row still renders', async () => {
-    vi.mocked(api.getModelPlaza).mockResolvedValue({
-      description: '',
-      groups: [{
-        id: 1, name: 'g', description: '', platform: 'x', subscription_type: 'standard',
-        rate_multiplier: 0.5, peak_rate_enabled: false, peak_start: '', peak_end: '',
-        peak_rate_multiplier: 1, is_exclusive: false, image_rate_independent: false,
-        image_rate_multiplier: 1,
-        models: [{
-          name: 'no-ref', platform: 'x',
-          pricing: { billing_mode: 'token', input_price: 2, output_price: 4, cache_write_price: null, cache_read_price: null, image_input_price: null, image_output_price: null, per_request_price: null, intervals: [] },
-          official_pricing: null
-        }]
-      }]
-    } as any)
-
-    const w = mount(LandingPriceBoard, mountOpts)
-    await flushPromises()
+  it('hides the saving badge when official pricing is missing, row still renders', () => {
+    const w = mount(LandingPriceBoard, {
+      ...mountOpts,
+      props: {
+        rows: [row({ name: 'no-ref', platform: 'x', inputOfficial: null, outputOfficial: null, savingPct: null })],
+        usingFallback: false
+      }
+    })
     expect(w.text()).toContain('NO-REF')
     expect(w.find('[data-testid="saving-badge"]').exists()).toBe(false)
   })
 
-  it('renders nothing when the API succeeds but every row is filtered out', async () => {
-    vi.mocked(api.getModelPlaza).mockResolvedValue({
-      description: '',
-      groups: [{
-        id: 1, name: 'g', description: '', platform: 'x', subscription_type: 'standard',
-        rate_multiplier: 0.5, peak_rate_enabled: false, peak_start: '', peak_end: '',
-        peak_rate_multiplier: 1, is_exclusive: false, image_rate_independent: false,
-        image_rate_multiplier: 1,
-        // No models at all: a non-empty group list with nothing usable inside
-        // is a legitimate zero-row result, NOT a fallback (see useLandingBoard).
-        models: []
-      }]
-    } as any)
-
-    const w = mount(LandingPriceBoard, mountOpts)
-    await flushPromises()
+  it('renders nothing when the API succeeds but every row is filtered out', () => {
+    // A non-empty group list with nothing usable inside is a legitimate
+    // zero-row result, NOT a fallback (see useLandingBoard).
+    const w = mount(LandingPriceBoard, {
+      ...mountOpts,
+      props: { rows: [], usingFallback: false }
+    })
 
     // No board header, no table, no fallback relabel — the section must not exist at all.
     expect(w.html()).not.toContain('landing.board.liveLabel')
@@ -105,24 +98,11 @@ describe('LandingPriceBoard', () => {
     expect(w.find('section').exists()).toBe(false)
   })
 
-  it('labels the saving column/badge as measuring the output price specifically', async () => {
-    vi.mocked(api.getModelPlaza).mockResolvedValue({
-      description: '',
-      groups: [{
-        id: 1, name: 'g', description: '', platform: 'anthropic', subscription_type: 'standard',
-        rate_multiplier: 0.28, peak_rate_enabled: false, peak_start: '', peak_end: '',
-        peak_rate_multiplier: 1, is_exclusive: false, image_rate_independent: false,
-        image_rate_multiplier: 1,
-        models: [{
-          name: 'claude-opus-5', platform: 'anthropic',
-          pricing: { billing_mode: 'token', input_price: 15, output_price: 75, cache_write_price: null, cache_read_price: null, image_input_price: null, image_output_price: null, per_request_price: null, intervals: [] },
-          official_pricing: { input_price: 15, output_price: 75, cache_write_price: null, cache_read_price: null }
-        }]
-      }]
-    } as any)
-
-    const w = mount(LandingPriceBoard, mountOpts)
-    await flushPromises()
+  it('labels the saving column/badge as measuring the output price specifically', () => {
+    const w = mount(LandingPriceBoard, {
+      ...mountOpts,
+      props: { rows: [row()], usingFallback: false }
+    })
 
     // The bare percentage alone would read as a whole-row claim; the wording
     // must name the output price specifically (see useLandingBoard.ts comment).

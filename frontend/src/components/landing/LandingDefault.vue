@@ -3,7 +3,7 @@
     <LandingStatusStrip :uptime-text="uptimeText" :ttft-text="ttftText" />
     <LandingNav />
     <LandingHero :saving-pct="savingPct" :model-count="modelCount" :updated-at="updatedAt" />
-    <LandingPriceBoard />
+    <LandingPriceBoard :rows="rows" :using-fallback="usingFallback" />
     <!--
       LandingPriceBoard carries its own `mx-auto max-w-[1200px] px-6 sm:px-10`
       container, LandingStats does not (it is a bare full-bleed grid), so only
@@ -11,7 +11,7 @@
       and shrink the board by one extra gutter on each side.
     -->
     <div class="mx-auto w-full max-w-[1200px] px-6 sm:px-10">
-      <LandingStats :model-count="modelCount" />
+      <LandingStats :model-count="modelCount" :uptime-text="uptimeText" :ttft-text="ttftText" />
     </div>
     <LandingSteps :model-count="modelCount" />
     <LandingCompat />
@@ -35,22 +35,26 @@ import LandingSupport from './LandingSupport.vue'
 import LandingCta from './LandingCta.vue'
 import { useLandingBoard } from '@/composables/useLandingBoard'
 import { useLandingStatus } from '@/composables/useLandingStatus'
-import { getModelPlaza } from '@/api/modelPlaza'
 
-// Page-level figures only. The pricing board renders its own five-row view; this
-// instance is unbounded on purpose because a median taken over the board's top
-// five rows would be a median of the five best savings, not a typical figure.
-const { rows, usingFallback, load: loadBoard } = useLandingBoard(Number.MAX_SAFE_INTEGER)
+// This component is the SINGLE owner of landing data fetching: exactly one
+// /model-plaza request and one /public/status request per page load, pushed
+// down to the presentational sections as props. The sections must not fetch
+// for themselves. Both endpoints share one per-IP rate-limit bucket, so every
+// duplicate request lowers the number of page loads an IP (office NAT, CGNAT,
+// crawler fleet) gets before a 429 — and a 429 makes useLandingBoard fall back
+// to static rows, which trips the honesty gates below and strips the page of
+// every figure it was built to show.
+//
+// Unbounded limit: the board displays five rows, but savingPct below is a
+// median over the whole comparable catalogue. useLandingBoard sorts by saving
+// descending, so a median over the top five would be a median of the five best
+// savings, not a typical figure. LandingPriceBoard slices what it displays.
+const { rows, usingFallback, modelCount, load: loadBoard } = useLandingBoard(Number.MAX_SAFE_INTEGER)
 
-// The strip and the stats tiles show the same two figures. LandingStats loads
-// them itself, so this instance exists purely to feed LandingStatusStrip, and
-// the values are passed through untouched — including null, which is what makes
-// the strip render its numberless variant instead of inventing a figure.
+// Same two figures feed LandingStatusStrip and LandingStats. Fetched once,
+// passed through untouched — including null, which is what makes both render
+// their numberless variants instead of inventing a figure.
 const { uptimeText, ttftText, load: loadStatus } = useLandingStatus()
-
-// null means "unknown", which makes LandingStats drop the tile and the hero drop
-// its eyebrow count, rather than printing a zero.
-const modelCount = ref<number | null>(null)
 
 // Formatted clock for the hero. null whenever the prices on screen are not
 // demonstrably live — a "last updated" clock above canned data is a false claim.
@@ -80,24 +84,8 @@ function formatClock(date: Date): string {
   return `${hours}:${minutes}`
 }
 
-async function loadModelCount(): Promise<void> {
-  try {
-    const data = await getModelPlaza()
-    const names = new Set<string>()
-    for (const group of data.groups ?? []) {
-      for (const model of group.models ?? []) names.add(model.name)
-    }
-    // Never 0 as a stand-in for unknown: an endpoint that returns nothing means
-    // we do not know the catalogue size, not that the catalogue is empty.
-    modelCount.value = names.size > 0 ? names.size : null
-  } catch {
-    modelCount.value = null
-  }
-}
-
 onMounted(async () => {
   void loadStatus()
-  void loadModelCount()
 
   await loadBoard()
   // Only stamp the clock when the prices really came back live. `usingFallback`

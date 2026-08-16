@@ -104,17 +104,22 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import FlapText from './FlapText.vue'
-import { useLandingBoard } from '@/composables/useLandingBoard'
+import type { BoardRow } from '@/composables/useLandingBoard'
 
 const { t } = useI18n()
-const { rows, usingFallback, load } = useLandingBoard(5)
+
+// Purely presentational. This component used to own a useLandingBoard()
+// instance, which meant the landing page fetched /model-plaza once here and
+// again in LandingDefault. Both endpoints share one per-IP rate-limit bucket,
+// and a 429 makes useLandingBoard fall back to static rows, which in turn
+// trips the honesty gates that blank the hero figures and the stat tiles — so
+// the redundant fetch actively degraded the page it was duplicating work for.
+// LandingDefault is now the single owner of fetching and passes data down.
+defineProps<{ rows: BoardRow[]; usingFallback: boolean }>()
 
 function money(value: number): string {
   return `$${value.toFixed(2)}`
 }
-
-onMounted(load)
 </script>

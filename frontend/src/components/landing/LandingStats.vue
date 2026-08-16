@@ -25,14 +25,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useLandingStatus } from '@/composables/useLandingStatus'
 
-const props = defineProps<{ modelCount: number | null }>()
+// Purely presentational. This component used to own a useLandingStatus()
+// instance, so /public/status was fetched here AND in LandingDefault (which
+// needs the same two figures for LandingStatusStrip). Both landing endpoints
+// share a single per-IP rate-limit bucket, so the duplicate spent the visitor's
+// allowance twice over for identical data — and could in principle show a
+// figure that disagrees with the strip if the two responses straddled a
+// refresh. LandingDefault now fetches once and passes the values down.
+const props = defineProps<{
+  modelCount: number | null
+  uptimeText: string | null
+  ttftText: string | null
+}>()
 
 const { t } = useI18n()
-const { uptimeText, ttftText, load } = useLandingStatus()
 
 // A tile with no data is dropped entirely rather than rendered as 0 or "—":
 // an invented figure on a page whose whole pitch is transparency is worse than
@@ -44,15 +53,13 @@ const tiles = computed(() => {
   if (props.modelCount !== null) {
     out.push({ key: 'models', value: String(props.modelCount), label: t('landing.stats.models') })
   }
-  if (uptimeText.value !== null) {
-    out.push({ key: 'uptime', value: uptimeText.value, label: t('landing.stats.uptime') })
+  if (props.uptimeText !== null) {
+    out.push({ key: 'uptime', value: props.uptimeText, label: t('landing.stats.uptime') })
   }
-  if (ttftText.value !== null) {
-    out.push({ key: 'ttft', value: ttftText.value, label: t('landing.stats.ttft') })
+  if (props.ttftText !== null) {
+    out.push({ key: 'ttft', value: props.ttftText, label: t('landing.stats.ttft') })
   }
   out.push({ key: 'formats', value: '3', label: t('landing.stats.formats') })
   return out
 })
-
-onMounted(load)
 </script>
