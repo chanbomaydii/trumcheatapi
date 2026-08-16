@@ -24,9 +24,15 @@ export default {
     },
     strip: {
       status: 'Tất cả hệ thống hoạt động',
+      // Hiển thị khi uptime thực đo thấp hơn ngưỡng vận hành bình thường.
+      statusDegraded: 'Dịch vụ đang suy giảm',
       statusUptime: 'uptime {uptime}',
       latency: 'hà nội ⇄ us-east',
-      latencyTtft: 'độ trễ cổng {ttft}'
+      // Phải trùng nghĩa với ô thống kê "TTFT trung vị 24h": cùng một con số
+      // không được mang hai tên gọi trên cùng một màn hình. "Độ trễ cổng" là
+      // nhãn đã bị bỏ — không có gì đo overhead của cổng, và TTFT bao gồm cả
+      // thời gian model sinh token.
+      latencyTtft: 'TTFT {ttft}'
     },
     nav: {
       modelBoard: 'Bảng model',

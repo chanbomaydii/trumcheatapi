@@ -23,9 +23,14 @@ export default {
     },
     strip: {
       status: '所有系统正常运行',
+      // 实测可用率低于正常运行阈值时显示。
+      statusDegraded: '服务降级中',
       statusUptime: '正常运行率 {uptime}',
       latency: '河内 ⇄ us-east',
-      latencyTtft: '网关延迟 {ttft}'
+      // 必须与"24 小时 TTFT 中位数"数据卡片同义：同一个数字不能在同一屏上
+      // 有两种含义。"网关延迟"是已废弃的说法 — 没有任何指标测量网关自身开销，
+      // 而 TTFT 包含模型生成时间。
+      latencyTtft: 'TTFT {ttft}'
     },
     nav: {
       modelBoard: '模型看板',

@@ -1,6 +1,6 @@
 <template>
   <div class="lp-root flex min-h-screen flex-col">
-    <LandingStatusStrip :uptime-text="uptimeText" :ttft-text="ttftText" />
+    <LandingStatusStrip :uptime-text="uptimeText" :ttft-text="ttftText" :status-level="statusLevel" />
     <LandingNav />
     <LandingHero :saving-pct="savingPct" :model-count="modelCount" :updated-at="updatedAt" />
     <LandingPriceBoard :rows="rows" :using-fallback="usingFallback" />
@@ -54,7 +54,7 @@ const { rows, usingFallback, modelCount, load: loadBoard } = useLandingBoard(Num
 // Same two figures feed LandingStatusStrip and LandingStats. Fetched once,
 // passed through untouched — including null, which is what makes both render
 // their numberless variants instead of inventing a figure.
-const { uptimeText, ttftText, load: loadStatus } = useLandingStatus()
+const { uptimeText, ttftText, statusLevel, load: loadStatus } = useLandingStatus()
 
 // Formatted clock for the hero. null whenever the prices on screen are not
 // demonstrably live — a "last updated" clock above canned data is a false claim.

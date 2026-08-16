@@ -24,9 +24,15 @@ export default {
     },
     strip: {
       status: 'All systems operational',
+      // Shown when the measured uptime ratio falls below the operational bar.
+      statusDegraded: 'Degraded service',
       statusUptime: '{uptime} uptime',
       latency: 'Hanoi ⇄ us-east',
-      latencyTtft: '{ttft} gateway latency'
+      // Must mean the same thing as the "24h median TTFT" stat tile: one number
+      // cannot carry two names on one screen. "Gateway latency" is the abolished
+      // label — nothing measures gateway overhead, and TTFT includes the model's
+      // own generation time.
+      latencyTtft: 'TTFT {ttft}'
     },
     nav: {
       modelBoard: 'Model board',

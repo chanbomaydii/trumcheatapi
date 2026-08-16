@@ -39,7 +39,10 @@ interface BoardState {
 
 const boardLoad = vi.fn()
 
-function stubComposables(board: BoardState = {}, status: { uptimeText?: string | null; ttftText?: string | null } = {}) {
+function stubComposables(
+  board: BoardState = {},
+  status: { uptimeText?: string | null; ttftText?: string | null; statusLevel?: 'operational' | 'degraded' | null } = {}
+) {
   boardLoad.mockResolvedValue(undefined)
   vi.mocked(useLandingBoard).mockReturnValue({
     rows: ref(board.rows ?? []),
@@ -52,6 +55,7 @@ function stubComposables(board: BoardState = {}, status: { uptimeText?: string |
   vi.mocked(useLandingStatus).mockReturnValue({
     uptimeText: ref(status.uptimeText ?? null),
     ttftText: ref(status.ttftText ?? null),
+    statusLevel: ref(status.statusLevel ?? null),
     load: vi.fn().mockResolvedValue(undefined)
   } as unknown as ReturnType<typeof useLandingStatus>)
 }
@@ -174,6 +178,13 @@ describe('LandingDefault', () => {
       expect(w.findComponent(LandingStats).props('ttftText')).toBe('< 1,0 s')
     })
 
+    it('passes the derived status level to the strip so the light matches the number', async () => {
+      stubComposables({ rows: [boardRow(70)] }, { uptimeText: '72,00%', statusLevel: 'degraded' })
+      const w = await mountDefault()
+
+      expect(w.findComponent(LandingStatusStrip).props('statusLevel')).toBe('degraded')
+    })
+
     it('passes null through untouched so both render their numberless variant', async () => {
       stubComposables({ rows: [boardRow(70)] }, { uptimeText: null, ttftText: null })
       const w = await mountDefault()
@@ -190,6 +201,7 @@ describe('LandingDefault', () => {
       vi.mocked(useLandingStatus).mockReturnValue({
         uptimeText: ref(null),
         ttftText: ref(null),
+        statusLevel: ref(null),
         load: statusLoad
       } as unknown as ReturnType<typeof useLandingStatus>)
 
