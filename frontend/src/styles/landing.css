@@ -1,0 +1,91 @@
+/* Landing page design tokens.
+ *
+ * Direction matters: :root carries the LIGHT palette and .dark overrides it,
+ * because tailwind.config.js sets darkMode:'class'. The approved mockup is
+ * written the other way round (dark-first with data-theme="light") purely
+ * because that was convenient for screenshots — do not copy its direction.
+ *
+ * The board, the flap tiles and the code block stay dark in BOTH modes: a real
+ * departure board is dark with lit characters, and inverting it turns the
+ * signature element into a spreadsheet.
+ */
+@import '@fontsource/barlow-condensed/400.css';
+@import '@fontsource/barlow-condensed/600.css';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/700.css';
+
+:root {
+  --lp-bg: #f7f7f4;
+  --lp-panel: #ffffff;
+  --lp-ink: #14161a;
+  --lp-dim: #6a6d75;
+  --lp-mute: #5d6069;
+  --lp-line: #e3e3de;
+  --lp-accent: #0d9488;
+  --lp-accent-ink: #ffffff;
+  --lp-accent-soft: rgba(13, 148, 136, 0.1);
+  --lp-ok: #15803d;
+  --lp-warn: #b45309;
+
+  /* Always dark, both modes. */
+  --lp-board-bg: #121317;
+  --lp-board-head: #0f1013;
+  --lp-board-ink: #f2ede0;
+  --lp-board-dim: #7b7d86;
+  --lp-board-line: #26272e;
+  --lp-board-line-soft: #1a1b20;
+  --lp-tile: #1c1d22;
+  --lp-seam: #0b0c0e;
+  --lp-code-bg: #0f1013;
+}
+
+.dark {
+  --lp-bg: #0b0c0e;
+  --lp-panel: #121317;
+  --lp-ink: #f1efe9;
+  --lp-dim: #7b7d86;
+  --lp-mute: #96938a;
+  --lp-line: #26272e;
+  --lp-accent: #14b8a6;
+  --lp-accent-ink: #04201d;
+  --lp-accent-soft: rgba(20, 184, 166, 0.14);
+  --lp-ok: #3ddc84;
+  --lp-warn: #f5a524;
+}
+
+.lp-root {
+  background: var(--lp-bg);
+  color: var(--lp-ink);
+  font-family: 'Barlow Condensed', system-ui, sans-serif;
+}
+
+.lp-mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Vietnamese stacked diacritics (Ẳ, Ệ, Ỗ, Ữ) get clipped below 1.14. */
+.lp-root h1 { line-height: 1.06; }
+.lp-root h2 { line-height: 1.14; }
+
+.flaps { display: inline-flex; gap: 2px; }
+.flap {
+  position: relative;
+  width: 19px;
+  padding: 6px 0;
+  border-radius: 2px;
+  background: var(--lp-tile);
+  color: var(--lp-board-ink);
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+}
+.flap::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  height: 1px;
+  background: var(--lp-seam);
+}
+.flap--space { width: 8px; background: transparent; }
