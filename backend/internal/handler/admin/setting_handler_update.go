@@ -346,6 +346,9 @@ type UpdateSettingsRequest struct {
 	ModelPlazaRequireAuth *bool   `json:"model_plaza_require_auth"`
 	ModelPlazaDescription *string `json:"model_plaza_description"`
 
+	// Public status endpoint feature switch (landing-page uptime/TTFT tiles)
+	PublicStatusEnabled *bool `json:"public_status_enabled"`
+
 	// Affiliate (邀请返利) feature switch
 	AffiliateEnabled *bool `json:"affiliate_enabled"`
 
@@ -1931,6 +1934,12 @@ func (h *SettingHandler) UpdateSettings(c *gin.Context) {
 			}
 			return previousSettings.ModelPlazaDescription
 		}(),
+		PublicStatusEnabled: func() bool {
+			if req.PublicStatusEnabled != nil {
+				return *req.PublicStatusEnabled
+			}
+			return previousSettings.PublicStatusEnabled
+		}(),
 		AffiliateEnabled: func() bool {
 			if req.AffiliateEnabled != nil {
 				return *req.AffiliateEnabled
@@ -2352,6 +2361,8 @@ func (h *SettingHandler) UpdateSettings(c *gin.Context) {
 		ModelPlazaEnabled:     updatedSettings.ModelPlazaEnabled,
 		ModelPlazaRequireAuth: updatedSettings.ModelPlazaRequireAuth,
 		ModelPlazaDescription: updatedSettings.ModelPlazaDescription,
+
+		PublicStatusEnabled: updatedSettings.PublicStatusEnabled,
 
 		AffiliateEnabled: updatedSettings.AffiliateEnabled,
 

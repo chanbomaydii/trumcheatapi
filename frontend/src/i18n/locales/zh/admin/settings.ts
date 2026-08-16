@@ -49,6 +49,12 @@ export default {
           priceDescription: '价格说明（Markdown）',
           priceDescriptionHint: '展示在模型广场页面顶部，可用于说明计费规则、汇率、优惠活动等。',
         },
+        publicStatus: {
+          title: '公开状态接口',
+          description: '向匿名访客公开 30 天可用率与 24 小时 TTFT 中位数（分桶上界），为首页状态条和数据卡片提供数据。默认关闭。',
+          enabled: '启用公开状态接口',
+          enabledHint: '关闭后 GET /api/v1/public/status 返回 404，首页直接省略可用率与 TTFT 数字。接口只输出比率和分桶上界，从不输出请求数量，因此无法据此反推流量规模。',
+        },
         riskControl: {
           title: '风控中心',
           description: '启用内容审计菜单和全端点请求审核入口。默认关闭。',

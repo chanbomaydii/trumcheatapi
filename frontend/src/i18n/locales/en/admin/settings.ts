@@ -49,6 +49,12 @@ export default {
           priceDescription: 'Pricing notes (Markdown)',
           priceDescriptionHint: 'Rendered at the top of the plaza page. Use it for billing rules, exchange rates, promotions, etc.',
         },
+        publicStatus: {
+          title: 'Public Status Endpoint',
+          description: 'Publishes a 30-day uptime ratio and a bucketed 24h median TTFT to anonymous visitors, powering the landing page status strip and stat tiles. Disabled by default.',
+          enabled: 'Enable public status endpoint',
+          enabledHint: 'When off, GET /api/v1/public/status returns 404 and the landing page simply omits the uptime and TTFT figures. Only ratios and bucket bounds are ever published — never request counts, so traffic volume cannot be inferred.',
+        },
         riskControl: {
           title: 'Risk Control',
           description: 'Enable the content moderation menu and gateway audit entry point. Disabled by default.',
