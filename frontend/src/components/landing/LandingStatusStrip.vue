@@ -24,8 +24,8 @@
           }}<template v-if="uptimeText"> · {{ t('landing.strip.statusUptime', { uptime: uptimeText }) }}</template>
         </template>
       </div>
-      <div>
-        {{ t('landing.strip.latency') }}<template v-if="ttftText"> · {{ t('landing.strip.latencyTtft', { ttft: ttftText }) }}</template>
+      <div v-if="ttftText">
+        {{ t('landing.strip.latencyTtft', { ttft: ttftText }) }}
       </div>
     </div>
   </div>

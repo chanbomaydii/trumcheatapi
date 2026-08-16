@@ -8,7 +8,7 @@ export default {
       formats: 'Compatible API formats'
     },
     board: {
-      liveLabel: 'Live pricing board — updated every 60s',
+      liveLabel: 'Live pricing read at page load',
       unit: 'USD / 1M tokens',
       columns: {
         model: 'Model',
@@ -26,11 +26,8 @@ export default {
       // Shown when the measured uptime ratio falls below the operational bar.
       statusDegraded: 'Degraded service',
       statusUptime: '{uptime} uptime',
-      latency: 'Hanoi ⇄ us-east',
       // Must mean the same thing as the "24h median TTFT" stat tile: one number
-      // cannot carry two names on one screen. "Gateway latency" is the abolished
-      // label — nothing measures gateway overhead, and TTFT includes the model's
-      // own generation time.
+      // cannot carry two names on one screen.
       latencyTtft: 'TTFT {ttft}'
     },
     nav: {
@@ -136,7 +133,7 @@ export default {
     },
     footer: {
       copyright: '© {year} {siteName}',
-      links: 'Docs · Status · Terms · Telegram'
+      links: 'Docs · Terms · Telegram'
     }
   },
 

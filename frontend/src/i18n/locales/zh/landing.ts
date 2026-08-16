@@ -8,7 +8,7 @@ export default {
       formats: '兼容 API 格式'
     },
     board: {
-      liveLabel: '实时价格看板 — 每 60 秒更新',
+      liveLabel: '实时价格 — 页面加载时读取',
       unit: 'USD / 1M Token',
       columns: {
         model: 'Model',
@@ -25,10 +25,8 @@ export default {
       // 实测可用率低于正常运行阈值时显示。
       statusDegraded: '服务降级中',
       statusUptime: '正常运行率 {uptime}',
-      latency: '河内 ⇄ us-east',
       // 必须与"24 小时 TTFT 中位数"数据卡片同义：同一个数字不能在同一屏上
-      // 有两种含义。"网关延迟"是已废弃的说法 — 没有任何指标测量网关自身开销，
-      // 而 TTFT 包含模型生成时间。
+      // 有两种含义。
       latencyTtft: 'TTFT {ttft}'
     },
     nav: {
@@ -134,7 +132,7 @@ export default {
     },
     footer: {
       copyright: '© {year} {siteName}',
-      links: '文档 · 状态 · 条款 · Telegram'
+      links: '文档 · 条款 · Telegram'
     }
   },
 

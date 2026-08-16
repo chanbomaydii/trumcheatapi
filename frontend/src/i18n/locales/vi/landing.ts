@@ -8,7 +8,7 @@ export default {
       formats: 'Định dạng API tương thích'
     },
     board: {
-      liveLabel: 'Bảng giá trực tiếp — cập nhật mỗi 60 giây',
+      liveLabel: 'Bảng giá trực tiếp được đọc tại lúc tải trang',
       unit: 'USD / 1 triệu token',
       columns: {
         model: 'Model',
@@ -26,11 +26,8 @@ export default {
       // Hiển thị khi uptime thực đo thấp hơn ngưỡng vận hành bình thường.
       statusDegraded: 'Dịch vụ đang suy giảm',
       statusUptime: 'uptime {uptime}',
-      latency: 'hà nội ⇄ us-east',
       // Phải trùng nghĩa với ô thống kê "TTFT trung vị 24h": cùng một con số
-      // không được mang hai tên gọi trên cùng một màn hình. "Độ trễ cổng" là
-      // nhãn đã bị bỏ — không có gì đo overhead của cổng, và TTFT bao gồm cả
-      // thời gian model sinh token.
+      // không được mang hai tên gọi trên cùng một màn hình.
       latencyTtft: 'TTFT {ttft}'
     },
     nav: {
@@ -136,7 +133,7 @@ export default {
     },
     footer: {
       copyright: '© {year} {siteName}',
-      links: 'Tài liệu · Trạng thái · Điều khoản · Telegram'
+      links: 'Tài liệu · Điều khoản · Telegram'
     }
   },
 
