@@ -9,7 +9,6 @@ export default {
     },
     board: {
       liveLabel: 'Bảng giá trực tiếp — cập nhật mỗi 60 giây',
-      referenceLabel: 'Bảng giá tham khảo',
       unit: 'USD / 1 triệu token',
       columns: {
         model: 'Model',

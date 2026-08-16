@@ -133,12 +133,40 @@ describe('useLandingBoard', () => {
     expect(b.rows.value[0].savingPct).toBe(72)
   })
 
-  it('falls back to static rows when the endpoint is off', async () => {
+  it('produces no rows at all when the endpoint is off', async () => {
+    // This case used to assert the opposite: that a failed request substituted
+    // four canned rows with invented model names, invented prices and
+    // savingPct: 72 — the exact figure stripped from the headline earlier in
+    // this branch. The board relabelled itself "reference pricing" when it did,
+    // but a visitor cannot tell "reference" from "this site's prices", so the
+    // rows were published as fact. With no rows the board hides itself.
     vi.mocked(api.getModelPlaza).mockRejectedValue(new Error('404'))
     const b = useLandingBoard()
     await b.load()
-    expect(b.usingFallback.value).toBe(true)
-    expect(b.rows.value.length).toBeGreaterThan(0)
+    expect(b.rows.value).toHaveLength(0)
+  })
+
+  it('produces no rows when the endpoint answers with nothing configured', async () => {
+    vi.mocked(api.getModelPlaza).mockResolvedValue({ description: '', groups: [] } as any)
+    const b = useLandingBoard()
+    await b.load()
+    expect(b.rows.value).toHaveLength(0)
+  })
+
+  it('never invents a model name the endpoint did not return', async () => {
+    // The deleted fallback set is the specific thing this guards against.
+    vi.mocked(api.getModelPlaza).mockRejectedValue(new Error('500'))
+    const failed = useLandingBoard()
+    await failed.load()
+
+    vi.mocked(api.getModelPlaza).mockResolvedValue({ description: '', groups: [] } as any)
+    const empty = useLandingBoard()
+    await empty.load()
+
+    const names = [...failed.rows.value, ...empty.rows.value].map((r) => r.name)
+    for (const invented of ['claude-opus-5', 'claude-sonnet-4.5', 'gpt-5.6-sol', 'gemini-3-pro']) {
+      expect(names).not.toContain(invented)
+    }
   })
 
   it('computes saving against official price, not against our own base price', async () => {
@@ -196,8 +224,8 @@ describe('useLandingBoard', () => {
   })
 
   it('reports an unknown model count as null, never 0', async () => {
-    // Endpoint off: the fallback rows are canned data and say nothing about
-    // this deployment's catalogue, so the count is unknown rather than zero.
+    // Endpoint off: nothing is known about this deployment's catalogue, so the
+    // count is unknown rather than a claim of zero models.
     vi.mocked(api.getModelPlaza).mockRejectedValue(new Error('404'))
     const failed = useLandingBoard()
     await failed.load()

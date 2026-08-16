@@ -9,7 +9,6 @@ export default {
     },
     board: {
       liveLabel: 'Live pricing board — updated every 60s',
-      referenceLabel: 'Reference pricing board',
       unit: 'USD / 1M tokens',
       columns: {
         model: 'Model',

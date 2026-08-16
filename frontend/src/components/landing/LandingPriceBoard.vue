@@ -25,8 +25,14 @@
         <div
           class="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--lp-board-line)] bg-[var(--lp-board-head)] px-[22px] py-[14px]"
         >
+          <!--
+            Unconditionally the live label: every row that reaches this table
+            now comes from the pricing endpoint. The "reference pricing"
+            alternative existed only to caption a set of invented rows, and a
+            visitor could not tell "reference" from "this site's prices" anyway.
+          -->
           <span class="lp-mono text-[11px] uppercase tracking-[0.24em] text-[var(--lp-board-dim)]">
-            {{ usingFallback ? t('landing.board.referenceLabel') : t('landing.board.liveLabel') }}
+            {{ t('landing.board.liveLabel') }}
           </span>
           <span class="lp-mono text-[11px] uppercase tracking-[0.24em] text-[var(--lp-board-dim)]">
             {{ t('landing.board.unit') }}
@@ -127,7 +133,7 @@ const { t } = useI18n()
 // trips the honesty gates that blank the hero figures and the stat tiles — so
 // the redundant fetch actively degraded the page it was duplicating work for.
 // LandingDefault is now the single owner of fetching and passes data down.
-defineProps<{ rows: BoardRow[]; usingFallback: boolean }>()
+defineProps<{ rows: BoardRow[] }>()
 
 function money(value: number): string {
   return `$${value.toFixed(2)}`

@@ -14,16 +14,19 @@ export interface BoardRow {
 }
 
 /**
- * Static rows used when the plaza endpoint is switched off or unreachable.
- * Callers MUST surface `usingFallback` so the board can be relabelled from
- * "live" to "reference" — presenting these as live figures would be a lie.
+ * There is deliberately no static fallback row set here.
+ *
+ * There used to be one: four invented model names at invented prices, three of
+ * them claiming savingPct: 72 — the exact figure stripped from the headline
+ * earlier in this branch for being fabricated. The board relabelled itself
+ * "reference pricing" when it used them, but a visitor cannot tell "reference"
+ * from "this site's prices", so the label made the deception quieter rather
+ * than removing it.
+ *
+ * When the pricing endpoint is off, unreachable or returns nothing usable, the
+ * composable now produces no rows and the board hides itself exactly as it
+ * already did for the genuinely-empty case.
  */
-const FALLBACK_ROWS: BoardRow[] = [
-  { name: 'claude-opus-5', platform: 'anthropic', inputOfficial: 15, inputActual: 4.2, outputOfficial: 75, outputActual: 21, savingPct: 72 },
-  { name: 'claude-sonnet-4.5', platform: 'anthropic', inputOfficial: 3, inputActual: 0.84, outputOfficial: 15, outputActual: 4.2, savingPct: 72 },
-  { name: 'gpt-5.6-sol', platform: 'openai', inputOfficial: 1.25, inputActual: 0.4, outputOfficial: 10, outputActual: 3.2, savingPct: 68 },
-  { name: 'gemini-3-pro', platform: 'google', inputOfficial: 2.5, inputActual: 0.62, outputOfficial: 15, outputActual: 3.75, savingPct: 75 }
-]
 
 /** A saving outside this band means the reference price is wrong, not that we are cheap. */
 const MIN_PLAUSIBLE_SAVING = 1
@@ -76,7 +79,6 @@ function toRow(g: ModelPlazaGroup, m: PlazaModel): BoardRow | null {
 export function useLandingBoard(limit = 5) {
   const rows: Ref<BoardRow[]> = ref([])
   const loading = ref(false)
-  const usingFallback = ref(false)
   /**
    * Distinct model names in the RAW response, counted before any of the
    * filtering that produces `rows` (image-billed, unpriced, implausible
@@ -101,14 +103,12 @@ export function useLandingBoard(limit = 5) {
       }
       modelCount.value = names.size > 0 ? names.size : null
 
-      // An empty group list means the endpoint has nothing configured —
-      // that is "nothing usable", same as a network failure below.
-      // A group list that merely filters down to zero rows (every model
-      // dropped by the filtering rules) is a legitimate, non-fallback
-      // empty result and must not be relabelled as fallback data.
+      // An empty group list means the endpoint has nothing configured. That is
+      // "nothing usable", the same as the network failure below, and the same
+      // as a group list that filters down to zero rows: all three produce no
+      // rows, and the board hides itself.
       if (groups.length === 0) {
-        rows.value = FALLBACK_ROWS.slice(0, limit)
-        usingFallback.value = true
+        rows.value = []
         return
       }
 
@@ -128,17 +128,16 @@ export function useLandingBoard(limit = 5) {
 
       const sorted = [...best.values()].sort((a, b) => (b.savingPct ?? -1) - (a.savingPct ?? -1))
       rows.value = sorted.slice(0, limit)
-      usingFallback.value = false
     } catch {
-      rows.value = FALLBACK_ROWS.slice(0, limit)
-      usingFallback.value = true
-      // The fallback rows are canned demo data, so their names say nothing
-      // about this deployment's catalogue.
+      // Switched off, rate-limited or unreachable. Publishing canned prices
+      // here would be inventing this deployment's price list, so the board
+      // simply does not render.
+      rows.value = []
       modelCount.value = null
     } finally {
       loading.value = false
     }
   }
 
-  return { rows, loading, usingFallback, modelCount, load }
+  return { rows, loading, modelCount, load }
 }

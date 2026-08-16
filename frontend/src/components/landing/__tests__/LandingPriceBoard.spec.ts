@@ -44,7 +44,7 @@ describe('LandingPriceBoard', () => {
   it('renders a row per model with both prices, name uppercased via FlapText', () => {
     const w = mount(LandingPriceBoard, {
       ...mountOpts,
-      props: { rows: [row()], usingFallback: false }
+      props: { rows: [row()] }
     })
 
     // Names are routed through FlapText uppercased, so assert the uppercase form.
@@ -56,19 +56,25 @@ describe('LandingPriceBoard', () => {
   it('labels the board as live data when the rows came from the endpoint', () => {
     const w = mount(LandingPriceBoard, {
       ...mountOpts,
-      props: { rows: [row()], usingFallback: false }
+      props: { rows: [row()] }
     })
     expect(w.html()).toContain('landing.board.liveLabel')
     expect(w.html()).not.toContain('landing.board.referenceLabel')
   })
 
-  it('flags the board as reference data when the endpoint is off', () => {
+  it('has no "reference pricing" mode left to fall into', () => {
+    // The original intent of this case was that canned rows must never be
+    // presented as live. That intent is now enforced upstream: there are no
+    // canned rows, so every row reaching the board is live by construction and
+    // the reference relabel has no reason to exist. A visitor could not tell
+    // "reference pricing" from "this site's prices" anyway, which is what made
+    // the relabel a quieter deception rather than a fix.
     const w = mount(LandingPriceBoard, {
       ...mountOpts,
-      props: { rows: [row()], usingFallback: true }
+      props: { rows: [row()] }
     })
-    expect(w.html()).toContain('landing.board.referenceLabel')
-    expect(w.html()).not.toContain('landing.board.liveLabel')
+    expect(w.html()).not.toContain('landing.board.referenceLabel')
+    expect(w.html()).toContain('landing.board.liveLabel')
   })
 
   it('hides the saving badge when official pricing is missing, row still renders', () => {
@@ -76,19 +82,18 @@ describe('LandingPriceBoard', () => {
       ...mountOpts,
       props: {
         rows: [row({ name: 'no-ref', platform: 'x', inputOfficial: null, outputOfficial: null, savingPct: null })],
-        usingFallback: false
       }
     })
     expect(w.text()).toContain('NO-REF')
     expect(w.find('[data-testid="saving-badge"]').exists()).toBe(false)
   })
 
-  it('renders nothing when the API succeeds but every row is filtered out', () => {
-    // A non-empty group list with nothing usable inside is a legitimate
-    // zero-row result, NOT a fallback (see useLandingBoard).
+  it('renders nothing when there are no rows, whatever the reason', () => {
+    // Filtered-out rows, an unconfigured endpoint and a failed request all
+    // arrive here identically as an empty array (see useLandingBoard).
     const w = mount(LandingPriceBoard, {
       ...mountOpts,
-      props: { rows: [], usingFallback: false }
+      props: { rows: [] }
     })
 
     // No board header, no table, no fallback relabel — the section must not exist at all.
@@ -101,7 +106,7 @@ describe('LandingPriceBoard', () => {
   it('labels the saving column/badge as measuring the output price specifically', () => {
     const w = mount(LandingPriceBoard, {
       ...mountOpts,
-      props: { rows: [row()], usingFallback: false }
+      props: { rows: [row()] }
     })
 
     // The bare percentage alone would read as a whole-row claim; the wording

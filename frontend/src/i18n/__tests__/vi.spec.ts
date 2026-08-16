@@ -28,7 +28,7 @@ describe('vi locale', () => {
     expect(missing).toEqual([])
   })
 
-  it('defines the six new landing keys the departure-board page uses', () => {
+  it('defines the landing keys the departure-board page uses', () => {
     const paths = keyPaths(vi)
     for (const k of [
       'landing.stats.models',
@@ -36,10 +36,24 @@ describe('vi locale', () => {
       'landing.stats.ttft',
       'landing.stats.formats',
       'landing.board.liveLabel',
-      'landing.board.referenceLabel'
+      // The status light needs a degraded wording too, or it can only ever
+      // claim that everything is fine.
+      'landing.strip.status',
+      'landing.strip.statusDegraded'
     ]) {
       expect(paths).toContain(k)
     }
+  })
+
+  it('has no "reference pricing" label, because there is no canned pricing left', () => {
+    const paths = keyPaths(vi)
+    expect(paths).not.toContain('landing.board.referenceLabel')
+    expect(keyPaths(en)).not.toContain('landing.board.referenceLabel')
+  })
+
+  it('has no status-page claim, because there is no status page', () => {
+    expect(keyPaths(vi)).not.toContain('landing.support.sla.statusPage')
+    expect(keyPaths(en)).not.toContain('landing.support.sla.statusPage')
   })
 
   it('does NOT claim full parity with English (admin namespace is out of scope)', () => {

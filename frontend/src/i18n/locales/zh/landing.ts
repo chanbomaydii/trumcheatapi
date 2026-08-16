@@ -9,7 +9,6 @@ export default {
     },
     board: {
       liveLabel: '实时价格看板 — 每 60 秒更新',
-      referenceLabel: '参考价格看板',
       unit: 'USD / 1M Token',
       columns: {
         model: 'Model',

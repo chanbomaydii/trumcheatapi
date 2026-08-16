@@ -33,7 +33,6 @@ function boardRow(savingPct: number | null, name = `m-${savingPct}`): BoardRow {
 
 interface BoardState {
   rows?: BoardRow[]
-  usingFallback?: boolean
   modelCount?: number | null
 }
 
@@ -47,7 +46,6 @@ function stubComposables(
   vi.mocked(useLandingBoard).mockReturnValue({
     rows: ref(board.rows ?? []),
     loading: ref(false),
-    usingFallback: ref(board.usingFallback ?? false),
     modelCount: ref(board.modelCount ?? null),
     load: boardLoad
   } as unknown as ReturnType<typeof useLandingBoard>)
@@ -108,12 +106,13 @@ describe('LandingDefault', () => {
       expect(w.findComponent(LandingHero).props('savingPct')).toBe(60)
     })
 
-    it('is null when the board fell back to canned rows', async () => {
-      stubComposables({ rows: [boardRow(72), boardRow(75)], usingFallback: true })
+    it('is null when the pricing endpoint produced nothing', async () => {
+      // There are no canned fallback rows any more, so an unreachable or
+      // switched-off endpoint reaches this component as an empty row set — and
+      // an empty row set can support no headline claim.
+      stubComposables({ rows: [] })
       const w = await mountDefault()
 
-      // The fallback rows carry real-looking percentages, but they describe no
-      // actual deployment — publishing one as a headline would be fabrication.
       expect(w.findComponent(LandingHero).props('savingPct')).toBeNull()
     })
 
@@ -131,16 +130,11 @@ describe('LandingDefault', () => {
       expect(w.findComponent(LandingHero).props('updatedAt')).toBe('14:32')
     })
 
-    it('is null when the board fell back to canned rows', async () => {
-      stubComposables({ rows: [boardRow(72)], usingFallback: true })
-      const w = await mountDefault()
-
-      // A "last price update" clock above static demo prices is a false claim
-      // about freshness, so the hero drops the whole clock block.
-      expect(w.findComponent(LandingHero).props('updatedAt')).toBeNull()
-    })
-
-    it('is null when the fetch succeeded but produced no rows', async () => {
+    it('is null whenever there are no rows on screen', async () => {
+      // A "last price update" clock above nothing — or above prices that never
+      // arrived — is a false claim about freshness, so the hero drops the whole
+      // clock block. A failed fetch, a switched-off endpoint and an empty
+      // catalogue are now indistinguishable here, which is the point.
       stubComposables({ rows: [] })
       const w = await mountDefault()
       expect(w.findComponent(LandingHero).props('updatedAt')).toBeNull()
@@ -217,13 +211,22 @@ describe('LandingDefault', () => {
       expect(statusLoad).toHaveBeenCalledTimes(1)
     })
 
-    it('gives the price board the rows and fallback flag it no longer fetches', async () => {
+    it('gives the price board the rows it no longer fetches', async () => {
       const rows = [boardRow(70), boardRow(80)]
-      stubComposables({ rows, usingFallback: true })
+      stubComposables({ rows })
       const w = await mountDefault()
 
       expect(w.findComponent(LandingPriceBoard).props('rows')).toEqual(rows)
-      expect(w.findComponent(LandingPriceBoard).props('usingFallback')).toBe(true)
+    })
+
+    it('offers the scroll-to-pricing affordances only when the board has rows', async () => {
+      stubComposables({ rows: [boardRow(70)] })
+      const withRows = await mountDefault()
+      expect(withRows.findComponent(LandingHero).props('hasPricing')).toBe(true)
+
+      stubComposables({ rows: [] })
+      const withoutRows = await mountDefault()
+      expect(withoutRows.findComponent(LandingHero).props('hasPricing')).toBe(false)
     })
   })
 })

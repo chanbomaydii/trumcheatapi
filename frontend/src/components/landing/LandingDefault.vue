@@ -8,7 +8,7 @@
       :updated-at="updatedAt"
       :has-pricing="hasPricing"
     />
-    <LandingPriceBoard :rows="rows" :using-fallback="usingFallback" />
+    <LandingPriceBoard :rows="rows" />
     <!--
       LandingPriceBoard carries its own `mx-auto max-w-[1200px] px-6 sm:px-10`
       container, LandingStats does not (it is a bare full-bleed grid), so only
@@ -54,7 +54,7 @@ import { useLandingStatus } from '@/composables/useLandingStatus'
 // median over the whole comparable catalogue. useLandingBoard sorts by saving
 // descending, so a median over the top five would be a median of the five best
 // savings, not a typical figure. LandingPriceBoard slices what it displays.
-const { rows, usingFallback, modelCount, load: loadBoard } = useLandingBoard(Number.MAX_SAFE_INTEGER)
+const { rows, modelCount, load: loadBoard } = useLandingBoard(Number.MAX_SAFE_INTEGER)
 
 // Same two figures feed LandingStatusStrip and LandingStats. Fetched once,
 // passed through untouched — including null, which is what makes both render
@@ -72,11 +72,10 @@ const updatedAt = ref<string | null>(null)
 const hasPricing = computed(() => rows.value.length > 0)
 
 const savingPct = computed<number | null>(() => {
-  // Fallback rows are canned reference data. A headline saving derived from them
-  // would be fabricated for this deployment, so the hero keeps its non-numeric
-  // line instead.
-  if (usingFallback.value) return null
-
+  // No explicit fallback guard is needed any more: useLandingBoard produces no
+  // rows at all when the endpoint is off or unreachable, so `values` is empty
+  // and the hero keeps its non-numeric line. Every row that gets here came from
+  // this deployment's own pricing data.
   const values = rows.value.map((r) => r.savingPct).filter((v): v is number => v !== null)
   if (values.length === 0) return null
 
@@ -99,8 +98,9 @@ onMounted(async () => {
   void loadStatus()
 
   await loadBoard()
-  // Only stamp the clock when the prices really came back live. `usingFallback`
-  // covers both a failed request and a switched-off endpoint.
-  updatedAt.value = !usingFallback.value && rows.value.length > 0 ? formatClock(new Date()) : null
+  // Only stamp the clock when prices really came back. Rows are empty for a
+  // failed request, a switched-off endpoint and an unconfigured one alike, so
+  // a non-empty board is now sufficient proof that the figures are live.
+  updatedAt.value = rows.value.length > 0 ? formatClock(new Date()) : null
 })
 </script>
