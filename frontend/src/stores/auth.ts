@@ -92,8 +92,20 @@ export const useAuthStore = defineStore('auth', () => {
     return !!token.value && !!user.value
   })
 
+  const isRoot = computed(() => {
+    return user.value?.role === 'root'
+  })
+
   const isAdmin = computed(() => {
     return user.value?.role === 'admin'
+  })
+
+  const isReseller = computed(() => {
+    return user.value?.role === 'reseller'
+  })
+
+  const canAccessAdminPanel = computed(() => {
+    return isRoot.value || isAdmin.value
   })
 
   const isSimpleMode = computed(() => runMode.value === 'simple')
@@ -497,7 +509,10 @@ export const useAuthStore = defineStore('auth', () => {
 
     // Computed
     isAuthenticated,
+    isRoot,
     isAdmin,
+    isReseller,
+    canAccessAdminPanel,
     isSimpleMode,
     hasPendingAuthSession,
 

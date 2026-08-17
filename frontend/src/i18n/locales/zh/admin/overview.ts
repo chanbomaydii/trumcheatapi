@@ -393,7 +393,7 @@ export default {
       rebatesDescription: '查看每一笔产生返利的充值订单',
       transfersDescription: '查看返利额度转入账户余额的提取流水',
       errors: {
-        loadFailed: '加载邀请返利记录失败'
+        loadFailed: '加载推广记录失败'
       },
       records: {
         search: '搜索',
@@ -558,7 +558,9 @@ export default {
       failedToLoadApiKeys: '加载用户 API 密钥失败',
       deleteConfirm: "确定要删除用户 '{email}' 吗？此操作无法撤销。",
       roles: {
+        root: 'Root',
         admin: '管理员',
+        reseller: '经销商',
         user: '用户'
       },
       form: {

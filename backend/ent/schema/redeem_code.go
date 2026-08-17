@@ -42,6 +42,9 @@ func (RedeemCode) Fields() []ent.Field {
 		field.String("type").
 			MaxLen(20).
 			Default(domain.RedeemTypeBalance),
+		field.String("source").
+			MaxLen(32).
+			Default("system"),
 		field.Float("value").
 			SchemaType(map[string]string{dialect.Postgres: "decimal(20,8)"}).
 			Default(0),
@@ -72,6 +75,12 @@ func (RedeemCode) Fields() []ent.Field {
 			Nillable(),
 		field.Int("validity_days").
 			Default(30),
+		field.Int64("created_by_reseller_id").
+			Optional().
+			Nillable(),
+		field.Int64("reseller_ledger_id").
+			Optional().
+			Nillable(),
 	}
 }
 
@@ -85,6 +94,11 @@ func (RedeemCode) Edges() []ent.Edge {
 			Ref("redeem_codes").
 			Field("group_id").
 			Unique(),
+		edge.From("created_by_reseller", User.Type).
+			Ref("created_reseller_redeem_codes").
+			Field("created_by_reseller_id").
+			Unique().
+			Annotations(entsql.OnDelete(entsql.Restrict)),
 	}
 }
 
@@ -95,5 +109,8 @@ func (RedeemCode) Indexes() []ent.Index {
 		index.Fields("used_by"),
 		index.Fields("group_id"),
 		index.Fields("expires_at"),
+		index.Fields("source"),
+		index.Fields("created_by_reseller_id", "status"),
+		index.Fields("reseller_ledger_id"),
 	}
 }

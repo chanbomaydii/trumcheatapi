@@ -13,6 +13,7 @@ import (
 	"github.com/Wei-Shaw/sub2api/internal/handler/dto"
 	infraerrors "github.com/Wei-Shaw/sub2api/internal/pkg/errors"
 	"github.com/Wei-Shaw/sub2api/internal/pkg/response"
+	middleware2 "github.com/Wei-Shaw/sub2api/internal/server/middleware"
 	"github.com/Wei-Shaw/sub2api/internal/service"
 
 	"github.com/gin-gonic/gin"
@@ -22,6 +23,43 @@ import (
 type RedeemHandler struct {
 	adminService  service.AdminService
 	redeemService *service.RedeemService
+}
+
+func redeemAdminContext(c *gin.Context) (context.Context, bool) {
+	role, _ := middleware2.GetUserRoleFromContext(c)
+	if role == service.RoleRoot {
+		return c.Request.Context(), true
+	}
+	return service.ContextExcludeResellerCDKeys(c.Request.Context()), false
+}
+
+func redeemListContext(c *gin.Context) (context.Context, bool) {
+	ctx, isRoot := redeemAdminContext(c)
+	switch c.Query("source") {
+	case "all":
+		if !isRoot {
+			response.Forbidden(c, "All CDKey sources require root")
+			return ctx, false
+		}
+		return c.Request.Context(), true
+	case service.RedeemSourceResellerCDKey:
+		if !isRoot {
+			response.Forbidden(c, "CDKey access requires root")
+			return ctx, false
+		}
+		return service.ContextOnlyResellerCDKeys(c.Request.Context()), true
+	default:
+		return service.ContextExcludeResellerCDKeys(c.Request.Context()), true
+	}
+}
+
+func (h *RedeemHandler) authorizeMutableCodes(c *gin.Context, ids ...int64) bool {
+	ctx, isRoot := redeemAdminContext(c)
+	if err := h.redeemService.EnsureCodesMutableByAdmin(ctx, ids, isRoot); err != nil {
+		response.ErrorFrom(c, err)
+		return false
+	}
+	return true
 }
 
 // NewRedeemHandler creates a new admin redeem handler
@@ -34,7 +72,7 @@ func NewRedeemHandler(adminService service.AdminService, redeemService *service.
 
 // GenerateRedeemCodesRequest represents generate redeem codes request
 type GenerateRedeemCodesRequest struct {
-	Count         int        `json:"count" binding:"required,min=1,max=100"`
+	Count         int        `json:"count" binding:"required,min=1,max=1000"`
 	Type          string     `json:"type" binding:"required,oneof=balance concurrency subscription invitation"`
 	Value         float64    `json:"value"`
 	GroupID       *int64     `json:"group_id"`      // 订阅类型必填
@@ -96,7 +134,11 @@ func (h *RedeemHandler) List(c *gin.Context) {
 		search = search[:100]
 	}
 
-	codes, total, err := h.adminService.ListRedeemCodes(c.Request.Context(), page, pageSize, codeType, status, search, sortBy, sortOrder)
+	ctx, ok := redeemListContext(c)
+	if !ok {
+		return
+	}
+	codes, total, err := h.adminService.ListRedeemCodes(ctx, page, pageSize, codeType, status, search, sortBy, sortOrder)
 	if err != nil {
 		response.ErrorFrom(c, err)
 		return
@@ -123,6 +165,11 @@ func (h *RedeemHandler) GetByID(c *gin.Context) {
 		response.ErrorFrom(c, err)
 		return
 	}
+	_, isRoot := redeemAdminContext(c)
+	if service.IsResellerCDKey(code) && !isRoot {
+		response.NotFound(c, "Redeem code not found")
+		return
+	}
 
 	response.Success(c, dto.RedeemCodeFromServiceAdmin(code))
 }
@@ -134,6 +181,12 @@ func (h *RedeemHandler) Generate(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.BadRequest(c, "Invalid request: "+err.Error())
 		return
+	}
+	_, isRoot := redeemAdminContext(c)
+	if !isRoot {
+		req.Type = service.RedeemTypeBalance
+		req.GroupID = nil
+		req.ValidityDays = 0
 	}
 
 	expiresAt, err := resolveRedeemCodeExpiresAt(req.ExpiresAt, req.ExpiresInDays)
@@ -203,6 +256,10 @@ func (h *RedeemHandler) CreateAndRedeem(c *gin.Context) {
 	executeAdminIdempotentJSON(c, "admin.redeem_codes.create_and_redeem", req, service.DefaultWriteIdempotencyTTL(), func(ctx context.Context) (any, error) {
 		existing, err := h.redeemService.GetByCode(ctx, req.Code)
 		if err == nil {
+			_, isRoot := redeemAdminContext(c)
+			if service.IsResellerCDKey(existing) && !isRoot {
+				return nil, infraerrors.Forbidden("RESELLER_CDKEY_IMMUTABLE", "reseller CDKeys can only be managed by root")
+			}
 			return h.resolveCreateAndRedeemExisting(ctx, existing, req.UserID)
 		}
 		if !errors.Is(err, service.ErrRedeemCodeNotFound) {
@@ -223,6 +280,10 @@ func (h *RedeemHandler) CreateAndRedeem(c *gin.Context) {
 			// Unique code race: if code now exists, use idempotent semantics by used_by.
 			existingAfterCreateErr, getErr := h.redeemService.GetByCode(ctx, req.Code)
 			if getErr == nil {
+				_, isRoot := redeemAdminContext(c)
+				if service.IsResellerCDKey(existingAfterCreateErr) && !isRoot {
+					return nil, infraerrors.Forbidden("RESELLER_CDKEY_IMMUTABLE", "reseller CDKeys can only be managed by root")
+				}
 				return h.resolveCreateAndRedeemExisting(ctx, existingAfterCreateErr, req.UserID)
 			}
 			return nil, createErr
@@ -274,6 +335,9 @@ func (h *RedeemHandler) Delete(c *gin.Context) {
 		response.BadRequest(c, "Invalid redeem code ID")
 		return
 	}
+	if !h.authorizeMutableCodes(c, codeID) {
+		return
+	}
 
 	err = h.adminService.DeleteRedeemCode(c.Request.Context(), codeID)
 	if err != nil {
@@ -292,6 +356,9 @@ func (h *RedeemHandler) BatchDelete(c *gin.Context) {
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.BadRequest(c, "Invalid request: "+err.Error())
+		return
+	}
+	if !h.authorizeMutableCodes(c, req.IDs...) {
 		return
 	}
 
@@ -318,6 +385,9 @@ func (h *RedeemHandler) BatchUpdate(c *gin.Context) {
 	var req dto.BatchUpdateRedeemCodesRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.BadRequest(c, "Invalid request: "+err.Error())
+		return
+	}
+	if !h.authorizeMutableCodes(c, req.IDs...) {
 		return
 	}
 
@@ -358,6 +428,9 @@ func (h *RedeemHandler) Expire(c *gin.Context) {
 	codeID, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		response.BadRequest(c, "Invalid redeem code ID")
+		return
+	}
+	if !h.authorizeMutableCodes(c, codeID) {
 		return
 	}
 
@@ -401,7 +474,11 @@ func (h *RedeemHandler) Export(c *gin.Context) {
 	}
 
 	// Get all codes without pagination (use large page size)
-	codes, _, err := h.adminService.ListRedeemCodes(c.Request.Context(), 1, 10000, codeType, status, search, sortBy, sortOrder)
+	ctx, ok := redeemListContext(c)
+	if !ok {
+		return
+	}
+	codes, _, err := h.adminService.ListRedeemCodes(ctx, 1, 10000, codeType, status, search, sortBy, sortOrder)
 	if err != nil {
 		response.ErrorFrom(c, err)
 		return

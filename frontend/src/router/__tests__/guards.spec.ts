@@ -119,8 +119,9 @@ function simulateGuard(
     const restrictedPaths = [
       '/admin/groups',
       '/admin/subscriptions',
-      '/admin/redeem',
+      '/admin/codes',
       '/subscriptions',
+      '/activate-cdkey',
       '/redeem',
     ]
     if (restrictedPaths.some((path) => toPath.startsWith(path))) {
@@ -270,7 +271,7 @@ describe('路由守卫逻辑', () => {
       expect(redirect).toBe('/dashboard')
     })
 
-    it('普通用户简易模式访问 /redeem 重定向到 /dashboard', () => {
+    it('普通用户简易模式访问 /activate-cdkey 重定向到 /dashboard', () => {
       const authState: MockAuthState = {
         isAuthenticated: true,
         isAdmin: false,
@@ -278,7 +279,7 @@ describe('路由守卫逻辑', () => {
         backendModeEnabled: false,
         hasPendingAuthSession: false,
       }
-      const redirect = simulateGuard('/redeem', {}, authState)
+      const redirect = simulateGuard('/activate-cdkey', {}, authState)
       expect(redirect).toBe('/dashboard')
     })
 

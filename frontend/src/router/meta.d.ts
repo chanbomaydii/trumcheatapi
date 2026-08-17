@@ -19,6 +19,12 @@ declare module 'vue-router' {
      */
     requiresAdmin?: boolean
 
+    /** Whether a limited admin may access this admin route. Root always may. */
+    adminAccess?: 'limited' | 'root'
+
+    /** Whether this route is reserved for reseller accounts. */
+    requiresReseller?: boolean
+
     /**
      * Page title for this route
      */

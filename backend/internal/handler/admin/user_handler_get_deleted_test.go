@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/Wei-Shaw/sub2api/internal/server/middleware"
 	"github.com/Wei-Shaw/sub2api/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
@@ -26,6 +27,10 @@ func (s *getByIDAdminStub) GetUserIncludeDeleted(_ context.Context, id int64) (*
 func setupGetByIDRouter(svc service.AdminService) *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	r := gin.New()
+	r.Use(func(c *gin.Context) {
+		c.Set(string(middleware.ContextKeyUserRole), service.RoleRoot)
+		c.Next()
+	})
 	h := NewUserHandler(svc, nil, nil, nil, nil, nil, nil)
 	r.GET("/admin/users/:id", h.GetByID)
 	return r

@@ -90,14 +90,14 @@ describe('RegisterView invitation layout', () => {
     registerMock.mockResolvedValue({})
   })
 
-  it('keeps the optional affiliate invitation field before Turnstile', async () => {
+  it('uses one optional invitation_code field for reseller codes before Turnstile', async () => {
     const wrapper = mountRegister()
     await flushPromises()
 
-    const invitationField = wrapper.get('[data-testid="affiliate-invitation-field"]')
+    const invitationField = wrapper.get('[data-testid="invitation-code-field"]')
     const turnstile = wrapper.get('[data-testid="registration-turnstile"]')
 
-    expect(invitationField.get('input').attributes('id')).toBe('affiliate_code')
+    expect(invitationField.get('input').attributes('id')).toBe('invitation_code')
     expect(invitationField.text()).toContain('common.optional')
     expect(
       invitationField.element.compareDocumentPosition(turnstile.element) &
@@ -114,7 +114,7 @@ describe('RegisterView invitation layout', () => {
     const wrapper = mountRegister()
     await flushPromises()
 
-    expect(wrapper.find('[data-testid="affiliate-invitation-field"]').exists()).toBe(false)
+    expect(wrapper.findAll('#invitation_code')).toHaveLength(1)
     expect(wrapper.get('#invitation_code').exists()).toBe(true)
   })
 

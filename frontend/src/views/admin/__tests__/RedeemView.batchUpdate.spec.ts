@@ -37,6 +37,10 @@ vi.mock('@/stores/app', () => ({
   })
 }))
 
+vi.mock('@/stores/auth', () => ({
+  useAuthStore: () => ({ isRoot: false })
+}))
+
 vi.mock('@/composables/useClipboard', () => ({
   useClipboard: () => ({
     copyToClipboard: vi.fn()
@@ -78,7 +82,8 @@ const DataTableStub = {
 }
 
 const SelectStub = {
-  props: ['modelValue', 'options'],
+  name: 'SelectStub',
+  props: ['modelValue', 'options', 'disabled'],
   emits: ['update:modelValue', 'change'],
   setup(props: { options: Array<{ value: unknown; label: string }> }, { emit }: { emit: (event: string, ...args: unknown[]) => void }) {
     const onChange = (event: Event) => {
@@ -183,5 +188,32 @@ describe('admin RedeemView batch update', () => {
       notes: 'maintenance'
     })
     expect(showSuccess).toHaveBeenCalledWith('admin.redeem.batchUpdateSuccess')
+  })
+
+  it('locks the Admin CDKey type to Balance', async () => {
+    const wrapper = mount(RedeemView, {
+      attachTo: document.body,
+      global: {
+        stubs: {
+          AppLayout: { template: '<div><slot /></div>' },
+          TablePageLayout: {
+            template: '<div><slot name="filters" /><slot name="table" /><slot name="pagination" /></div>'
+          },
+          DataTable: DataTableStub,
+          Pagination: true,
+          ConfirmDialog: true,
+          Select: SelectStub,
+          Icon: true,
+          Teleport: true
+        }
+      }
+    })
+
+    await flushPromises()
+    await wrapper.findAll('.btn-primary').at(-1)?.trigger('click')
+
+    const dialogSelects = wrapper.findAllComponents(SelectStub).filter((select) => select.props('modelValue') === 'balance')
+    expect(dialogSelects).toHaveLength(1)
+    expect(dialogSelects[0].props('disabled')).toBe(true)
   })
 })

@@ -18,6 +18,8 @@ const (
 	FieldCode = "code"
 	// FieldType holds the string denoting the type field in the database.
 	FieldType = "type"
+	// FieldSource holds the string denoting the source field in the database.
+	FieldSource = "source"
 	// FieldValue holds the string denoting the value field in the database.
 	FieldValue = "value"
 	// FieldStatus holds the string denoting the status field in the database.
@@ -36,10 +38,16 @@ const (
 	FieldGroupID = "group_id"
 	// FieldValidityDays holds the string denoting the validity_days field in the database.
 	FieldValidityDays = "validity_days"
+	// FieldCreatedByResellerID holds the string denoting the created_by_reseller_id field in the database.
+	FieldCreatedByResellerID = "created_by_reseller_id"
+	// FieldResellerLedgerID holds the string denoting the reseller_ledger_id field in the database.
+	FieldResellerLedgerID = "reseller_ledger_id"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
 	// EdgeGroup holds the string denoting the group edge name in mutations.
 	EdgeGroup = "group"
+	// EdgeCreatedByReseller holds the string denoting the created_by_reseller edge name in mutations.
+	EdgeCreatedByReseller = "created_by_reseller"
 	// Table holds the table name of the redeemcode in the database.
 	Table = "redeem_codes"
 	// UserTable is the table that holds the user relation/edge.
@@ -56,6 +64,13 @@ const (
 	GroupInverseTable = "groups"
 	// GroupColumn is the table column denoting the group relation/edge.
 	GroupColumn = "group_id"
+	// CreatedByResellerTable is the table that holds the created_by_reseller relation/edge.
+	CreatedByResellerTable = "redeem_codes"
+	// CreatedByResellerInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	CreatedByResellerInverseTable = "users"
+	// CreatedByResellerColumn is the table column denoting the created_by_reseller relation/edge.
+	CreatedByResellerColumn = "created_by_reseller_id"
 )
 
 // Columns holds all SQL columns for redeemcode fields.
@@ -63,6 +78,7 @@ var Columns = []string{
 	FieldID,
 	FieldCode,
 	FieldType,
+	FieldSource,
 	FieldValue,
 	FieldStatus,
 	FieldUsedBy,
@@ -72,6 +88,8 @@ var Columns = []string{
 	FieldExpiresAt,
 	FieldGroupID,
 	FieldValidityDays,
+	FieldCreatedByResellerID,
+	FieldResellerLedgerID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -91,6 +109,10 @@ var (
 	DefaultType string
 	// TypeValidator is a validator for the "type" field. It is called by the builders before save.
 	TypeValidator func(string) error
+	// DefaultSource holds the default value on creation for the "source" field.
+	DefaultSource string
+	// SourceValidator is a validator for the "source" field. It is called by the builders before save.
+	SourceValidator func(string) error
 	// DefaultValue holds the default value on creation for the "value" field.
 	DefaultValue float64
 	// DefaultStatus holds the default value on creation for the "status" field.
@@ -119,6 +141,11 @@ func ByCode(opts ...sql.OrderTermOption) OrderOption {
 // ByType orders the results by the type field.
 func ByType(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldType, opts...).ToFunc()
+}
+
+// BySource orders the results by the source field.
+func BySource(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSource, opts...).ToFunc()
 }
 
 // ByValue orders the results by the value field.
@@ -166,6 +193,16 @@ func ByValidityDays(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldValidityDays, opts...).ToFunc()
 }
 
+// ByCreatedByResellerID orders the results by the created_by_reseller_id field.
+func ByCreatedByResellerID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatedByResellerID, opts...).ToFunc()
+}
+
+// ByResellerLedgerID orders the results by the reseller_ledger_id field.
+func ByResellerLedgerID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldResellerLedgerID, opts...).ToFunc()
+}
+
 // ByUserField orders the results by user field.
 func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -177,6 +214,13 @@ func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
 func ByGroupField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newGroupStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByCreatedByResellerField orders the results by created_by_reseller field.
+func ByCreatedByResellerField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCreatedByResellerStep(), sql.OrderByField(field, opts...))
 	}
 }
 func newUserStep() *sqlgraph.Step {
@@ -191,5 +235,12 @@ func newGroupStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(GroupInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, GroupTable, GroupColumn),
+	)
+}
+func newCreatedByResellerStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CreatedByResellerInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, CreatedByResellerTable, CreatedByResellerColumn),
 	)
 }

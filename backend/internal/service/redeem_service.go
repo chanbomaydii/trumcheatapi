@@ -31,12 +31,52 @@ const (
 )
 
 type ctxKeySkipRedeemAffiliate struct{}
+type ctxKeyExcludeResellerCDKeys struct{}
+type ctxKeyOnlyResellerCDKeys struct{}
 
 // ContextSkipRedeemAffiliate returns a context that suppresses the redeem-level
 // affiliate rebate. Used by payment fulfillment which handles rebate separately
 // via applyAffiliateRebateForOrder (with audit-log deduplication).
 func ContextSkipRedeemAffiliate(ctx context.Context) context.Context {
 	return context.WithValue(ctx, ctxKeySkipRedeemAffiliate{}, true)
+}
+
+func ContextExcludeResellerCDKeys(ctx context.Context) context.Context {
+	return context.WithValue(ctx, ctxKeyExcludeResellerCDKeys{}, true)
+}
+
+func ExcludeResellerCDKeysFromContext(ctx context.Context) bool {
+	value, _ := ctx.Value(ctxKeyExcludeResellerCDKeys{}).(bool)
+	return value
+}
+
+func ContextOnlyResellerCDKeys(ctx context.Context) context.Context {
+	return context.WithValue(ctx, ctxKeyOnlyResellerCDKeys{}, true)
+}
+
+func OnlyResellerCDKeysFromContext(ctx context.Context) bool {
+	value, _ := ctx.Value(ctxKeyOnlyResellerCDKeys{}).(bool)
+	return value
+}
+
+func IsResellerCDKey(code *RedeemCode) bool {
+	return code != nil && code.Source == RedeemSourceResellerCDKey && code.CreatedByResellerID != nil
+}
+
+func (s *RedeemService) EnsureCodesMutableByAdmin(ctx context.Context, ids []int64, isRoot bool) error {
+	if isRoot {
+		return nil
+	}
+	for _, id := range ids {
+		code, err := s.redeemRepo.GetByID(ctx, id)
+		if err != nil {
+			return err
+		}
+		if IsResellerCDKey(code) {
+			return infraerrors.Forbidden("RESELLER_CDKEY_IMMUTABLE", "reseller CDKeys can only be managed by root")
+		}
+	}
+	return nil
 }
 
 // RedeemCache defines cache operations for redeem service

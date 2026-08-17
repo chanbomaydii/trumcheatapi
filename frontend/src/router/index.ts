@@ -11,6 +11,7 @@ import { useAdminComplianceStore } from '@/stores/adminCompliance'
 import { useNavigationLoadingState } from '@/composables/useNavigationLoading'
 import { useRoutePrefetch } from '@/composables/useRoutePrefetch'
 import { getSetupStatus } from '@/api/setup'
+import { canRoleAccessPath } from '@/constants/roleCapabilities'
 import { resolveCompletedSetupRedirectPath } from './setupRedirect'
 import { resolveRouteDocumentTitle } from './title'
 
@@ -241,16 +242,20 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
-    path: '/redeem',
-    name: 'Redeem',
+    path: '/activate-cdkey',
+    name: 'ActivateCDKey',
     component: () => import('@/views/user/RedeemView.vue'),
     meta: {
       requiresAuth: true,
       requiresAdmin: false,
-      title: 'Redeem Code',
+      title: 'Activate CDKey',
       titleKey: 'redeem.title',
       descriptionKey: 'redeem.description'
     }
+  },
+  {
+    path: '/redeem',
+    redirect: '/activate-cdkey'
   },
   {
     path: '/affiliate',
@@ -396,6 +401,36 @@ const routes: RouteRecordRaw[] = [
     }
   },
 
+  // ==================== Reseller Routes ====================
+  {
+    path: '/reseller/users',
+    name: 'ResellerUsers',
+    component: () => import('@/views/reseller/UsersView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresReseller: true,
+      title: 'Reseller Users',
+      titleKey: 'reseller.users.title',
+      descriptionKey: 'reseller.users.description'
+    }
+  },
+  {
+    path: '/reseller/codes',
+    name: 'ResellerCodes',
+    component: () => import('@/views/reseller/CodesView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresReseller: true,
+      title: 'Codes',
+      titleKey: 'reseller.codes.title',
+      descriptionKey: 'reseller.codes.description'
+    }
+  },
+  {
+    path: '/reseller/cdkeys',
+    redirect: '/reseller/codes'
+  },
+
   // ==================== Admin Routes ====================
   {
     path: '/admin',
@@ -408,6 +443,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
+      adminAccess: 'limited',
       title: 'Admin Dashboard',
       titleKey: 'admin.dashboard.title',
       descriptionKey: 'admin.dashboard.description'
@@ -444,6 +480,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
+      adminAccess: 'limited',
       title: 'User Management',
       titleKey: 'admin.users.title',
       descriptionKey: 'admin.users.description'
@@ -456,6 +493,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
+      adminAccess: 'limited',
       title: 'Group Management',
       titleKey: 'admin.groups.title',
       descriptionKey: 'admin.groups.description'
@@ -519,6 +557,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
+      adminAccess: 'limited',
       title: 'Account Management',
       titleKey: 'admin.accounts.title',
       descriptionKey: 'admin.accounts.description'
@@ -531,6 +570,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
+      adminAccess: 'limited',
       title: 'Announcements',
       titleKey: 'admin.announcements.title',
       descriptionKey: 'admin.announcements.description'
@@ -549,28 +589,41 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
-    path: '/admin/redeem',
-    name: 'AdminRedeem',
-    component: () => import('@/views/admin/RedeemView.vue'),
+    path: '/admin/codes',
+    redirect: '/admin/cdkeys'
+  },
+  {
+    path: '/admin/cdkeys',
+    name: 'AdminCDKeys',
+    component: () => import('@/views/admin/CodesView.vue'),
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
-      title: 'Redeem Code Management',
-      titleKey: 'admin.redeem.title',
-      descriptionKey: 'admin.redeem.description'
+      adminAccess: 'limited',
+      title: 'CDKeys',
+      titleKey: 'codes.title',
+      descriptionKey: 'codes.description'
     }
   },
   {
+    path: '/admin/codes/redeem',
+    redirect: '/admin/cdkeys'
+  },
+  {
+    path: '/admin/codes/registration',
+    redirect: '/admin/cdkeys'
+  },
+  {
+    path: '/admin/codes/cdkeys',
+    redirect: '/admin/cdkeys'
+  },
+  {
+    path: '/admin/redeem',
+    redirect: '/admin/cdkeys'
+  },
+  {
     path: '/admin/promo-codes',
-    name: 'AdminPromoCodes',
-    component: () => import('@/views/admin/PromoCodesView.vue'),
-    meta: {
-      requiresAuth: true,
-      requiresAdmin: true,
-      title: 'Promo Code Management',
-      titleKey: 'admin.promo.title',
-      descriptionKey: 'admin.promo.description'
-    }
+    redirect: '/admin/cdkeys'
   },
   {
     path: '/admin/settings',
@@ -617,6 +670,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
+      adminAccess: 'limited',
       title: 'Usage Records',
       titleKey: 'admin.usage.title',
       descriptionKey: 'admin.usage.description'
@@ -783,19 +837,20 @@ router.beforeEach(async (to, _from, next) => {
   const adminSettingsStore = useAdminSettingsStore()
   const customMenuItems = [
     ...(appStore.cachedPublicSettings?.custom_menu_items ?? []),
-    ...(authStore.isAdmin ? adminSettingsStore.customMenuItems : []),
+    ...(authStore.isRoot ? adminSettingsStore.customMenuItems : []),
   ]
   document.title = resolveRouteDocumentTitle(to, appStore.siteName, customMenuItems)
 
   // Check if route requires authentication
   const requiresAuth = to.meta.requiresAuth !== false // Default to true
   const requiresAdmin = to.meta.requiresAdmin === true
+  const requiresReseller = to.meta.requiresReseller === true
 
   if (to.path === '/setup') {
     try {
       const status = await getSetupStatus()
       if (!status.needs_setup) {
-        next(resolveCompletedSetupRedirectPath(authStore.isAuthenticated, authStore.isAdmin))
+        next(resolveCompletedSetupRedirectPath(authStore.isAuthenticated, authStore.canAccessAdminPanel))
         return
       }
     } catch {
@@ -809,12 +864,12 @@ router.beforeEach(async (to, _from, next) => {
     if (authStore.isAuthenticated && (to.path === '/login' || to.path === '/register')) {
       // In backend mode, non-admin users should NOT be redirected away from login
       // (they are blocked from all protected routes, so redirecting would cause a loop)
-      if (appStore.backendModeEnabled && !authStore.isAdmin) {
+      if (appStore.backendModeEnabled && !authStore.canAccessAdminPanel) {
         next()
         return
       }
       // Admin users go to admin dashboard, regular users go to user dashboard
-      next(authStore.isAdmin ? '/admin/dashboard' : '/dashboard')
+      next(authStore.canAccessAdminPanel ? '/admin/dashboard' : '/dashboard')
       return
     }
     // Model Plaza:公开路由但受「启用开关 + 可选强制登录」双重控制(后端同口径 fail-closed)
@@ -831,7 +886,7 @@ router.beforeEach(async (to, _from, next) => {
       if (appStore.publicSettingsLoaded && plazaSettings?.model_plaza_enabled === false) {
         next(
           authStore.isAuthenticated
-            ? authStore.isAdmin
+            ? authStore.canAccessAdminPanel
               ? '/admin/dashboard'
               : '/dashboard'
             : '/home'
@@ -843,7 +898,7 @@ router.beforeEach(async (to, _from, next) => {
         return
       }
       // Backend mode:登录的非管理员也不可见(匿名由下方公共拦截处理,广场不在白名单)
-      if (appStore.backendModeEnabled && authStore.isAuthenticated && !authStore.isAdmin) {
+      if (appStore.backendModeEnabled && authStore.isAuthenticated && !authStore.canAccessAdminPanel) {
         next('/login')
         return
       }
@@ -871,13 +926,23 @@ router.beforeEach(async (to, _from, next) => {
   }
 
   // Check admin requirement
-  if (requiresAdmin && !authStore.isAdmin) {
+  if (requiresAdmin && !authStore.canAccessAdminPanel) {
     // User is authenticated but not admin, redirect to user dashboard
     next('/dashboard')
     return
   }
 
-  if (requiresAdmin && authStore.isAdmin) {
+  if (requiresAdmin && authStore.user && !canRoleAccessPath(authStore.user.role, to.path)) {
+    next('/admin/dashboard')
+    return
+  }
+
+  if (requiresReseller && !authStore.isReseller) {
+    next(authStore.canAccessAdminPanel ? '/admin/dashboard' : '/dashboard')
+    return
+  }
+
+  if (requiresAdmin && authStore.canAccessAdminPanel) {
     const adminComplianceStore = useAdminComplianceStore()
     if (!adminComplianceStore.initialized) {
       try {
@@ -910,7 +975,7 @@ router.beforeEach(async (to, _from, next) => {
     appStore.publicSettingsLoaded &&
     appStore.cachedPublicSettings?.payment_enabled === false
   ) {
-    next(authStore.isAdmin ? '/admin/dashboard' : '/dashboard')
+    next(authStore.canAccessAdminPanel ? '/admin/dashboard' : '/dashboard')
     return
   }
 
@@ -919,7 +984,7 @@ router.beforeEach(async (to, _from, next) => {
     appStore.publicSettingsLoaded &&
     appStore.cachedPublicSettings?.risk_control_enabled === false
   ) {
-    next(authStore.isAdmin ? '/admin/settings' : '/dashboard')
+    next(authStore.isRoot ? '/admin/settings' : authStore.canAccessAdminPanel ? '/admin/dashboard' : '/dashboard')
     return
   }
 
@@ -928,21 +993,23 @@ router.beforeEach(async (to, _from, next) => {
     const restrictedPaths = [
       '/admin/groups',
       '/admin/subscriptions',
-      '/admin/redeem',
+      '/admin/codes',
+      '/admin/cdkeys',
       '/subscriptions',
+      '/activate-cdkey',
       '/redeem'
     ]
 
     if (restrictedPaths.some((path) => to.path.startsWith(path))) {
       // 简易模式下访问受限页面,重定向到仪表板
-      next(authStore.isAdmin ? '/admin/dashboard' : '/dashboard')
+      next(authStore.canAccessAdminPanel ? '/admin/dashboard' : '/dashboard')
       return
     }
   }
 
   // Backend mode: admin gets full access, non-admin blocked
   if (appStore.backendModeEnabled) {
-    if (authStore.isAuthenticated && authStore.isAdmin) {
+    if (authStore.isAuthenticated && authStore.canAccessAdminPanel) {
       next()
       return
     }

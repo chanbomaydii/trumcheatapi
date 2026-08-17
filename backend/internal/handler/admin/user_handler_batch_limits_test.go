@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/Wei-Shaw/sub2api/internal/server/middleware"
 	"github.com/Wei-Shaw/sub2api/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
@@ -44,6 +45,10 @@ func (s *batchLimitsAdminServiceStub) BatchUpdateLimits(_ context.Context, userI
 func setupBatchLimitsRouter(serviceStub service.AdminService) *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
+	router.Use(func(c *gin.Context) {
+		c.Set(string(middleware.ContextKeyUserRole), service.RoleRoot)
+		c.Next()
+	})
 	handler := NewUserHandler(serviceStub, nil, nil, nil, nil, nil, nil)
 	router.POST("/api/v1/admin/users/batch-limits", handler.BatchUpdateLimits)
 	return router

@@ -55,8 +55,10 @@ export default {
     batchImageAgentDesc: '复制给 Agent 的任务说明',
     viewUsage: '查看使用记录',
     checkDetailedLogs: '查看详细的使用日志',
-    redeemCode: '兑换码',
-    addBalanceWithCode: '使用兑换码充值'
+    redeemCode: '激活CDKey',
+    addBalanceWithCode: '应用余额、并发或订阅权益',
+    activateCDKey: '激活CDKey',
+    activateCDKeyDescription: '应用余额、并发或订阅权益'
   },
 
   // Groups (shared)
@@ -587,31 +589,31 @@ export default {
   },
 
   affiliate: {
-    title: '邀请返利',
-    description: '邀请新用户注册，并将返利额度转入账户余额',
+    title: '推广',
+    description: '邀请新用户注册、获得推广奖励，并结算到账户余额',
     yourCode: '我的邀请码',
     inviteLink: '邀请链接',
     copyCode: '复制邀请码',
     copyLink: '复制链接',
     codeCopied: '邀请码已复制',
     linkCopied: '邀请链接已复制',
-    loadFailed: '加载邀请返利数据失败',
+    loadFailed: '加载推广数据失败',
     transferFailed: '转入余额失败',
     stats: {
-      rebateRate: '我的返利比例',
-      rebateRateHint: '被邀请用户每次充值后你可获得的返利比例',
+      rebateRate: '我的奖励比例',
+      rebateRateHint: '被邀请用户充值后你可获得的奖励比例',
       invitedUsers: '邀请人数',
-      availableQuota: '可转返利额度',
+      availableQuota: '可结算奖励',
       frozenQuota: '冻结中',
-      frozenQuotaHint: '新产生的返利正在冻结期中',
-      totalQuota: '历史返利额度'
+      frozenQuotaHint: '新产生的奖励正在冻结期中',
+      totalQuota: '累计推广奖励'
     },
     transfer: {
-      title: '返利额度转余额',
-      description: '将当前可用返利额度一键转入账户余额',
+      title: '结算推广奖励',
+      description: '将当前可用推广奖励转入账户余额',
       button: '转入余额',
       transferring: '转入中...',
-      empty: '当前没有可转入额度',
+      empty: '当前没有可结算奖励',
       success: '已转入余额：{amount}'
     },
     invitees: {
@@ -620,49 +622,49 @@ export default {
       columns: {
         email: '邮箱',
         username: '用户名',
-        rebate: '返利明细',
+        rebate: '奖励明细',
         joinedAt: '注册时间'
       }
     },
     tips: {
       title: '使用说明',
       line1: '将邀请码或邀请链接分享给新用户。',
-      line2: '被邀请用户充值后，你可获得 {rate} 的返利额度。',
-      line3: '返利额度可随时转入账户余额。',
-      line4: '新产生的返利需要经过冻结期后才能提现。'
+      line2: '被邀请用户充值后，你可获得 {rate} 的推广奖励。',
+      line3: '可用奖励可随时结算到账户余额。',
+      line4: '新产生的奖励需要经过冻结期后才能结算。'
     }
   },
 
   // Redeem
   redeem: {
-    title: '兑换码',
-    description: '输入兑换码以充值余额或增加并发数',
+    title: '激活CDKey',
+    description: '输入CDKey以应用余额、并发或订阅权益',
     currentBalance: '当前余额',
     concurrency: '并发数',
     requests: '请求',
-    redeemCodeLabel: '兑换码',
-    redeemCodePlaceholder: '请输入兑换码',
-    redeemCodeHint: '兑换码区分大小写',
-    redeeming: '兑换中...',
-    redeemButton: '兑换',
-    redeemSuccess: '兑换成功！',
-    redeemFailed: '兑换失败',
+    redeemCodeLabel: 'CDKey',
+    redeemCodePlaceholder: '请输入CDKey',
+    redeemCodeHint: 'CDKey区分大小写',
+    redeeming: '激活中...',
+    redeemButton: '激活CDKey',
+    redeemSuccess: 'CDKey激活成功',
+    redeemFailed: '激活失败',
     added: '已添加',
     concurrentRequests: '并发请求',
     newBalance: '新余额',
     newConcurrency: '新并发数',
-    aboutCodes: '关于兑换码',
-    codeRule1: '每个兑换码只能使用一次',
-    codeRule2: '兑换码可以增加余额、并发数或试用权限',
-    codeRule3: '如有兑换问题，请联系客服',
+    aboutCodes: '关于CDKey',
+    codeRule1: '每个CDKey只能激活一次',
+    codeRule2: 'CDKey可以增加余额、并发数或订阅权益',
+    codeRule3: '如有激活问题，请联系客服',
     codeRule4: '余额和并发数即时更新',
     recentActivity: '最近活动',
-    historyWillAppear: '您的兑换历史将显示在这里',
-    balanceAddedRedeem: '余额充值（兑换）',
+    historyWillAppear: '您的CDKey激活记录将显示在这里',
+    balanceAddedRedeem: '余额充值（CDKey）',
     balanceAddedAffiliate: '余额充值（返利转入）',
     balanceAddedAdmin: '余额充值（管理员）',
     balanceDeductedAdmin: '余额扣除（管理员）',
-    concurrencyAddedRedeem: '并发增加（兑换）',
+    concurrencyAddedRedeem: '并发增加（CDKey）',
     concurrencyAddedAdmin: '并发增加（管理员）',
     concurrencyReducedAdmin: '并发减少（管理员）',
     adminAdjustment: '管理员调整',
@@ -670,10 +672,10 @@ export default {
     subscriptionAssignedDesc: '您已获得 {groupName} 的访问权限',
     subscriptionDays: '{days} 天',
     days: '天',
-    codeRedeemSuccess: '兑换成功！',
-    failedToRedeem: '兑换失败，请检查兑换码后重试。',
-    subscriptionRefreshFailed: '兑换成功，但订阅状态刷新失败。',
-    pleaseEnterCode: '请输入兑换码'
+    codeRedeemSuccess: 'CDKey激活成功！',
+    failedToRedeem: 'CDKey激活失败，请检查后重试。',
+    subscriptionRefreshFailed: 'CDKey已激活，但订阅状态刷新失败。',
+    pleaseEnterCode: '请输入CDKey'
   },
 
   // Profile
@@ -695,6 +697,7 @@ export default {
     securityDescription: '密码、双因素认证和通知提醒集中放在右侧。',
     administrator: '管理员',
     user: '用户',
+    roles: { root: 'Root', admin: '管理员', reseller: '经销商', user: '用户' },
     username: '用户名',
     email: '邮箱',
     status: '状态',

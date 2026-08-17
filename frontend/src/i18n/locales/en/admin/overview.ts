@@ -390,7 +390,7 @@ export default {
 
     affiliates: {
       invitesDescription: 'View site-wide inviter and invitee relationships',
-      rebatesDescription: 'View recharge orders that generated affiliate rebates',
+      rebatesDescription: 'View recharge orders that generated Affiliate commission',
       transfersDescription: 'View affiliate quota transfers into account balance',
       errors: {
         loadFailed: 'Failed to load affiliate records'
@@ -669,7 +669,9 @@ export default {
       createdAt: 'Created',
       totalRecharged: 'Total Recharged',
       roles: {
+        root: 'Root',
         admin: 'Admin',
+        reseller: 'Reseller',
         user: 'User'
       },
       // Settings Dropdowns

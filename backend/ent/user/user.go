@@ -67,6 +67,8 @@ const (
 	EdgeAPIKeys = "api_keys"
 	// EdgeRedeemCodes holds the string denoting the redeem_codes edge name in mutations.
 	EdgeRedeemCodes = "redeem_codes"
+	// EdgeCreatedResellerRedeemCodes holds the string denoting the created_reseller_redeem_codes edge name in mutations.
+	EdgeCreatedResellerRedeemCodes = "created_reseller_redeem_codes"
 	// EdgeSubscriptions holds the string denoting the subscriptions edge name in mutations.
 	EdgeSubscriptions = "subscriptions"
 	// EdgeAssignedSubscriptions holds the string denoting the assigned_subscriptions edge name in mutations.
@@ -107,6 +109,13 @@ const (
 	RedeemCodesInverseTable = "redeem_codes"
 	// RedeemCodesColumn is the table column denoting the redeem_codes relation/edge.
 	RedeemCodesColumn = "used_by"
+	// CreatedResellerRedeemCodesTable is the table that holds the created_reseller_redeem_codes relation/edge.
+	CreatedResellerRedeemCodesTable = "redeem_codes"
+	// CreatedResellerRedeemCodesInverseTable is the table name for the RedeemCode entity.
+	// It exists in this package in order to avoid circular dependency with the "redeemcode" package.
+	CreatedResellerRedeemCodesInverseTable = "redeem_codes"
+	// CreatedResellerRedeemCodesColumn is the table column denoting the created_reseller_redeem_codes relation/edge.
+	CreatedResellerRedeemCodesColumn = "created_by_reseller_id"
 	// SubscriptionsTable is the table that holds the subscriptions relation/edge.
 	SubscriptionsTable = "user_subscriptions"
 	// SubscriptionsInverseTable is the table name for the UserSubscription entity.
@@ -448,6 +457,20 @@ func ByRedeemCodes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByCreatedResellerRedeemCodesCount orders the results by created_reseller_redeem_codes count.
+func ByCreatedResellerRedeemCodesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCreatedResellerRedeemCodesStep(), opts...)
+	}
+}
+
+// ByCreatedResellerRedeemCodes orders the results by created_reseller_redeem_codes terms.
+func ByCreatedResellerRedeemCodes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCreatedResellerRedeemCodesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // BySubscriptionsCount orders the results by subscriptions count.
 func BySubscriptionsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -627,6 +650,13 @@ func newRedeemCodesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(RedeemCodesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, RedeemCodesTable, RedeemCodesColumn),
+	)
+}
+func newCreatedResellerRedeemCodesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CreatedResellerRedeemCodesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, CreatedResellerRedeemCodesTable, CreatedResellerRedeemCodesColumn),
 	)
 }
 func newSubscriptionsStep() *sqlgraph.Step {

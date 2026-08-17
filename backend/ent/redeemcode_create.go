@@ -44,6 +44,20 @@ func (_c *RedeemCodeCreate) SetNillableType(v *string) *RedeemCodeCreate {
 	return _c
 }
 
+// SetSource sets the "source" field.
+func (_c *RedeemCodeCreate) SetSource(v string) *RedeemCodeCreate {
+	_c.mutation.SetSource(v)
+	return _c
+}
+
+// SetNillableSource sets the "source" field if the given value is not nil.
+func (_c *RedeemCodeCreate) SetNillableSource(v *string) *RedeemCodeCreate {
+	if v != nil {
+		_c.SetSource(*v)
+	}
+	return _c
+}
+
 // SetValue sets the "value" field.
 func (_c *RedeemCodeCreate) SetValue(v float64) *RedeemCodeCreate {
 	_c.mutation.SetValue(v)
@@ -170,6 +184,34 @@ func (_c *RedeemCodeCreate) SetNillableValidityDays(v *int) *RedeemCodeCreate {
 	return _c
 }
 
+// SetCreatedByResellerID sets the "created_by_reseller_id" field.
+func (_c *RedeemCodeCreate) SetCreatedByResellerID(v int64) *RedeemCodeCreate {
+	_c.mutation.SetCreatedByResellerID(v)
+	return _c
+}
+
+// SetNillableCreatedByResellerID sets the "created_by_reseller_id" field if the given value is not nil.
+func (_c *RedeemCodeCreate) SetNillableCreatedByResellerID(v *int64) *RedeemCodeCreate {
+	if v != nil {
+		_c.SetCreatedByResellerID(*v)
+	}
+	return _c
+}
+
+// SetResellerLedgerID sets the "reseller_ledger_id" field.
+func (_c *RedeemCodeCreate) SetResellerLedgerID(v int64) *RedeemCodeCreate {
+	_c.mutation.SetResellerLedgerID(v)
+	return _c
+}
+
+// SetNillableResellerLedgerID sets the "reseller_ledger_id" field if the given value is not nil.
+func (_c *RedeemCodeCreate) SetNillableResellerLedgerID(v *int64) *RedeemCodeCreate {
+	if v != nil {
+		_c.SetResellerLedgerID(*v)
+	}
+	return _c
+}
+
 // SetUserID sets the "user" edge to the User entity by ID.
 func (_c *RedeemCodeCreate) SetUserID(id int64) *RedeemCodeCreate {
 	_c.mutation.SetUserID(id)
@@ -192,6 +234,11 @@ func (_c *RedeemCodeCreate) SetUser(v *User) *RedeemCodeCreate {
 // SetGroup sets the "group" edge to the Group entity.
 func (_c *RedeemCodeCreate) SetGroup(v *Group) *RedeemCodeCreate {
 	return _c.SetGroupID(v.ID)
+}
+
+// SetCreatedByReseller sets the "created_by_reseller" edge to the User entity.
+func (_c *RedeemCodeCreate) SetCreatedByReseller(v *User) *RedeemCodeCreate {
+	return _c.SetCreatedByResellerID(v.ID)
 }
 
 // Mutation returns the RedeemCodeMutation object of the builder.
@@ -233,6 +280,10 @@ func (_c *RedeemCodeCreate) defaults() {
 		v := redeemcode.DefaultType
 		_c.mutation.SetType(v)
 	}
+	if _, ok := _c.mutation.Source(); !ok {
+		v := redeemcode.DefaultSource
+		_c.mutation.SetSource(v)
+	}
 	if _, ok := _c.mutation.Value(); !ok {
 		v := redeemcode.DefaultValue
 		_c.mutation.SetValue(v)
@@ -267,6 +318,14 @@ func (_c *RedeemCodeCreate) check() error {
 	if v, ok := _c.mutation.GetType(); ok {
 		if err := redeemcode.TypeValidator(v); err != nil {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "RedeemCode.type": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.Source(); !ok {
+		return &ValidationError{Name: "source", err: errors.New(`ent: missing required field "RedeemCode.source"`)}
+	}
+	if v, ok := _c.mutation.Source(); ok {
+		if err := redeemcode.SourceValidator(v); err != nil {
+			return &ValidationError{Name: "source", err: fmt.Errorf(`ent: validator failed for field "RedeemCode.source": %w`, err)}
 		}
 	}
 	if _, ok := _c.mutation.Value(); !ok {
@@ -321,6 +380,10 @@ func (_c *RedeemCodeCreate) createSpec() (*RedeemCode, *sqlgraph.CreateSpec) {
 		_spec.SetField(redeemcode.FieldType, field.TypeString, value)
 		_node.Type = value
 	}
+	if value, ok := _c.mutation.Source(); ok {
+		_spec.SetField(redeemcode.FieldSource, field.TypeString, value)
+		_node.Source = value
+	}
 	if value, ok := _c.mutation.Value(); ok {
 		_spec.SetField(redeemcode.FieldValue, field.TypeFloat64, value)
 		_node.Value = value
@@ -348,6 +411,10 @@ func (_c *RedeemCodeCreate) createSpec() (*RedeemCode, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.ValidityDays(); ok {
 		_spec.SetField(redeemcode.FieldValidityDays, field.TypeInt, value)
 		_node.ValidityDays = value
+	}
+	if value, ok := _c.mutation.ResellerLedgerID(); ok {
+		_spec.SetField(redeemcode.FieldResellerLedgerID, field.TypeInt64, value)
+		_node.ResellerLedgerID = &value
 	}
 	if nodes := _c.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -381,6 +448,23 @@ func (_c *RedeemCodeCreate) createSpec() (*RedeemCode, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.GroupID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.CreatedByResellerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   redeemcode.CreatedByResellerTable,
+			Columns: []string{redeemcode.CreatedByResellerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.CreatedByResellerID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -456,6 +540,18 @@ func (u *RedeemCodeUpsert) SetType(v string) *RedeemCodeUpsert {
 // UpdateType sets the "type" field to the value that was provided on create.
 func (u *RedeemCodeUpsert) UpdateType() *RedeemCodeUpsert {
 	u.SetExcluded(redeemcode.FieldType)
+	return u
+}
+
+// SetSource sets the "source" field.
+func (u *RedeemCodeUpsert) SetSource(v string) *RedeemCodeUpsert {
+	u.Set(redeemcode.FieldSource, v)
+	return u
+}
+
+// UpdateSource sets the "source" field to the value that was provided on create.
+func (u *RedeemCodeUpsert) UpdateSource() *RedeemCodeUpsert {
+	u.SetExcluded(redeemcode.FieldSource)
 	return u
 }
 
@@ -597,6 +693,48 @@ func (u *RedeemCodeUpsert) AddValidityDays(v int) *RedeemCodeUpsert {
 	return u
 }
 
+// SetCreatedByResellerID sets the "created_by_reseller_id" field.
+func (u *RedeemCodeUpsert) SetCreatedByResellerID(v int64) *RedeemCodeUpsert {
+	u.Set(redeemcode.FieldCreatedByResellerID, v)
+	return u
+}
+
+// UpdateCreatedByResellerID sets the "created_by_reseller_id" field to the value that was provided on create.
+func (u *RedeemCodeUpsert) UpdateCreatedByResellerID() *RedeemCodeUpsert {
+	u.SetExcluded(redeemcode.FieldCreatedByResellerID)
+	return u
+}
+
+// ClearCreatedByResellerID clears the value of the "created_by_reseller_id" field.
+func (u *RedeemCodeUpsert) ClearCreatedByResellerID() *RedeemCodeUpsert {
+	u.SetNull(redeemcode.FieldCreatedByResellerID)
+	return u
+}
+
+// SetResellerLedgerID sets the "reseller_ledger_id" field.
+func (u *RedeemCodeUpsert) SetResellerLedgerID(v int64) *RedeemCodeUpsert {
+	u.Set(redeemcode.FieldResellerLedgerID, v)
+	return u
+}
+
+// UpdateResellerLedgerID sets the "reseller_ledger_id" field to the value that was provided on create.
+func (u *RedeemCodeUpsert) UpdateResellerLedgerID() *RedeemCodeUpsert {
+	u.SetExcluded(redeemcode.FieldResellerLedgerID)
+	return u
+}
+
+// AddResellerLedgerID adds v to the "reseller_ledger_id" field.
+func (u *RedeemCodeUpsert) AddResellerLedgerID(v int64) *RedeemCodeUpsert {
+	u.Add(redeemcode.FieldResellerLedgerID, v)
+	return u
+}
+
+// ClearResellerLedgerID clears the value of the "reseller_ledger_id" field.
+func (u *RedeemCodeUpsert) ClearResellerLedgerID() *RedeemCodeUpsert {
+	u.SetNull(redeemcode.FieldResellerLedgerID)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -667,6 +805,20 @@ func (u *RedeemCodeUpsertOne) SetType(v string) *RedeemCodeUpsertOne {
 func (u *RedeemCodeUpsertOne) UpdateType() *RedeemCodeUpsertOne {
 	return u.Update(func(s *RedeemCodeUpsert) {
 		s.UpdateType()
+	})
+}
+
+// SetSource sets the "source" field.
+func (u *RedeemCodeUpsertOne) SetSource(v string) *RedeemCodeUpsertOne {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.SetSource(v)
+	})
+}
+
+// UpdateSource sets the "source" field to the value that was provided on create.
+func (u *RedeemCodeUpsertOne) UpdateSource() *RedeemCodeUpsertOne {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.UpdateSource()
 	})
 }
 
@@ -828,6 +980,55 @@ func (u *RedeemCodeUpsertOne) AddValidityDays(v int) *RedeemCodeUpsertOne {
 func (u *RedeemCodeUpsertOne) UpdateValidityDays() *RedeemCodeUpsertOne {
 	return u.Update(func(s *RedeemCodeUpsert) {
 		s.UpdateValidityDays()
+	})
+}
+
+// SetCreatedByResellerID sets the "created_by_reseller_id" field.
+func (u *RedeemCodeUpsertOne) SetCreatedByResellerID(v int64) *RedeemCodeUpsertOne {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.SetCreatedByResellerID(v)
+	})
+}
+
+// UpdateCreatedByResellerID sets the "created_by_reseller_id" field to the value that was provided on create.
+func (u *RedeemCodeUpsertOne) UpdateCreatedByResellerID() *RedeemCodeUpsertOne {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.UpdateCreatedByResellerID()
+	})
+}
+
+// ClearCreatedByResellerID clears the value of the "created_by_reseller_id" field.
+func (u *RedeemCodeUpsertOne) ClearCreatedByResellerID() *RedeemCodeUpsertOne {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.ClearCreatedByResellerID()
+	})
+}
+
+// SetResellerLedgerID sets the "reseller_ledger_id" field.
+func (u *RedeemCodeUpsertOne) SetResellerLedgerID(v int64) *RedeemCodeUpsertOne {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.SetResellerLedgerID(v)
+	})
+}
+
+// AddResellerLedgerID adds v to the "reseller_ledger_id" field.
+func (u *RedeemCodeUpsertOne) AddResellerLedgerID(v int64) *RedeemCodeUpsertOne {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.AddResellerLedgerID(v)
+	})
+}
+
+// UpdateResellerLedgerID sets the "reseller_ledger_id" field to the value that was provided on create.
+func (u *RedeemCodeUpsertOne) UpdateResellerLedgerID() *RedeemCodeUpsertOne {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.UpdateResellerLedgerID()
+	})
+}
+
+// ClearResellerLedgerID clears the value of the "reseller_ledger_id" field.
+func (u *RedeemCodeUpsertOne) ClearResellerLedgerID() *RedeemCodeUpsertOne {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.ClearResellerLedgerID()
 	})
 }
 
@@ -1070,6 +1271,20 @@ func (u *RedeemCodeUpsertBulk) UpdateType() *RedeemCodeUpsertBulk {
 	})
 }
 
+// SetSource sets the "source" field.
+func (u *RedeemCodeUpsertBulk) SetSource(v string) *RedeemCodeUpsertBulk {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.SetSource(v)
+	})
+}
+
+// UpdateSource sets the "source" field to the value that was provided on create.
+func (u *RedeemCodeUpsertBulk) UpdateSource() *RedeemCodeUpsertBulk {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.UpdateSource()
+	})
+}
+
 // SetValue sets the "value" field.
 func (u *RedeemCodeUpsertBulk) SetValue(v float64) *RedeemCodeUpsertBulk {
 	return u.Update(func(s *RedeemCodeUpsert) {
@@ -1228,6 +1443,55 @@ func (u *RedeemCodeUpsertBulk) AddValidityDays(v int) *RedeemCodeUpsertBulk {
 func (u *RedeemCodeUpsertBulk) UpdateValidityDays() *RedeemCodeUpsertBulk {
 	return u.Update(func(s *RedeemCodeUpsert) {
 		s.UpdateValidityDays()
+	})
+}
+
+// SetCreatedByResellerID sets the "created_by_reseller_id" field.
+func (u *RedeemCodeUpsertBulk) SetCreatedByResellerID(v int64) *RedeemCodeUpsertBulk {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.SetCreatedByResellerID(v)
+	})
+}
+
+// UpdateCreatedByResellerID sets the "created_by_reseller_id" field to the value that was provided on create.
+func (u *RedeemCodeUpsertBulk) UpdateCreatedByResellerID() *RedeemCodeUpsertBulk {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.UpdateCreatedByResellerID()
+	})
+}
+
+// ClearCreatedByResellerID clears the value of the "created_by_reseller_id" field.
+func (u *RedeemCodeUpsertBulk) ClearCreatedByResellerID() *RedeemCodeUpsertBulk {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.ClearCreatedByResellerID()
+	})
+}
+
+// SetResellerLedgerID sets the "reseller_ledger_id" field.
+func (u *RedeemCodeUpsertBulk) SetResellerLedgerID(v int64) *RedeemCodeUpsertBulk {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.SetResellerLedgerID(v)
+	})
+}
+
+// AddResellerLedgerID adds v to the "reseller_ledger_id" field.
+func (u *RedeemCodeUpsertBulk) AddResellerLedgerID(v int64) *RedeemCodeUpsertBulk {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.AddResellerLedgerID(v)
+	})
+}
+
+// UpdateResellerLedgerID sets the "reseller_ledger_id" field to the value that was provided on create.
+func (u *RedeemCodeUpsertBulk) UpdateResellerLedgerID() *RedeemCodeUpsertBulk {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.UpdateResellerLedgerID()
+	})
+}
+
+// ClearResellerLedgerID clears the value of the "reseller_ledger_id" field.
+func (u *RedeemCodeUpsertBulk) ClearResellerLedgerID() *RedeemCodeUpsertBulk {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.ClearResellerLedgerID()
 	})
 }
 

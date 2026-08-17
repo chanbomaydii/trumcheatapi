@@ -24,7 +24,7 @@ export async function list(
     signal?: AbortSignal
   }
 ): Promise<BasePaginationResponse<PromoCode>> {
-  const { data } = await apiClient.get<BasePaginationResponse<PromoCode>>('/admin/promo-codes', {
+  const { data } = await apiClient.get<BasePaginationResponse<PromoCode>>('/admin/codes/registration', {
     params: { page, page_size: pageSize, ...filters },
     signal: options?.signal
   })
@@ -32,22 +32,22 @@ export async function list(
 }
 
 export async function getById(id: number): Promise<PromoCode> {
-  const { data } = await apiClient.get<PromoCode>(`/admin/promo-codes/${id}`)
+  const { data } = await apiClient.get<PromoCode>(`/admin/codes/registration/${id}`)
   return data
 }
 
 export async function create(request: CreatePromoCodeRequest): Promise<PromoCode> {
-  const { data } = await apiClient.post<PromoCode>('/admin/promo-codes', request)
+  const { data } = await apiClient.post<PromoCode>('/admin/codes/registration', request)
   return data
 }
 
 export async function update(id: number, request: UpdatePromoCodeRequest): Promise<PromoCode> {
-  const { data } = await apiClient.put<PromoCode>(`/admin/promo-codes/${id}`, request)
+  const { data } = await apiClient.put<PromoCode>(`/admin/codes/registration/${id}`, request)
   return data
 }
 
 export async function deleteCode(id: number): Promise<{ message: string }> {
-  const { data } = await apiClient.delete<{ message: string }>(`/admin/promo-codes/${id}`)
+  const { data } = await apiClient.delete<{ message: string }>(`/admin/codes/registration/${id}`)
   return data
 }
 
@@ -57,7 +57,7 @@ export async function getUsages(
   pageSize: number = 20
 ): Promise<BasePaginationResponse<PromoCodeUsage>> {
   const { data } = await apiClient.get<BasePaginationResponse<PromoCodeUsage>>(
-    `/admin/promo-codes/${id}/usages`,
+    `/admin/codes/registration/${id}/usages`,
     { params: { page, page_size: pageSize } }
   )
   return data

@@ -55,8 +55,10 @@ export default {
     batchImageAgentDesc: 'Copy instructions for an agent',
     viewUsage: 'View Usage',
     checkDetailedLogs: 'Check detailed usage logs',
-    redeemCode: 'Redeem Code',
-    addBalanceWithCode: 'Add balance with a code'
+    redeemCode: 'Activate CDKey',
+    addBalanceWithCode: 'Apply balance, concurrency, or subscription access',
+    activateCDKey: 'Activate CDKey',
+    activateCDKeyDescription: 'Apply balance, concurrency, or subscription access'
   },
 
   // Groups (shared)
@@ -582,8 +584,8 @@ export default {
   },
 
   affiliate: {
-    title: 'Affiliate Rebates',
-    description: 'Invite new users and convert your rebate quota into account balance',
+    title: 'Affiliate',
+    description: 'Invite new users, earn commission, and pay rewards into your balance',
     yourCode: 'Your Affiliate Code',
     inviteLink: 'Invite Link',
     copyCode: 'Copy Code',
@@ -593,20 +595,20 @@ export default {
     loadFailed: 'Failed to load affiliate data',
     transferFailed: 'Failed to transfer affiliate quota',
     stats: {
-      rebateRate: 'My Rebate Rate',
+      rebateRate: 'My Commission Rate',
       rebateRateHint: 'What you earn each time an invitee recharges',
       invitedUsers: 'Invited Users',
-      availableQuota: 'Available Rebate Quota',
+      availableQuota: 'Available Rewards',
       frozenQuota: 'Frozen',
-      frozenQuotaHint: 'Recently earned rebates pending release',
-      totalQuota: 'Historical Rebate Quota'
+      frozenQuotaHint: 'Recently earned commission pending release',
+      totalQuota: 'Lifetime Commission'
     },
     transfer: {
-      title: 'Transfer Rebate Quota',
-      description: 'Move available rebate quota into your account balance',
+      title: 'Payout Rewards',
+      description: 'Move available Affiliate rewards into your account balance',
       button: 'Transfer to Balance',
       transferring: 'Transferring...',
-      empty: 'No available rebate quota',
+      empty: 'No rewards available',
       success: '{amount} has been transferred to your balance'
     },
     invitees: {
@@ -615,49 +617,49 @@ export default {
       columns: {
         email: 'Email',
         username: 'Username',
-        rebate: 'Rebate',
+        rebate: 'Commission',
         joinedAt: 'Joined At'
       }
     },
     tips: {
       title: 'How It Works',
       line1: 'Share your affiliate code or invite link with new users.',
-      line2: 'When invitees recharge, you receive {rate} of the recharge as rebate quota.',
-      line3: 'Transfer rebate quota to balance at any time.',
-      line4: 'Newly earned rebates may have a waiting period before they can be transferred.'
+      line2: 'When invitees recharge, you receive {rate} of the recharge as commission.',
+      line3: 'Pay available rewards into your balance at any time.',
+      line4: 'New commission may have a waiting period before payout.'
     }
   },
 
   // Redeem
   redeem: {
-    title: 'Redeem Code',
-    description: 'Enter your redeem code to add balance or increase concurrency',
+    title: 'Activate CDKey',
+    description: 'Enter a CDKey to apply its balance, concurrency, or subscription access',
     currentBalance: 'Current Balance',
     concurrency: 'Concurrency',
     requests: 'requests',
-    redeemCodeLabel: 'Redeem Code',
-    redeemCodePlaceholder: 'Enter your redeem code',
-    redeemCodeHint: 'Redeem codes are case-sensitive',
-    redeeming: 'Redeeming...',
-    redeemButton: 'Redeem Code',
-    redeemSuccess: 'Code Redeemed Successfully!',
-    redeemFailed: 'Redemption Failed',
+    redeemCodeLabel: 'CDKey',
+    redeemCodePlaceholder: 'Enter your CDKey',
+    redeemCodeHint: 'CDKeys are case-sensitive',
+    redeeming: 'Activating...',
+    redeemButton: 'Activate CDKey',
+    redeemSuccess: 'CDKey Activated',
+    redeemFailed: 'Activation Failed',
     added: 'Added',
     concurrentRequests: 'concurrent requests',
     newBalance: 'New Balance',
     newConcurrency: 'New Concurrency',
-    aboutCodes: 'About Redeem Codes',
-    codeRule1: 'Each code can only be used once',
-    codeRule2: 'Codes may add balance, increase concurrency, or grant trial access',
-    codeRule3: 'Contact support if you have issues redeeming a code',
+    aboutCodes: 'About CDKeys',
+    codeRule1: 'Each CDKey can only be activated once',
+    codeRule2: 'A CDKey may add balance, increase concurrency, or grant subscription access',
+    codeRule3: 'Contact support if you have issues activating a CDKey',
     codeRule4: 'Balance and concurrency updates are immediate',
     recentActivity: 'Recent Activity',
-    historyWillAppear: 'Your redemption history will appear here',
-    balanceAddedRedeem: 'Balance Added (Redeem)',
+    historyWillAppear: 'Your CDKey activation history will appear here',
+    balanceAddedRedeem: 'Balance Added (CDKey)',
     balanceAddedAffiliate: 'Balance Added (Affiliate Transfer)',
     balanceAddedAdmin: 'Balance Added (Admin)',
     balanceDeductedAdmin: 'Balance Deducted (Admin)',
-    concurrencyAddedRedeem: 'Concurrency Added (Redeem)',
+    concurrencyAddedRedeem: 'Concurrency Added (CDKey)',
     concurrencyAddedAdmin: 'Concurrency Added (Admin)',
     concurrencyReducedAdmin: 'Concurrency Reduced (Admin)',
     adminAdjustment: 'Admin Adjustment',
@@ -665,10 +667,10 @@ export default {
     subscriptionAssignedDesc: 'You have been granted access to {groupName}',
     subscriptionDays: '{days} days',
     days: ' days',
-    codeRedeemSuccess: 'Code redeemed successfully!',
-    failedToRedeem: 'Failed to redeem code. Please check the code and try again.',
-    subscriptionRefreshFailed: 'Redeemed successfully, but failed to refresh subscription status.',
-    pleaseEnterCode: 'Please enter a redeem code'
+    codeRedeemSuccess: 'CDKey activated successfully!',
+    failedToRedeem: 'Failed to activate CDKey. Please check the key and try again.',
+    subscriptionRefreshFailed: 'CDKey activated, but subscription status could not be refreshed.',
+    pleaseEnterCode: 'Please enter a CDKey'
   },
 
   // Profile
@@ -690,6 +692,7 @@ export default {
     securityDescription: 'Password, two-factor authentication, and alerts live in the right rail.',
     administrator: 'Administrator',
     user: 'User',
+    roles: { root: 'Root', admin: 'Administrator', reseller: 'Reseller', user: 'User' },
     username: 'Username',
     email: 'Email',
     status: 'Status',

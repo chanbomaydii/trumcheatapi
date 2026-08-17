@@ -28,12 +28,13 @@ export async function list(
     search?: string
     sort_by?: string
     sort_order?: 'asc' | 'desc'
+    source?: 'all' | 'system' | 'reseller_cdkey'
   },
   options?: {
     signal?: AbortSignal
   }
 ): Promise<PaginatedResponse<RedeemCode>> {
-  const { data } = await apiClient.get<PaginatedResponse<RedeemCode>>('/admin/redeem-codes', {
+  const { data } = await apiClient.get<PaginatedResponse<RedeemCode>>('/admin/codes/redeem', {
     params: {
       page,
       page_size: pageSize,
@@ -50,7 +51,7 @@ export async function list(
  * @returns Redeem code details
  */
 export async function getById(id: number): Promise<RedeemCode> {
-  const { data } = await apiClient.get<RedeemCode>(`/admin/redeem-codes/${id}`)
+  const { data } = await apiClient.get<RedeemCode>(`/admin/codes/redeem/${id}`)
   return data
 }
 
@@ -89,7 +90,31 @@ export async function generate(
     payload.expires_in_days = expiresInDays
   }
 
-  const { data } = await apiClient.post<RedeemCode[]>('/admin/redeem-codes/generate', payload)
+  const { data } = await apiClient.post<RedeemCode[]>('/admin/codes/redeem/generate', payload)
+  return data
+}
+
+export async function createCDKeysForReseller(
+  resellerId: number,
+  count: number,
+  value: number,
+  expiresInDays: number | null,
+  idempotencyKey: string
+): Promise<{
+  ledger_id: number
+  codes: RedeemCode[]
+  total_value: number
+  reseller_balance_after: number
+  replayed: boolean
+}> {
+  const { data } = await apiClient.post('/admin/codes/cdkeys/generate', {
+    reseller_id: resellerId,
+    count,
+    value,
+    ...(expiresInDays ? { expires_in_days: expiresInDays } : {})
+  }, {
+    headers: { 'Idempotency-Key': idempotencyKey }
+  })
   return data
 }
 
@@ -99,7 +124,7 @@ export async function generate(
  * @returns Success confirmation
  */
 export async function deleteCode(id: number): Promise<{ message: string }> {
-  const { data } = await apiClient.delete<{ message: string }>(`/admin/redeem-codes/${id}`)
+  const { data } = await apiClient.delete<{ message: string }>(`/admin/codes/redeem/${id}`)
   return data
 }
 
@@ -115,7 +140,7 @@ export async function batchDelete(ids: number[]): Promise<{
   const { data } = await apiClient.post<{
     deleted: number
     message: string
-  }>('/admin/redeem-codes/batch-delete', { ids })
+  }>('/admin/codes/redeem/batch-delete', { ids })
   return data
 }
 
@@ -135,7 +160,7 @@ export async function batchUpdate(
   const { data } = await apiClient.post<{
     updated: number
     message: string
-  }>('/admin/redeem-codes/batch-update', { ids, fields })
+  }>('/admin/codes/redeem/batch-update', { ids, fields })
   return data
 }
 
@@ -145,7 +170,7 @@ export async function batchUpdate(
  * @returns Updated redeem code
  */
 export async function expire(id: number): Promise<RedeemCode> {
-  const { data } = await apiClient.post<RedeemCode>(`/admin/redeem-codes/${id}/expire`)
+  const { data } = await apiClient.post<RedeemCode>(`/admin/codes/redeem/${id}/expire`)
   return data
 }
 
@@ -168,7 +193,7 @@ export async function getStats(): Promise<{
     expired_codes: number
     total_value_distributed: number
     by_type: Record<RedeemCodeType, number>
-  }>('/admin/redeem-codes/stats')
+  }>('/admin/codes/redeem/stats')
   return data
 }
 
@@ -183,8 +208,9 @@ export async function exportCodes(filters?: {
   search?: string
   sort_by?: string
   sort_order?: 'asc' | 'desc'
+  source?: 'all' | 'system' | 'reseller_cdkey'
 }): Promise<Blob> {
-  const response = await apiClient.get('/admin/redeem-codes/export', {
+  const response = await apiClient.get('/admin/codes/redeem/export', {
     params: filters,
     responseType: 'blob'
   })
@@ -195,6 +221,7 @@ export const redeemAPI = {
   list,
   getById,
   generate,
+  createCDKeysForReseller,
   delete: deleteCode,
   batchDelete,
   batchUpdate,

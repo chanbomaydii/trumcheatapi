@@ -834,19 +834,21 @@ WHERE user_id = $1`, userID)
 
 func queryAffiliateByCode(ctx context.Context, client affiliateQueryExecer, code string) (*service.AffiliateSummary, error) {
 	rows, err := client.QueryContext(ctx, `
-SELECT user_id,
-       aff_code,
-       aff_code_custom,
-       aff_rebate_rate_percent,
-       inviter_id,
-       aff_count,
-       aff_quota::double precision,
-       aff_frozen_quota::double precision,
-       aff_history_quota::double precision,
-       created_at,
-       updated_at
-FROM user_affiliates
-WHERE aff_code = $1
+SELECT ua.user_id,
+	   u.role,
+	   ua.aff_code,
+	   ua.aff_code_custom,
+	   ua.aff_rebate_rate_percent,
+	   ua.inviter_id,
+	   ua.aff_count,
+	   ua.aff_quota::double precision,
+	   ua.aff_frozen_quota::double precision,
+	   ua.aff_history_quota::double precision,
+	   ua.created_at,
+	   ua.updated_at
+FROM user_affiliates ua
+JOIN users u ON u.id = ua.user_id AND u.deleted_at IS NULL
+WHERE ua.aff_code = $1
 LIMIT 1`, strings.ToUpper(strings.TrimSpace(code)))
 	if err != nil {
 		return nil, err
@@ -865,6 +867,7 @@ LIMIT 1`, strings.ToUpper(strings.TrimSpace(code)))
 	var rebateRate sql.NullFloat64
 	if err := rows.Scan(
 		&out.UserID,
+		&out.Role,
 		&out.AffCode,
 		&out.AffCodeCustom,
 		&rebateRate,

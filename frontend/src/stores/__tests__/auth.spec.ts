@@ -314,31 +314,37 @@ describe('useAuthStore', () => {
     })
   })
 
-  // --- isAdmin ---
+  // --- role capabilities ---
 
-  describe('isAdmin', () => {
-    it('管理员用户返回 true', async () => {
-      const adminResponse = { ...fakeAuthResponse, user: { ...fakeAdminUser } }
-      mockLogin.mockResolvedValue(adminResponse)
+  describe('role capabilities', () => {
+    it.each([
+      ['root', true, false, false, true],
+      ['admin', false, true, false, true],
+      ['reseller', false, false, true, false],
+      ['user', false, false, false, false],
+    ] as const)(
+      '%s có capability đúng',
+      async (role, isRoot, isAdmin, isReseller, canAccessAdminPanel) => {
+      mockLogin.mockResolvedValue({
+        ...fakeAuthResponse,
+        user: { ...fakeUser, role },
+      })
       const store = useAuthStore()
 
-      await store.login({ email: 'admin@example.com', password: '123456' })
+      await store.login({ email: `${role}@example.com`, password: '123456' })
 
-      expect(store.isAdmin).toBe(true)
+      expect(store.isRoot).toBe(isRoot)
+      expect(store.isAdmin).toBe(isAdmin)
+      expect(store.isReseller).toBe(isReseller)
+      expect(store.canAccessAdminPanel).toBe(canAccessAdminPanel)
     })
 
-    it('普通用户返回 false', async () => {
-      mockLogin.mockResolvedValue(fakeAuthResponse)
+    it('未 đăng nhập không có capability', () => {
       const store = useAuthStore()
-
-      await store.login({ email: 'test@example.com', password: '123456' })
-
+      expect(store.isRoot).toBe(false)
       expect(store.isAdmin).toBe(false)
-    })
-
-    it('未登录时返回 false', () => {
-      const store = useAuthStore()
-      expect(store.isAdmin).toBe(false)
+      expect(store.isReseller).toBe(false)
+      expect(store.canAccessAdminPanel).toBe(false)
     })
   })
 

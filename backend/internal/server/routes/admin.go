@@ -61,69 +61,75 @@ func RegisterAdminRoutes(
 		// 国产供应商（kimi/zhipu/deepseek）额度与余额
 		registerCNProviderRoutes(admin, h)
 
-		// 代理管理
-		registerProxyRoutes(admin, h, stepUpAuth)
-
 		// 卡密管理
 		registerRedeemCodeRoutes(admin, h)
 
 		// 优惠码管理
 		registerPromoCodeRoutes(admin, h)
 
-		// 系统设置
-		registerSettingsRoutes(admin, h)
-
-		// 数据管理
-		registerDataManagementRoutes(admin, h, stepUpAuth)
-
-		// 数据库备份恢复
-		registerBackupRoutes(admin, h, stepUpAuth)
-
-		// 运维监控（Ops）
-		registerOpsRoutes(admin, h)
-
-		// 系统管理
-		registerSystemRoutes(admin, h)
-
-		// 订阅管理
-		registerSubscriptionRoutes(admin, h)
-
 		// 使用记录管理
 		registerUsageRoutes(admin, h)
 
-		// 用户属性管理
-		registerUserAttributeRoutes(admin, h)
-
-		// 错误透传规则管理
-		registerErrorPassthroughRoutes(admin, h)
-
-		// TLS 指纹模板管理
-		registerTLSFingerprintProfileRoutes(admin, h)
-
-		// API Key 管理
-		registerAdminAPIKeyRoutes(admin, h)
-
-		// 定时测试计划
+		// 定时测试计划是账号管理的组成部分。
 		registerScheduledTestRoutes(admin, h)
 
-		// 渠道管理
-		registerChannelRoutes(admin, h)
+		root := admin.Group("")
+		root.Use(middleware.RootOnly())
+		{
+			root.POST("/codes/cdkeys/generate", h.Reseller.AdminCreateCDKeys)
 
-		// 渠道监控
-		registerChannelMonitorRoutes(admin, h, settingService)
-		registerChannelMonitorV2Routes(admin, h, settingService)
+			// 代理管理
+			registerProxyRoutes(root, h, stepUpAuth)
 
-		// 风控中心
-		registerContentModerationRoutes(admin, h)
+			// 系统设置
+			registerSettingsRoutes(root, h)
 
-		// 独立提示词输入审计
-		registerPromptAuditRoutes(admin, h)
+			// 数据管理
+			registerDataManagementRoutes(root, h, stepUpAuth)
 
-		// 邀请返利（专属用户管理）
-		registerAffiliateRoutes(admin, h)
+			// 数据库备份恢复
+			registerBackupRoutes(root, h, stepUpAuth)
 
-		// 操作审计日志
-		registerAuditLogRoutes(admin, h, stepUpAuth)
+			// 运维监控（Ops）
+			registerOpsRoutes(root, h)
+
+			// 系统管理
+			registerSystemRoutes(root, h)
+
+			// 订阅管理
+			registerSubscriptionRoutes(root, h)
+
+			// 用户属性管理
+			registerUserAttributeRoutes(root, h)
+
+			// 错误透传规则管理
+			registerErrorPassthroughRoutes(root, h)
+
+			// TLS 指纹模板管理
+			registerTLSFingerprintProfileRoutes(root, h)
+
+			// API Key 管理
+			registerAdminAPIKeyRoutes(root, h)
+
+			// 渠道管理
+			registerChannelRoutes(root, h)
+
+			// 渠道监控
+			registerChannelMonitorRoutes(root, h, settingService)
+			registerChannelMonitorV2Routes(root, h, settingService)
+
+			// 风控中心
+			registerContentModerationRoutes(root, h)
+
+			// 独立提示词输入审计
+			registerPromptAuditRoutes(root, h)
+
+			// 邀请返利（专属用户管理）
+			registerAffiliateRoutes(root, h)
+
+			// 操作审计日志
+			registerAuditLogRoutes(root, h, stepUpAuth)
+		}
 	}
 }
 
@@ -518,8 +524,7 @@ func registerProxyRoutes(admin *gin.RouterGroup, h *handler.Handlers, stepUpAuth
 }
 
 func registerRedeemCodeRoutes(admin *gin.RouterGroup, h *handler.Handlers) {
-	codes := admin.Group("/redeem-codes")
-	{
+	register := func(codes *gin.RouterGroup) {
 		codes.GET("", h.Admin.Redeem.List)
 		codes.GET("/stats", h.Admin.Redeem.GetStats)
 		codes.GET("/export", h.Admin.Redeem.Export)
@@ -531,11 +536,12 @@ func registerRedeemCodeRoutes(admin *gin.RouterGroup, h *handler.Handlers) {
 		codes.POST("/batch-update", h.Admin.Redeem.BatchUpdate)
 		codes.POST("/:id/expire", h.Admin.Redeem.Expire)
 	}
+	register(admin.Group("/codes/redeem"))
+	register(admin.Group("/redeem-codes"))
 }
 
 func registerPromoCodeRoutes(admin *gin.RouterGroup, h *handler.Handlers) {
-	promoCodes := admin.Group("/promo-codes")
-	{
+	register := func(promoCodes *gin.RouterGroup) {
 		promoCodes.GET("", h.Admin.Promo.List)
 		promoCodes.GET("/:id", h.Admin.Promo.GetByID)
 		promoCodes.POST("", h.Admin.Promo.Create)
@@ -543,6 +549,8 @@ func registerPromoCodeRoutes(admin *gin.RouterGroup, h *handler.Handlers) {
 		promoCodes.DELETE("/:id", h.Admin.Promo.Delete)
 		promoCodes.GET("/:id/usages", h.Admin.Promo.GetUsages)
 	}
+	register(admin.Group("/codes/registration"))
+	register(admin.Group("/promo-codes"))
 }
 
 func registerSettingsRoutes(admin *gin.RouterGroup, h *handler.Handlers) {

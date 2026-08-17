@@ -65,7 +65,19 @@ type User struct {
 }
 
 func (u *User) IsAdmin() bool {
-	return u.Role == RoleAdmin
+	return u.Role == RoleRoot || u.Role == RoleAdmin
+}
+
+func (u *User) IsRoot() bool {
+	return u.Role == RoleRoot
+}
+
+func (u *User) IsReseller() bool {
+	return u.Role == RoleReseller
+}
+
+func (u *User) CanAccessAdminPanel() bool {
+	return u.IsAdmin()
 }
 
 func (u *User) IsActive() bool {

@@ -800,6 +800,7 @@ var ProviderSet = wire.NewSet(
 	NewAccountService,
 	NewProxyService,
 	NewRedeemService,
+	NewResellerService,
 	NewPromoService,
 	NewUsageService,
 	NewDashboardService,

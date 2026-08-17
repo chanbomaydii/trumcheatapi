@@ -56,7 +56,7 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: true, title: 'Usage Statistics' }
   },
   {
-    path: '/redeem',
+    path: '/activate-cdkey',
     name: 'Redeem',
     component: () => import('@/views/RedeemView.vue'),
     meta: { requiresAuth: true, title: 'Redeem Code' }

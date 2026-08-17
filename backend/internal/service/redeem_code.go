@@ -10,6 +10,7 @@ type RedeemCode struct {
 	ID        int64
 	Code      string
 	Type      string
+	Source    string
 	Value     float64
 	Status    string
 	UsedBy    *int64
@@ -18,8 +19,10 @@ type RedeemCode struct {
 	CreatedAt time.Time
 	ExpiresAt *time.Time
 
-	GroupID      *int64
-	ValidityDays int
+	GroupID             *int64
+	CreatedByResellerID *int64
+	ResellerLedgerID    *int64
+	ValidityDays        int
 
 	User  *User
 	Group *Group

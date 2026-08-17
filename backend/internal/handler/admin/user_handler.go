@@ -63,7 +63,7 @@ type CreateUserRequest struct {
 	Password      string   `json:"password" binding:"required,min=6"`
 	Username      string   `json:"username"`
 	Notes         string   `json:"notes"`
-	Role          string   `json:"role" binding:"omitempty,oneof=admin user"`
+	Role          string   `json:"role" binding:"omitempty,oneof=root admin reseller user"`
 	Balance       *float64 `json:"balance"`
 	Concurrency   int      `json:"concurrency"`
 	RPMLimit      int      `json:"rpm_limit"`
@@ -77,7 +77,7 @@ type UpdateUserRequest struct {
 	Password      string   `json:"password" binding:"omitempty,min=6"`
 	Username      *string  `json:"username"`
 	Notes         *string  `json:"notes"`
-	Role          string   `json:"role" binding:"omitempty,oneof=admin user"`
+	Role          string   `json:"role" binding:"omitempty,oneof=root admin reseller user"`
 	Balance       *float64 `json:"balance"`
 	Concurrency   *int     `json:"concurrency"`
 	RPMLimit      *int     `json:"rpm_limit"`
@@ -111,6 +111,60 @@ type BindUserAuthIdentityChannelRequest struct {
 	Metadata       map[string]any `json:"metadata"`
 }
 
+func isRootActor(c *gin.Context) bool {
+	role, ok := middleware.GetUserRoleFromContext(c)
+	return ok && role == service.RoleRoot
+}
+
+func canAdminManageRole(role string) bool {
+	return role == service.RoleReseller || role == service.RoleUser
+}
+
+func (h *UserHandler) authorizeAssignedRole(c *gin.Context, role string) bool {
+	if isRootActor(c) || role == "" || canAdminManageRole(role) {
+		return true
+	}
+	response.Forbidden(c, "Admin can only assign reseller or user roles")
+	return false
+}
+
+func (h *UserHandler) authorizeUserTarget(c *gin.Context, userID int64) (*service.User, bool) {
+	user, err := h.adminService.GetUser(c.Request.Context(), userID)
+	if err != nil {
+		response.ErrorFrom(c, err)
+		return nil, false
+	}
+	if !isRootActor(c) && !canAdminManageRole(user.Role) {
+		response.Forbidden(c, "Admin cannot manage root or admin accounts")
+		return nil, false
+	}
+	return user, true
+}
+
+func authorizeLoadedUserTarget(c *gin.Context, user *service.User) bool {
+	if user == nil {
+		response.NotFound(c, "User not found")
+		return false
+	}
+	if !isRootActor(c) && !canAdminManageRole(user.Role) {
+		response.Forbidden(c, "Admin cannot manage root or admin accounts")
+		return false
+	}
+	return true
+}
+
+func (h *UserHandler) authorizeUserTargets(c *gin.Context, userIDs []int64) bool {
+	if isRootActor(c) {
+		return true
+	}
+	for _, userID := range userIDs {
+		if _, ok := h.authorizeUserTarget(c, userID); !ok {
+			return false
+		}
+	}
+	return true
+}
+
 // List handles listing all users with pagination
 // GET /api/v1/admin/users
 // Query params:
@@ -136,6 +190,9 @@ func (h *UserHandler) List(c *gin.Context) {
 		Search:     search,
 		GroupName:  strings.TrimSpace(c.Query("group_name")),
 		Attributes: parseAttributeFilters(c),
+	}
+	if !isRootActor(c) {
+		filters.Roles = []string{service.RoleReseller, service.RoleUser}
 	}
 	if raw := strings.TrimSpace(c.Query("api_key_group_id")); raw != "" {
 		if id, parseErr := strconv.ParseInt(raw, 10, 64); parseErr == nil && id > 0 {
@@ -224,6 +281,9 @@ func (h *UserHandler) GetByID(c *gin.Context) {
 		response.ErrorFrom(c, err)
 		return
 	}
+	if !authorizeLoadedUserTarget(c, user) {
+		return
+	}
 
 	response.Success(c, dto.UserFromServiceAdmin(user))
 }
@@ -234,6 +294,9 @@ func (h *UserHandler) BindAuthIdentity(c *gin.Context) {
 	userID, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		response.BadRequest(c, "Invalid user ID")
+		return
+	}
+	if _, ok := h.authorizeUserTarget(c, userID); !ok {
 		return
 	}
 
@@ -275,9 +338,12 @@ func (h *UserHandler) Create(c *gin.Context) {
 		response.BadRequest(c, "Invalid request: "+err.Error())
 		return
 	}
+	if !h.authorizeAssignedRole(c, req.Role) {
+		return
+	}
 
-	// 创建管理员账号属权限敏感操作：需最近完成 step-up 2FA 验证。
-	if req.Role == service.RoleAdmin {
+	// 创建 Root/Admin 属权限敏感操作：需最近完成 step-up 2FA 验证。
+	if req.Role == service.RoleRoot || req.Role == service.RoleAdmin {
 		if !middleware.EnforceStepUp(c, h.totpService, h.userService, h.settingService) {
 			return
 		}
@@ -317,23 +383,22 @@ func (h *UserHandler) Update(c *gin.Context) {
 		response.BadRequest(c, "Invalid request: "+err.Error())
 		return
 	}
+	target, ok := h.authorizeUserTarget(c, userID)
+	if !ok || !h.authorizeAssignedRole(c, req.Role) {
+		return
+	}
 
 	// 防锁死保护：管理员不能把自己降级为普通用户(单管理员场景下会失去后台访问权)。
 	// 与既有"不能禁用/删除 admin"保护一致。降级其他管理员仍然允许。
-	if req.Role == service.RoleUser && userID == getAdminIDFromContext(c) {
+	if req.Role != "" && req.Role != target.Role && userID == getAdminIDFromContext(c) {
 		response.BadRequest(c, "cannot demote yourself from admin")
 		return
 	}
 
 	// 把普通用户提升为管理员属权限敏感操作：需最近完成 step-up 2FA 验证。
 	// 目标已是管理员时（前端编辑表单总是携带 role）不触发，避免日常编辑被打断。
-	if req.Role == service.RoleAdmin {
-		target, err := h.adminService.GetUser(c.Request.Context(), userID)
-		if err != nil {
-			response.ErrorFrom(c, err)
-			return
-		}
-		if target.Role != service.RoleAdmin {
+	if req.Role == service.RoleRoot || req.Role == service.RoleAdmin {
+		if target.Role != req.Role {
 			if !middleware.EnforceStepUp(c, h.totpService, h.userService, h.settingService) {
 				return
 			}
@@ -371,6 +436,9 @@ func (h *UserHandler) Delete(c *gin.Context) {
 		response.BadRequest(c, "Invalid user ID")
 		return
 	}
+	if _, ok := h.authorizeUserTarget(c, userID); !ok {
+		return
+	}
 
 	err = h.adminService.DeleteUser(c.Request.Context(), userID)
 	if err != nil {
@@ -387,6 +455,9 @@ func (h *UserHandler) UpdateBalance(c *gin.Context) {
 	userID, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		response.BadRequest(c, "Invalid user ID")
+		return
+	}
+	if _, ok := h.authorizeUserTarget(c, userID); !ok {
 		return
 	}
 
@@ -420,6 +491,9 @@ func (h *UserHandler) GetUserAPIKeys(c *gin.Context) {
 		response.BadRequest(c, "Invalid user ID")
 		return
 	}
+	if _, ok := h.authorizeUserTarget(c, userID); !ok {
+		return
+	}
 
 	page, pageSize := response.ParsePagination(c)
 	sortBy := c.DefaultQuery("sort_by", "created_at")
@@ -446,6 +520,9 @@ func (h *UserHandler) GetUserUsage(c *gin.Context) {
 		response.BadRequest(c, "Invalid user ID")
 		return
 	}
+	if _, ok := h.authorizeUserTarget(c, userID); !ok {
+		return
+	}
 
 	period := c.DefaultQuery("period", "month")
 
@@ -466,6 +543,9 @@ func (h *UserHandler) GetBalanceHistory(c *gin.Context) {
 	userID, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		response.BadRequest(c, "Invalid user ID")
+		return
+	}
+	if _, ok := h.authorizeUserTarget(c, userID); !ok {
 		return
 	}
 
@@ -513,6 +593,9 @@ func (h *UserHandler) ReplaceGroup(c *gin.Context) {
 		response.BadRequest(c, "Invalid user ID")
 		return
 	}
+	if _, ok := h.authorizeUserTarget(c, userID); !ok {
+		return
+	}
 
 	var req ReplaceGroupRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -537,6 +620,9 @@ func (h *UserHandler) GetUserRPMStatus(c *gin.Context) {
 	userID, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		response.BadRequest(c, "Invalid user ID")
+		return
+	}
+	if _, ok := h.authorizeUserTarget(c, userID); !ok {
 		return
 	}
 
@@ -598,6 +684,9 @@ func (h *UserHandler) BatchUpdateConcurrency(c *gin.Context) {
 
 	if len(userIDs) == 0 {
 		response.Success(c, gin.H{"affected": 0})
+		return
+	}
+	if !h.authorizeUserTargets(c, userIDs) {
 		return
 	}
 
@@ -662,6 +751,9 @@ func (h *UserHandler) BatchUpdateLimits(c *gin.Context) {
 		response.Success(c, gin.H{"affected": 0})
 		return
 	}
+	if !h.authorizeUserTargets(c, userIDs) {
+		return
+	}
 
 	affected, err := h.adminService.BatchUpdateLimits(
 		c.Request.Context(),
@@ -683,6 +775,9 @@ func (h *UserHandler) GetUserPlatformQuotas(c *gin.Context) {
 	userID, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
 		response.BadRequest(c, "invalid user id")
+		return
+	}
+	if _, ok := h.authorizeUserTarget(c, userID); !ok {
 		return
 	}
 	if h.userPlatformQuotaRepo == nil {
@@ -733,6 +828,9 @@ func (h *UserHandler) UpdateUserPlatformQuotas(c *gin.Context) {
 	userID, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		response.BadRequest(c, "Invalid user ID")
+		return
+	}
+	if _, ok := h.authorizeUserTarget(c, userID); !ok {
 		return
 	}
 
@@ -909,6 +1007,9 @@ func (h *UserHandler) ResetUserPlatformQuotaWindow(c *gin.Context) {
 	userID, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		response.BadRequest(c, "Invalid user ID")
+		return
+	}
+	if _, ok := h.authorizeUserTarget(c, userID); !ok {
 		return
 	}
 

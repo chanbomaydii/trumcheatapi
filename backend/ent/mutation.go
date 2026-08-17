@@ -38932,28 +38932,33 @@ func (m *ProxyMutation) ResetEdge(name string) error {
 // RedeemCodeMutation represents an operation that mutates the RedeemCode nodes in the graph.
 type RedeemCodeMutation struct {
 	config
-	op               Op
-	typ              string
-	id               *int64
-	code             *string
-	_type            *string
-	value            *float64
-	addvalue         *float64
-	status           *string
-	used_at          *time.Time
-	notes            *string
-	created_at       *time.Time
-	expires_at       *time.Time
-	validity_days    *int
-	addvalidity_days *int
-	clearedFields    map[string]struct{}
-	user             *int64
-	cleareduser      bool
-	group            *int64
-	clearedgroup     bool
-	done             bool
-	oldValue         func(context.Context) (*RedeemCode, error)
-	predicates       []predicate.RedeemCode
+	op                         Op
+	typ                        string
+	id                         *int64
+	code                       *string
+	_type                      *string
+	source                     *string
+	value                      *float64
+	addvalue                   *float64
+	status                     *string
+	used_at                    *time.Time
+	notes                      *string
+	created_at                 *time.Time
+	expires_at                 *time.Time
+	validity_days              *int
+	addvalidity_days           *int
+	reseller_ledger_id         *int64
+	addreseller_ledger_id      *int64
+	clearedFields              map[string]struct{}
+	user                       *int64
+	cleareduser                bool
+	group                      *int64
+	clearedgroup               bool
+	created_by_reseller        *int64
+	clearedcreated_by_reseller bool
+	done                       bool
+	oldValue                   func(context.Context) (*RedeemCode, error)
+	predicates                 []predicate.RedeemCode
 }
 
 var _ ent.Mutation = (*RedeemCodeMutation)(nil)
@@ -39124,6 +39129,42 @@ func (m *RedeemCodeMutation) OldType(ctx context.Context) (v string, err error) 
 // ResetType resets all changes to the "type" field.
 func (m *RedeemCodeMutation) ResetType() {
 	m._type = nil
+}
+
+// SetSource sets the "source" field.
+func (m *RedeemCodeMutation) SetSource(s string) {
+	m.source = &s
+}
+
+// Source returns the value of the "source" field in the mutation.
+func (m *RedeemCodeMutation) Source() (r string, exists bool) {
+	v := m.source
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSource returns the old "source" field's value of the RedeemCode entity.
+// If the RedeemCode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RedeemCodeMutation) OldSource(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSource is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSource requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSource: %w", err)
+	}
+	return oldValue.Source, nil
+}
+
+// ResetSource resets all changes to the "source" field.
+func (m *RedeemCodeMutation) ResetSource() {
+	m.source = nil
 }
 
 // SetValue sets the "value" field.
@@ -39555,6 +39596,125 @@ func (m *RedeemCodeMutation) ResetValidityDays() {
 	m.addvalidity_days = nil
 }
 
+// SetCreatedByResellerID sets the "created_by_reseller_id" field.
+func (m *RedeemCodeMutation) SetCreatedByResellerID(i int64) {
+	m.created_by_reseller = &i
+}
+
+// CreatedByResellerID returns the value of the "created_by_reseller_id" field in the mutation.
+func (m *RedeemCodeMutation) CreatedByResellerID() (r int64, exists bool) {
+	v := m.created_by_reseller
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedByResellerID returns the old "created_by_reseller_id" field's value of the RedeemCode entity.
+// If the RedeemCode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RedeemCodeMutation) OldCreatedByResellerID(ctx context.Context) (v *int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedByResellerID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedByResellerID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedByResellerID: %w", err)
+	}
+	return oldValue.CreatedByResellerID, nil
+}
+
+// ClearCreatedByResellerID clears the value of the "created_by_reseller_id" field.
+func (m *RedeemCodeMutation) ClearCreatedByResellerID() {
+	m.created_by_reseller = nil
+	m.clearedFields[redeemcode.FieldCreatedByResellerID] = struct{}{}
+}
+
+// CreatedByResellerIDCleared returns if the "created_by_reseller_id" field was cleared in this mutation.
+func (m *RedeemCodeMutation) CreatedByResellerIDCleared() bool {
+	_, ok := m.clearedFields[redeemcode.FieldCreatedByResellerID]
+	return ok
+}
+
+// ResetCreatedByResellerID resets all changes to the "created_by_reseller_id" field.
+func (m *RedeemCodeMutation) ResetCreatedByResellerID() {
+	m.created_by_reseller = nil
+	delete(m.clearedFields, redeemcode.FieldCreatedByResellerID)
+}
+
+// SetResellerLedgerID sets the "reseller_ledger_id" field.
+func (m *RedeemCodeMutation) SetResellerLedgerID(i int64) {
+	m.reseller_ledger_id = &i
+	m.addreseller_ledger_id = nil
+}
+
+// ResellerLedgerID returns the value of the "reseller_ledger_id" field in the mutation.
+func (m *RedeemCodeMutation) ResellerLedgerID() (r int64, exists bool) {
+	v := m.reseller_ledger_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldResellerLedgerID returns the old "reseller_ledger_id" field's value of the RedeemCode entity.
+// If the RedeemCode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RedeemCodeMutation) OldResellerLedgerID(ctx context.Context) (v *int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldResellerLedgerID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldResellerLedgerID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldResellerLedgerID: %w", err)
+	}
+	return oldValue.ResellerLedgerID, nil
+}
+
+// AddResellerLedgerID adds i to the "reseller_ledger_id" field.
+func (m *RedeemCodeMutation) AddResellerLedgerID(i int64) {
+	if m.addreseller_ledger_id != nil {
+		*m.addreseller_ledger_id += i
+	} else {
+		m.addreseller_ledger_id = &i
+	}
+}
+
+// AddedResellerLedgerID returns the value that was added to the "reseller_ledger_id" field in this mutation.
+func (m *RedeemCodeMutation) AddedResellerLedgerID() (r int64, exists bool) {
+	v := m.addreseller_ledger_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearResellerLedgerID clears the value of the "reseller_ledger_id" field.
+func (m *RedeemCodeMutation) ClearResellerLedgerID() {
+	m.reseller_ledger_id = nil
+	m.addreseller_ledger_id = nil
+	m.clearedFields[redeemcode.FieldResellerLedgerID] = struct{}{}
+}
+
+// ResellerLedgerIDCleared returns if the "reseller_ledger_id" field was cleared in this mutation.
+func (m *RedeemCodeMutation) ResellerLedgerIDCleared() bool {
+	_, ok := m.clearedFields[redeemcode.FieldResellerLedgerID]
+	return ok
+}
+
+// ResetResellerLedgerID resets all changes to the "reseller_ledger_id" field.
+func (m *RedeemCodeMutation) ResetResellerLedgerID() {
+	m.reseller_ledger_id = nil
+	m.addreseller_ledger_id = nil
+	delete(m.clearedFields, redeemcode.FieldResellerLedgerID)
+}
+
 // SetUserID sets the "user" edge to the User entity by id.
 func (m *RedeemCodeMutation) SetUserID(id int64) {
 	m.user = &id
@@ -39622,6 +39782,33 @@ func (m *RedeemCodeMutation) ResetGroup() {
 	m.clearedgroup = false
 }
 
+// ClearCreatedByReseller clears the "created_by_reseller" edge to the User entity.
+func (m *RedeemCodeMutation) ClearCreatedByReseller() {
+	m.clearedcreated_by_reseller = true
+	m.clearedFields[redeemcode.FieldCreatedByResellerID] = struct{}{}
+}
+
+// CreatedByResellerCleared reports if the "created_by_reseller" edge to the User entity was cleared.
+func (m *RedeemCodeMutation) CreatedByResellerCleared() bool {
+	return m.CreatedByResellerIDCleared() || m.clearedcreated_by_reseller
+}
+
+// CreatedByResellerIDs returns the "created_by_reseller" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CreatedByResellerID instead. It exists only for internal usage by the builders.
+func (m *RedeemCodeMutation) CreatedByResellerIDs() (ids []int64) {
+	if id := m.created_by_reseller; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCreatedByReseller resets all changes to the "created_by_reseller" edge.
+func (m *RedeemCodeMutation) ResetCreatedByReseller() {
+	m.created_by_reseller = nil
+	m.clearedcreated_by_reseller = false
+}
+
 // Where appends a list predicates to the RedeemCodeMutation builder.
 func (m *RedeemCodeMutation) Where(ps ...predicate.RedeemCode) {
 	m.predicates = append(m.predicates, ps...)
@@ -39656,12 +39843,15 @@ func (m *RedeemCodeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RedeemCodeMutation) Fields() []string {
-	fields := make([]string, 0, 11)
+	fields := make([]string, 0, 14)
 	if m.code != nil {
 		fields = append(fields, redeemcode.FieldCode)
 	}
 	if m._type != nil {
 		fields = append(fields, redeemcode.FieldType)
+	}
+	if m.source != nil {
+		fields = append(fields, redeemcode.FieldSource)
 	}
 	if m.value != nil {
 		fields = append(fields, redeemcode.FieldValue)
@@ -39690,6 +39880,12 @@ func (m *RedeemCodeMutation) Fields() []string {
 	if m.validity_days != nil {
 		fields = append(fields, redeemcode.FieldValidityDays)
 	}
+	if m.created_by_reseller != nil {
+		fields = append(fields, redeemcode.FieldCreatedByResellerID)
+	}
+	if m.reseller_ledger_id != nil {
+		fields = append(fields, redeemcode.FieldResellerLedgerID)
+	}
 	return fields
 }
 
@@ -39702,6 +39898,8 @@ func (m *RedeemCodeMutation) Field(name string) (ent.Value, bool) {
 		return m.Code()
 	case redeemcode.FieldType:
 		return m.GetType()
+	case redeemcode.FieldSource:
+		return m.Source()
 	case redeemcode.FieldValue:
 		return m.Value()
 	case redeemcode.FieldStatus:
@@ -39720,6 +39918,10 @@ func (m *RedeemCodeMutation) Field(name string) (ent.Value, bool) {
 		return m.GroupID()
 	case redeemcode.FieldValidityDays:
 		return m.ValidityDays()
+	case redeemcode.FieldCreatedByResellerID:
+		return m.CreatedByResellerID()
+	case redeemcode.FieldResellerLedgerID:
+		return m.ResellerLedgerID()
 	}
 	return nil, false
 }
@@ -39733,6 +39935,8 @@ func (m *RedeemCodeMutation) OldField(ctx context.Context, name string) (ent.Val
 		return m.OldCode(ctx)
 	case redeemcode.FieldType:
 		return m.OldType(ctx)
+	case redeemcode.FieldSource:
+		return m.OldSource(ctx)
 	case redeemcode.FieldValue:
 		return m.OldValue(ctx)
 	case redeemcode.FieldStatus:
@@ -39751,6 +39955,10 @@ func (m *RedeemCodeMutation) OldField(ctx context.Context, name string) (ent.Val
 		return m.OldGroupID(ctx)
 	case redeemcode.FieldValidityDays:
 		return m.OldValidityDays(ctx)
+	case redeemcode.FieldCreatedByResellerID:
+		return m.OldCreatedByResellerID(ctx)
+	case redeemcode.FieldResellerLedgerID:
+		return m.OldResellerLedgerID(ctx)
 	}
 	return nil, fmt.Errorf("unknown RedeemCode field %s", name)
 }
@@ -39773,6 +39981,13 @@ func (m *RedeemCodeMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetType(v)
+		return nil
+	case redeemcode.FieldSource:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSource(v)
 		return nil
 	case redeemcode.FieldValue:
 		v, ok := value.(float64)
@@ -39837,6 +40052,20 @@ func (m *RedeemCodeMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetValidityDays(v)
 		return nil
+	case redeemcode.FieldCreatedByResellerID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedByResellerID(v)
+		return nil
+	case redeemcode.FieldResellerLedgerID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetResellerLedgerID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown RedeemCode field %s", name)
 }
@@ -39851,6 +40080,9 @@ func (m *RedeemCodeMutation) AddedFields() []string {
 	if m.addvalidity_days != nil {
 		fields = append(fields, redeemcode.FieldValidityDays)
 	}
+	if m.addreseller_ledger_id != nil {
+		fields = append(fields, redeemcode.FieldResellerLedgerID)
+	}
 	return fields
 }
 
@@ -39863,6 +40095,8 @@ func (m *RedeemCodeMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedValue()
 	case redeemcode.FieldValidityDays:
 		return m.AddedValidityDays()
+	case redeemcode.FieldResellerLedgerID:
+		return m.AddedResellerLedgerID()
 	}
 	return nil, false
 }
@@ -39886,6 +40120,13 @@ func (m *RedeemCodeMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddValidityDays(v)
 		return nil
+	case redeemcode.FieldResellerLedgerID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddResellerLedgerID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown RedeemCode numeric field %s", name)
 }
@@ -39908,6 +40149,12 @@ func (m *RedeemCodeMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(redeemcode.FieldGroupID) {
 		fields = append(fields, redeemcode.FieldGroupID)
+	}
+	if m.FieldCleared(redeemcode.FieldCreatedByResellerID) {
+		fields = append(fields, redeemcode.FieldCreatedByResellerID)
+	}
+	if m.FieldCleared(redeemcode.FieldResellerLedgerID) {
+		fields = append(fields, redeemcode.FieldResellerLedgerID)
 	}
 	return fields
 }
@@ -39938,6 +40185,12 @@ func (m *RedeemCodeMutation) ClearField(name string) error {
 	case redeemcode.FieldGroupID:
 		m.ClearGroupID()
 		return nil
+	case redeemcode.FieldCreatedByResellerID:
+		m.ClearCreatedByResellerID()
+		return nil
+	case redeemcode.FieldResellerLedgerID:
+		m.ClearResellerLedgerID()
+		return nil
 	}
 	return fmt.Errorf("unknown RedeemCode nullable field %s", name)
 }
@@ -39951,6 +40204,9 @@ func (m *RedeemCodeMutation) ResetField(name string) error {
 		return nil
 	case redeemcode.FieldType:
 		m.ResetType()
+		return nil
+	case redeemcode.FieldSource:
+		m.ResetSource()
 		return nil
 	case redeemcode.FieldValue:
 		m.ResetValue()
@@ -39979,18 +40235,27 @@ func (m *RedeemCodeMutation) ResetField(name string) error {
 	case redeemcode.FieldValidityDays:
 		m.ResetValidityDays()
 		return nil
+	case redeemcode.FieldCreatedByResellerID:
+		m.ResetCreatedByResellerID()
+		return nil
+	case redeemcode.FieldResellerLedgerID:
+		m.ResetResellerLedgerID()
+		return nil
 	}
 	return fmt.Errorf("unknown RedeemCode field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *RedeemCodeMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.user != nil {
 		edges = append(edges, redeemcode.EdgeUser)
 	}
 	if m.group != nil {
 		edges = append(edges, redeemcode.EdgeGroup)
+	}
+	if m.created_by_reseller != nil {
+		edges = append(edges, redeemcode.EdgeCreatedByReseller)
 	}
 	return edges
 }
@@ -40007,13 +40272,17 @@ func (m *RedeemCodeMutation) AddedIDs(name string) []ent.Value {
 		if id := m.group; id != nil {
 			return []ent.Value{*id}
 		}
+	case redeemcode.EdgeCreatedByReseller:
+		if id := m.created_by_reseller; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *RedeemCodeMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	return edges
 }
 
@@ -40025,12 +40294,15 @@ func (m *RedeemCodeMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *RedeemCodeMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.cleareduser {
 		edges = append(edges, redeemcode.EdgeUser)
 	}
 	if m.clearedgroup {
 		edges = append(edges, redeemcode.EdgeGroup)
+	}
+	if m.clearedcreated_by_reseller {
+		edges = append(edges, redeemcode.EdgeCreatedByReseller)
 	}
 	return edges
 }
@@ -40043,6 +40315,8 @@ func (m *RedeemCodeMutation) EdgeCleared(name string) bool {
 		return m.cleareduser
 	case redeemcode.EdgeGroup:
 		return m.clearedgroup
+	case redeemcode.EdgeCreatedByReseller:
+		return m.clearedcreated_by_reseller
 	}
 	return false
 }
@@ -40057,6 +40331,9 @@ func (m *RedeemCodeMutation) ClearEdge(name string) error {
 	case redeemcode.EdgeGroup:
 		m.ClearGroup()
 		return nil
+	case redeemcode.EdgeCreatedByReseller:
+		m.ClearCreatedByReseller()
+		return nil
 	}
 	return fmt.Errorf("unknown RedeemCode unique edge %s", name)
 }
@@ -40070,6 +40347,9 @@ func (m *RedeemCodeMutation) ResetEdge(name string) error {
 		return nil
 	case redeemcode.EdgeGroup:
 		m.ResetGroup()
+		return nil
+	case redeemcode.EdgeCreatedByReseller:
+		m.ResetCreatedByReseller()
 		return nil
 	}
 	return fmt.Errorf("unknown RedeemCode edge %s", name)
@@ -48846,82 +49126,85 @@ func (m *UsageLogMutation) ResetEdge(name string) error {
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op                            Op
-	typ                           string
-	id                            *int64
-	created_at                    *time.Time
-	updated_at                    *time.Time
-	deleted_at                    *time.Time
-	email                         *string
-	password_hash                 *string
-	role                          *string
-	balance                       *float64
-	addbalance                    *float64
-	frozen_balance                *float64
-	addfrozen_balance             *float64
-	concurrency                   *int
-	addconcurrency                *int
-	status                        *string
-	username                      *string
-	notes                         *string
-	totp_secret_encrypted         *string
-	totp_enabled                  *bool
-	totp_enabled_at               *time.Time
-	signup_source                 *string
-	last_login_at                 *time.Time
-	last_active_at                *time.Time
-	balance_notify_enabled        *bool
-	balance_notify_threshold_type *string
-	balance_notify_threshold      *float64
-	addbalance_notify_threshold   *float64
-	balance_notify_extra_emails   *string
-	total_recharged               *float64
-	addtotal_recharged            *float64
-	rpm_limit                     *int
-	addrpm_limit                  *int
-	clearedFields                 map[string]struct{}
-	api_keys                      map[int64]struct{}
-	removedapi_keys               map[int64]struct{}
-	clearedapi_keys               bool
-	redeem_codes                  map[int64]struct{}
-	removedredeem_codes           map[int64]struct{}
-	clearedredeem_codes           bool
-	subscriptions                 map[int64]struct{}
-	removedsubscriptions          map[int64]struct{}
-	clearedsubscriptions          bool
-	assigned_subscriptions        map[int64]struct{}
-	removedassigned_subscriptions map[int64]struct{}
-	clearedassigned_subscriptions bool
-	announcement_reads            map[int64]struct{}
-	removedannouncement_reads     map[int64]struct{}
-	clearedannouncement_reads     bool
-	allowed_groups                map[int64]struct{}
-	removedallowed_groups         map[int64]struct{}
-	clearedallowed_groups         bool
-	usage_logs                    map[int64]struct{}
-	removedusage_logs             map[int64]struct{}
-	clearedusage_logs             bool
-	attribute_values              map[int64]struct{}
-	removedattribute_values       map[int64]struct{}
-	clearedattribute_values       bool
-	promo_code_usages             map[int64]struct{}
-	removedpromo_code_usages      map[int64]struct{}
-	clearedpromo_code_usages      bool
-	payment_orders                map[int64]struct{}
-	removedpayment_orders         map[int64]struct{}
-	clearedpayment_orders         bool
-	auth_identities               map[int64]struct{}
-	removedauth_identities        map[int64]struct{}
-	clearedauth_identities        bool
-	pending_auth_sessions         map[int64]struct{}
-	removedpending_auth_sessions  map[int64]struct{}
-	clearedpending_auth_sessions  bool
-	platform_quotas               map[int64]struct{}
-	removedplatform_quotas        map[int64]struct{}
-	clearedplatform_quotas        bool
-	done                          bool
-	oldValue                      func(context.Context) (*User, error)
-	predicates                    []predicate.User
+	op                                   Op
+	typ                                  string
+	id                                   *int64
+	created_at                           *time.Time
+	updated_at                           *time.Time
+	deleted_at                           *time.Time
+	email                                *string
+	password_hash                        *string
+	role                                 *string
+	balance                              *float64
+	addbalance                           *float64
+	frozen_balance                       *float64
+	addfrozen_balance                    *float64
+	concurrency                          *int
+	addconcurrency                       *int
+	status                               *string
+	username                             *string
+	notes                                *string
+	totp_secret_encrypted                *string
+	totp_enabled                         *bool
+	totp_enabled_at                      *time.Time
+	signup_source                        *string
+	last_login_at                        *time.Time
+	last_active_at                       *time.Time
+	balance_notify_enabled               *bool
+	balance_notify_threshold_type        *string
+	balance_notify_threshold             *float64
+	addbalance_notify_threshold          *float64
+	balance_notify_extra_emails          *string
+	total_recharged                      *float64
+	addtotal_recharged                   *float64
+	rpm_limit                            *int
+	addrpm_limit                         *int
+	clearedFields                        map[string]struct{}
+	api_keys                             map[int64]struct{}
+	removedapi_keys                      map[int64]struct{}
+	clearedapi_keys                      bool
+	redeem_codes                         map[int64]struct{}
+	removedredeem_codes                  map[int64]struct{}
+	clearedredeem_codes                  bool
+	created_reseller_redeem_codes        map[int64]struct{}
+	removedcreated_reseller_redeem_codes map[int64]struct{}
+	clearedcreated_reseller_redeem_codes bool
+	subscriptions                        map[int64]struct{}
+	removedsubscriptions                 map[int64]struct{}
+	clearedsubscriptions                 bool
+	assigned_subscriptions               map[int64]struct{}
+	removedassigned_subscriptions        map[int64]struct{}
+	clearedassigned_subscriptions        bool
+	announcement_reads                   map[int64]struct{}
+	removedannouncement_reads            map[int64]struct{}
+	clearedannouncement_reads            bool
+	allowed_groups                       map[int64]struct{}
+	removedallowed_groups                map[int64]struct{}
+	clearedallowed_groups                bool
+	usage_logs                           map[int64]struct{}
+	removedusage_logs                    map[int64]struct{}
+	clearedusage_logs                    bool
+	attribute_values                     map[int64]struct{}
+	removedattribute_values              map[int64]struct{}
+	clearedattribute_values              bool
+	promo_code_usages                    map[int64]struct{}
+	removedpromo_code_usages             map[int64]struct{}
+	clearedpromo_code_usages             bool
+	payment_orders                       map[int64]struct{}
+	removedpayment_orders                map[int64]struct{}
+	clearedpayment_orders                bool
+	auth_identities                      map[int64]struct{}
+	removedauth_identities               map[int64]struct{}
+	clearedauth_identities               bool
+	pending_auth_sessions                map[int64]struct{}
+	removedpending_auth_sessions         map[int64]struct{}
+	clearedpending_auth_sessions         bool
+	platform_quotas                      map[int64]struct{}
+	removedplatform_quotas               map[int64]struct{}
+	clearedplatform_quotas               bool
+	done                                 bool
+	oldValue                             func(context.Context) (*User, error)
+	predicates                           []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -50193,6 +50476,60 @@ func (m *UserMutation) ResetRedeemCodes() {
 	m.removedredeem_codes = nil
 }
 
+// AddCreatedResellerRedeemCodeIDs adds the "created_reseller_redeem_codes" edge to the RedeemCode entity by ids.
+func (m *UserMutation) AddCreatedResellerRedeemCodeIDs(ids ...int64) {
+	if m.created_reseller_redeem_codes == nil {
+		m.created_reseller_redeem_codes = make(map[int64]struct{})
+	}
+	for i := range ids {
+		m.created_reseller_redeem_codes[ids[i]] = struct{}{}
+	}
+}
+
+// ClearCreatedResellerRedeemCodes clears the "created_reseller_redeem_codes" edge to the RedeemCode entity.
+func (m *UserMutation) ClearCreatedResellerRedeemCodes() {
+	m.clearedcreated_reseller_redeem_codes = true
+}
+
+// CreatedResellerRedeemCodesCleared reports if the "created_reseller_redeem_codes" edge to the RedeemCode entity was cleared.
+func (m *UserMutation) CreatedResellerRedeemCodesCleared() bool {
+	return m.clearedcreated_reseller_redeem_codes
+}
+
+// RemoveCreatedResellerRedeemCodeIDs removes the "created_reseller_redeem_codes" edge to the RedeemCode entity by IDs.
+func (m *UserMutation) RemoveCreatedResellerRedeemCodeIDs(ids ...int64) {
+	if m.removedcreated_reseller_redeem_codes == nil {
+		m.removedcreated_reseller_redeem_codes = make(map[int64]struct{})
+	}
+	for i := range ids {
+		delete(m.created_reseller_redeem_codes, ids[i])
+		m.removedcreated_reseller_redeem_codes[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedCreatedResellerRedeemCodes returns the removed IDs of the "created_reseller_redeem_codes" edge to the RedeemCode entity.
+func (m *UserMutation) RemovedCreatedResellerRedeemCodesIDs() (ids []int64) {
+	for id := range m.removedcreated_reseller_redeem_codes {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// CreatedResellerRedeemCodesIDs returns the "created_reseller_redeem_codes" edge IDs in the mutation.
+func (m *UserMutation) CreatedResellerRedeemCodesIDs() (ids []int64) {
+	for id := range m.created_reseller_redeem_codes {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetCreatedResellerRedeemCodes resets all changes to the "created_reseller_redeem_codes" edge.
+func (m *UserMutation) ResetCreatedResellerRedeemCodes() {
+	m.created_reseller_redeem_codes = nil
+	m.clearedcreated_reseller_redeem_codes = false
+	m.removedcreated_reseller_redeem_codes = nil
+}
+
 // AddSubscriptionIDs adds the "subscriptions" edge to the UserSubscription entity by ids.
 func (m *UserMutation) AddSubscriptionIDs(ids ...int64) {
 	if m.subscriptions == nil {
@@ -51425,12 +51762,15 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 13)
+	edges := make([]string, 0, 14)
 	if m.api_keys != nil {
 		edges = append(edges, user.EdgeAPIKeys)
 	}
 	if m.redeem_codes != nil {
 		edges = append(edges, user.EdgeRedeemCodes)
+	}
+	if m.created_reseller_redeem_codes != nil {
+		edges = append(edges, user.EdgeCreatedResellerRedeemCodes)
 	}
 	if m.subscriptions != nil {
 		edges = append(edges, user.EdgeSubscriptions)
@@ -51481,6 +51821,12 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 	case user.EdgeRedeemCodes:
 		ids := make([]ent.Value, 0, len(m.redeem_codes))
 		for id := range m.redeem_codes {
+			ids = append(ids, id)
+		}
+		return ids
+	case user.EdgeCreatedResellerRedeemCodes:
+		ids := make([]ent.Value, 0, len(m.created_reseller_redeem_codes))
+		for id := range m.created_reseller_redeem_codes {
 			ids = append(ids, id)
 		}
 		return ids
@@ -51556,12 +51902,15 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 13)
+	edges := make([]string, 0, 14)
 	if m.removedapi_keys != nil {
 		edges = append(edges, user.EdgeAPIKeys)
 	}
 	if m.removedredeem_codes != nil {
 		edges = append(edges, user.EdgeRedeemCodes)
+	}
+	if m.removedcreated_reseller_redeem_codes != nil {
+		edges = append(edges, user.EdgeCreatedResellerRedeemCodes)
 	}
 	if m.removedsubscriptions != nil {
 		edges = append(edges, user.EdgeSubscriptions)
@@ -51612,6 +51961,12 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 	case user.EdgeRedeemCodes:
 		ids := make([]ent.Value, 0, len(m.removedredeem_codes))
 		for id := range m.removedredeem_codes {
+			ids = append(ids, id)
+		}
+		return ids
+	case user.EdgeCreatedResellerRedeemCodes:
+		ids := make([]ent.Value, 0, len(m.removedcreated_reseller_redeem_codes))
+		for id := range m.removedcreated_reseller_redeem_codes {
 			ids = append(ids, id)
 		}
 		return ids
@@ -51687,12 +52042,15 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 13)
+	edges := make([]string, 0, 14)
 	if m.clearedapi_keys {
 		edges = append(edges, user.EdgeAPIKeys)
 	}
 	if m.clearedredeem_codes {
 		edges = append(edges, user.EdgeRedeemCodes)
+	}
+	if m.clearedcreated_reseller_redeem_codes {
+		edges = append(edges, user.EdgeCreatedResellerRedeemCodes)
 	}
 	if m.clearedsubscriptions {
 		edges = append(edges, user.EdgeSubscriptions)
@@ -51738,6 +52096,8 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 		return m.clearedapi_keys
 	case user.EdgeRedeemCodes:
 		return m.clearedredeem_codes
+	case user.EdgeCreatedResellerRedeemCodes:
+		return m.clearedcreated_reseller_redeem_codes
 	case user.EdgeSubscriptions:
 		return m.clearedsubscriptions
 	case user.EdgeAssignedSubscriptions:
@@ -51781,6 +52141,9 @@ func (m *UserMutation) ResetEdge(name string) error {
 		return nil
 	case user.EdgeRedeemCodes:
 		m.ResetRedeemCodes()
+		return nil
+	case user.EdgeCreatedResellerRedeemCodes:
+		m.ResetCreatedResellerRedeemCodes()
 		return nil
 	case user.EdgeSubscriptions:
 		m.ResetSubscriptions()

@@ -39,8 +39,8 @@ export const i18n = createI18n({
   locale: getDefaultLocale(),
   fallbackLocale: DEFAULT_LOCALE,
   messages: {},
-  // τªüτö¿ HTML µ╢êµü»Φ¡ªσæè - σ╝òσ»╝µ¡ÑΘ¬ñΣ╜┐τö¿σ»îµûçµ£¼σåàσ«╣∩╝êdriver.js µö»µîü HTML∩╝ë
-  // Φ┐ÖΣ║¢σåàσ«╣µÿ»σåàΘâ¿σ«ÜΣ╣ëτÜä∩╝îΣ╕ìσ¡ÿσ£¿ XSS ΘúÄΘÖ⌐
+  // 禁用 HTML 消息警告 - 引导步骤使用富文本内容（driver.js 支持 HTML）
+  // 这些内容是内部定义的，不存在 XSS 风险
   warnHtmlMessage: false
 })
 
@@ -73,7 +73,7 @@ export async function setLocale(locale: string): Promise<void> {
   localStorage.setItem(LOCALE_KEY, locale)
   document.documentElement.setAttribute('lang', locale)
 
-  // σÉîµ¡Ñµ¢┤µû░µ╡ÅΦºêσÖ¿Θí╡τ¡╛µáçΘóÿ∩╝îΣ╜┐σà╢Φ╖ƒΘÜÅΦ»¡Φ¿Çσêçµìó
+  // 同步更新浏览器页签标题，使其跟随语言切换
   const { resolveRouteDocumentTitle } = await import('@/router/title')
   const { default: router } = await import('@/router')
   const { useAppStore } = await import('@/stores/app')
@@ -85,7 +85,7 @@ export async function setLocale(locale: string): Promise<void> {
   const adminSettingsStore = useAdminSettingsStore()
   const customMenuItems = [
     ...(appStore.cachedPublicSettings?.custom_menu_items ?? []),
-    ...(authStore.isAdmin ? adminSettingsStore.customMenuItems : []),
+    ...(authStore.isRoot ? adminSettingsStore.customMenuItems : []),
   ]
   document.title = resolveRouteDocumentTitle(route, appStore.siteName, customMenuItems)
 }
@@ -96,9 +96,9 @@ export function getLocale(): LocaleCode {
 }
 
 export const availableLocales = [
-  { code: 'en', name: 'English', flag: '≡ƒç║≡ƒç╕' },
-  { code: 'vi', name: 'Tiß║┐ng Viß╗çt', flag: '≡ƒç╗≡ƒç│' },
-  { code: 'zh', name: 'Σ╕¡µûç', flag: '≡ƒç¿≡ƒç│' }
+  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'vi', name: 'Tiếng Việt', flag: '🇻🇳' },
+  { code: 'zh', name: '中文', flag: '🇨🇳' }
 ] as const
 
 export default i18n

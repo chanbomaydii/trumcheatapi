@@ -59,6 +59,7 @@ func isValidAffiliateCodeFormat(code string) bool {
 
 type AffiliateSummary struct {
 	UserID               int64     `json:"user_id"`
+	Role                 string    `json:"-"`
 	AffCode              string    `json:"aff_code"`
 	AffCodeCustom        bool      `json:"aff_code_custom"`
 	AffRebateRatePercent *float64  `json:"aff_rebate_rate_percent,omitempty"`
@@ -69,6 +70,43 @@ type AffiliateSummary struct {
 	AffHistoryQuota      float64   `json:"aff_history_quota"`
 	CreatedAt            time.Time `json:"created_at"`
 	UpdatedAt            time.Time `json:"updated_at"`
+}
+
+func (s *AffiliateService) ResolveResellerCode(ctx context.Context, rawCode string) (*AffiliateSummary, error) {
+	code := strings.ToUpper(strings.TrimSpace(rawCode))
+	if s == nil || s.repo == nil || !isValidAffiliateCodeFormat(code) {
+		return nil, ErrAffiliateCodeInvalid
+	}
+	summary, err := s.repo.GetAffiliateByCode(ctx, code)
+	if err != nil || summary == nil || summary.Role != RoleReseller {
+		return nil, ErrAffiliateCodeInvalid
+	}
+	return summary, nil
+}
+
+func (s *AffiliateService) BindResellerInviterByCode(ctx context.Context, userID int64, rawCode string) error {
+	reseller, err := s.ResolveResellerCode(ctx, rawCode)
+	if err != nil || reseller.UserID == userID {
+		return ErrAffiliateCodeInvalid
+	}
+	self, err := s.repo.EnsureUserAffiliate(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if self.InviterID != nil {
+		if *self.InviterID == reseller.UserID {
+			return nil
+		}
+		return ErrAffiliateAlreadyBound
+	}
+	bound, err := s.repo.BindInviter(ctx, userID, reseller.UserID)
+	if err != nil {
+		return err
+	}
+	if !bound {
+		return ErrAffiliateAlreadyBound
+	}
+	return nil
 }
 
 type AffiliateInvitee struct {

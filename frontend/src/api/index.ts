@@ -22,6 +22,14 @@ export { totpAPI } from './totp'
 export { passkeyAPI, type PasskeyCredentialSummary } from './passkey'
 export { default as announcementsAPI } from './announcements'
 export { channelMonitorUserAPI } from './channelMonitor'
+export { resellerAPI } from './reseller'
+export type {
+	ResellerProfile,
+	ResellerUser,
+	ResellerTransferResult,
+	ResellerCode,
+	ResellerCodeBatchResult,
+} from './reseller'
 
 // Admin APIs
 export { adminAPI } from './admin'

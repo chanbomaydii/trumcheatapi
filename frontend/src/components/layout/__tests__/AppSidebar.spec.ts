@@ -53,3 +53,16 @@ describe('AppSidebar header styles', () => {
     expect(sidebarBrandBlockMatch?.[0]).not.toContain('overflow: hidden;')
   })
 })
+
+describe('AppSidebar role navigation', () => {
+  it('filters limited admin navigation with the shared allowlist', () => {
+    expect(componentSource).toContain('LIMITED_ADMIN_ROUTE_PATHS.has(item.path)')
+    expect(componentSource).toContain('const roleItems = isRoot.value ? baseItems')
+  })
+
+  it('provides reseller users and codes routes', () => {
+    expect(componentSource).toContain("path: '/reseller/users'")
+    expect(componentSource).toContain("path: '/reseller/codes'")
+    expect(componentSource).toContain('v-else-if="isReseller && !appStore.backendModeEnabled"')
+  })
+})

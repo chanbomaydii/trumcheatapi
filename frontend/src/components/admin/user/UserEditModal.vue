@@ -33,7 +33,9 @@
         <label class="input-label">{{ t('admin.users.form.roleLabel') }}</label>
         <select v-model="form.role" class="input">
           <option value="user">{{ t('admin.users.roles.user') }}</option>
-          <option value="admin">{{ t('admin.users.roles.admin') }}</option>
+          <option value="reseller">{{ t('admin.users.roles.reseller') }}</option>
+          <option v-if="isRoot" value="admin">{{ t('admin.users.roles.admin') }}</option>
+          <option v-if="isRoot" value="root">{{ t('admin.users.roles.root') }}</option>
         </select>
       </div>
       <div>
@@ -85,7 +87,7 @@ import Icon from '@/components/icons/Icon.vue'
 import { useStepUp, isStepUpBlocked, isStepUpCancelled, stepUpBlockReason } from '@/composables/useStepUp'
 import TotpStepUpDialog from '@/components/auth/TotpStepUpDialog.vue'
 
-const props = defineProps<{ show: boolean, user: AdminUser | null }>()
+const props = defineProps<{ show: boolean, user: AdminUser | null, isRoot: boolean }>()
 const emit = defineEmits(['close', 'success'])
 const { t } = useI18n(); const appStore = useAppStore(); const { copyToClipboard } = useClipboard()
 

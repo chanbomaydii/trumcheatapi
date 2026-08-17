@@ -29,7 +29,9 @@
         <label class="input-label">{{ t('admin.users.form.roleLabel') }}</label>
         <select v-model="form.role" class="input">
           <option value="user">{{ t('admin.users.roles.user') }}</option>
-          <option value="admin">{{ t('admin.users.roles.admin') }}</option>
+          <option value="reseller">{{ t('admin.users.roles.reseller') }}</option>
+          <option v-if="isRoot" value="admin">{{ t('admin.users.roles.admin') }}</option>
+          <option v-if="isRoot" value="root">{{ t('admin.users.roles.root') }}</option>
         </select>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -78,11 +80,11 @@ import Icon from '@/components/icons/Icon.vue'
 import { useStepUp, isStepUpBlocked, isStepUpCancelled, stepUpBlockReason } from '@/composables/useStepUp'
 import TotpStepUpDialog from '@/components/auth/TotpStepUpDialog.vue'
 
-const props = defineProps<{ show: boolean }>()
+const props = defineProps<{ show: boolean; isRoot: boolean }>()
 const emit = defineEmits(['close', 'success']); const { t } = useI18n()
 const appStore = useAppStore()
 
-const form = reactive({ email: '', password: '', username: '', notes: '', role: 'user' as 'user' | 'admin', balance: '', concurrency: 1, rpm_limit: 0 })
+const form = reactive({ email: '', password: '', username: '', notes: '', role: 'user' as 'root' | 'admin' | 'reseller' | 'user', balance: '', concurrency: 1, rpm_limit: 0 })
 
 const stepUp = useStepUp()
 const loading = ref(false)

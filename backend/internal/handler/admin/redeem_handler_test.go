@@ -8,11 +8,42 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Wei-Shaw/sub2api/internal/server/middleware"
 	"github.com/Wei-Shaw/sub2api/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func TestGenerateRedeemCodesLocksAdminTypeToBalance(t *testing.T) {
+	for _, test := range []struct {
+		role     string
+		wantType string
+	}{
+		{role: service.RoleAdmin, wantType: service.RedeemTypeBalance},
+		{role: service.RoleRoot, wantType: service.RedeemTypeSubscription},
+	} {
+		t.Run(test.role, func(t *testing.T) {
+			gin.SetMode(gin.TestMode)
+			router := gin.New()
+			adminSvc := newStubAdminService()
+			handler := NewRedeemHandler(adminSvc, nil)
+			router.Use(func(c *gin.Context) {
+				c.Set(string(middleware.ContextKeyUserRole), test.role)
+			})
+			router.POST("/generate", handler.Generate)
+
+			rec := httptest.NewRecorder()
+			req := httptest.NewRequest(http.MethodPost, "/generate", bytes.NewBufferString(`{"count":1,"type":"subscription","value":10,"group_id":2,"validity_days":30}`))
+			req.Header.Set("Content-Type", "application/json")
+			router.ServeHTTP(rec, req)
+
+			require.Equal(t, http.StatusOK, rec.Code)
+			require.NotNil(t, adminSvc.lastGenerateRedeemCodesInput)
+			require.Equal(t, test.wantType, adminSvc.lastGenerateRedeemCodesInput.Type)
+		})
+	}
+}
 
 // newCreateAndRedeemHandler creates a RedeemHandler with a non-nil (but minimal)
 // RedeemService so that CreateAndRedeem's nil guard passes and we can test the

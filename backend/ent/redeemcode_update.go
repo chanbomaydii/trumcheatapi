@@ -58,6 +58,20 @@ func (_u *RedeemCodeUpdate) SetNillableType(v *string) *RedeemCodeUpdate {
 	return _u
 }
 
+// SetSource sets the "source" field.
+func (_u *RedeemCodeUpdate) SetSource(v string) *RedeemCodeUpdate {
+	_u.mutation.SetSource(v)
+	return _u
+}
+
+// SetNillableSource sets the "source" field if the given value is not nil.
+func (_u *RedeemCodeUpdate) SetNillableSource(v *string) *RedeemCodeUpdate {
+	if v != nil {
+		_u.SetSource(*v)
+	}
+	return _u
+}
+
 // SetValue sets the "value" field.
 func (_u *RedeemCodeUpdate) SetValue(v float64) *RedeemCodeUpdate {
 	_u.mutation.ResetValue()
@@ -214,6 +228,53 @@ func (_u *RedeemCodeUpdate) AddValidityDays(v int) *RedeemCodeUpdate {
 	return _u
 }
 
+// SetCreatedByResellerID sets the "created_by_reseller_id" field.
+func (_u *RedeemCodeUpdate) SetCreatedByResellerID(v int64) *RedeemCodeUpdate {
+	_u.mutation.SetCreatedByResellerID(v)
+	return _u
+}
+
+// SetNillableCreatedByResellerID sets the "created_by_reseller_id" field if the given value is not nil.
+func (_u *RedeemCodeUpdate) SetNillableCreatedByResellerID(v *int64) *RedeemCodeUpdate {
+	if v != nil {
+		_u.SetCreatedByResellerID(*v)
+	}
+	return _u
+}
+
+// ClearCreatedByResellerID clears the value of the "created_by_reseller_id" field.
+func (_u *RedeemCodeUpdate) ClearCreatedByResellerID() *RedeemCodeUpdate {
+	_u.mutation.ClearCreatedByResellerID()
+	return _u
+}
+
+// SetResellerLedgerID sets the "reseller_ledger_id" field.
+func (_u *RedeemCodeUpdate) SetResellerLedgerID(v int64) *RedeemCodeUpdate {
+	_u.mutation.ResetResellerLedgerID()
+	_u.mutation.SetResellerLedgerID(v)
+	return _u
+}
+
+// SetNillableResellerLedgerID sets the "reseller_ledger_id" field if the given value is not nil.
+func (_u *RedeemCodeUpdate) SetNillableResellerLedgerID(v *int64) *RedeemCodeUpdate {
+	if v != nil {
+		_u.SetResellerLedgerID(*v)
+	}
+	return _u
+}
+
+// AddResellerLedgerID adds value to the "reseller_ledger_id" field.
+func (_u *RedeemCodeUpdate) AddResellerLedgerID(v int64) *RedeemCodeUpdate {
+	_u.mutation.AddResellerLedgerID(v)
+	return _u
+}
+
+// ClearResellerLedgerID clears the value of the "reseller_ledger_id" field.
+func (_u *RedeemCodeUpdate) ClearResellerLedgerID() *RedeemCodeUpdate {
+	_u.mutation.ClearResellerLedgerID()
+	return _u
+}
+
 // SetUserID sets the "user" edge to the User entity by ID.
 func (_u *RedeemCodeUpdate) SetUserID(id int64) *RedeemCodeUpdate {
 	_u.mutation.SetUserID(id)
@@ -238,6 +299,11 @@ func (_u *RedeemCodeUpdate) SetGroup(v *Group) *RedeemCodeUpdate {
 	return _u.SetGroupID(v.ID)
 }
 
+// SetCreatedByReseller sets the "created_by_reseller" edge to the User entity.
+func (_u *RedeemCodeUpdate) SetCreatedByReseller(v *User) *RedeemCodeUpdate {
+	return _u.SetCreatedByResellerID(v.ID)
+}
+
 // Mutation returns the RedeemCodeMutation object of the builder.
 func (_u *RedeemCodeUpdate) Mutation() *RedeemCodeMutation {
 	return _u.mutation
@@ -252,6 +318,12 @@ func (_u *RedeemCodeUpdate) ClearUser() *RedeemCodeUpdate {
 // ClearGroup clears the "group" edge to the Group entity.
 func (_u *RedeemCodeUpdate) ClearGroup() *RedeemCodeUpdate {
 	_u.mutation.ClearGroup()
+	return _u
+}
+
+// ClearCreatedByReseller clears the "created_by_reseller" edge to the User entity.
+func (_u *RedeemCodeUpdate) ClearCreatedByReseller() *RedeemCodeUpdate {
+	_u.mutation.ClearCreatedByReseller()
 	return _u
 }
 
@@ -294,6 +366,11 @@ func (_u *RedeemCodeUpdate) check() error {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "RedeemCode.type": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.Source(); ok {
+		if err := redeemcode.SourceValidator(v); err != nil {
+			return &ValidationError{Name: "source", err: fmt.Errorf(`ent: validator failed for field "RedeemCode.source": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.Status(); ok {
 		if err := redeemcode.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "RedeemCode.status": %w`, err)}
@@ -319,6 +396,9 @@ func (_u *RedeemCodeUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 	}
 	if value, ok := _u.mutation.GetType(); ok {
 		_spec.SetField(redeemcode.FieldType, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.Source(); ok {
+		_spec.SetField(redeemcode.FieldSource, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Value(); ok {
 		_spec.SetField(redeemcode.FieldValue, field.TypeFloat64, value)
@@ -352,6 +432,15 @@ func (_u *RedeemCodeUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 	}
 	if value, ok := _u.mutation.AddedValidityDays(); ok {
 		_spec.AddField(redeemcode.FieldValidityDays, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.ResellerLedgerID(); ok {
+		_spec.SetField(redeemcode.FieldResellerLedgerID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedResellerLedgerID(); ok {
+		_spec.AddField(redeemcode.FieldResellerLedgerID, field.TypeInt64, value)
+	}
+	if _u.mutation.ResellerLedgerIDCleared() {
+		_spec.ClearField(redeemcode.FieldResellerLedgerID, field.TypeInt64)
 	}
 	if _u.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -411,6 +500,35 @@ func (_u *RedeemCodeUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.CreatedByResellerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   redeemcode.CreatedByResellerTable,
+			Columns: []string{redeemcode.CreatedByResellerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.CreatedByResellerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   redeemcode.CreatedByResellerTable,
+			Columns: []string{redeemcode.CreatedByResellerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{redeemcode.Label}
@@ -455,6 +573,20 @@ func (_u *RedeemCodeUpdateOne) SetType(v string) *RedeemCodeUpdateOne {
 func (_u *RedeemCodeUpdateOne) SetNillableType(v *string) *RedeemCodeUpdateOne {
 	if v != nil {
 		_u.SetType(*v)
+	}
+	return _u
+}
+
+// SetSource sets the "source" field.
+func (_u *RedeemCodeUpdateOne) SetSource(v string) *RedeemCodeUpdateOne {
+	_u.mutation.SetSource(v)
+	return _u
+}
+
+// SetNillableSource sets the "source" field if the given value is not nil.
+func (_u *RedeemCodeUpdateOne) SetNillableSource(v *string) *RedeemCodeUpdateOne {
+	if v != nil {
+		_u.SetSource(*v)
 	}
 	return _u
 }
@@ -615,6 +747,53 @@ func (_u *RedeemCodeUpdateOne) AddValidityDays(v int) *RedeemCodeUpdateOne {
 	return _u
 }
 
+// SetCreatedByResellerID sets the "created_by_reseller_id" field.
+func (_u *RedeemCodeUpdateOne) SetCreatedByResellerID(v int64) *RedeemCodeUpdateOne {
+	_u.mutation.SetCreatedByResellerID(v)
+	return _u
+}
+
+// SetNillableCreatedByResellerID sets the "created_by_reseller_id" field if the given value is not nil.
+func (_u *RedeemCodeUpdateOne) SetNillableCreatedByResellerID(v *int64) *RedeemCodeUpdateOne {
+	if v != nil {
+		_u.SetCreatedByResellerID(*v)
+	}
+	return _u
+}
+
+// ClearCreatedByResellerID clears the value of the "created_by_reseller_id" field.
+func (_u *RedeemCodeUpdateOne) ClearCreatedByResellerID() *RedeemCodeUpdateOne {
+	_u.mutation.ClearCreatedByResellerID()
+	return _u
+}
+
+// SetResellerLedgerID sets the "reseller_ledger_id" field.
+func (_u *RedeemCodeUpdateOne) SetResellerLedgerID(v int64) *RedeemCodeUpdateOne {
+	_u.mutation.ResetResellerLedgerID()
+	_u.mutation.SetResellerLedgerID(v)
+	return _u
+}
+
+// SetNillableResellerLedgerID sets the "reseller_ledger_id" field if the given value is not nil.
+func (_u *RedeemCodeUpdateOne) SetNillableResellerLedgerID(v *int64) *RedeemCodeUpdateOne {
+	if v != nil {
+		_u.SetResellerLedgerID(*v)
+	}
+	return _u
+}
+
+// AddResellerLedgerID adds value to the "reseller_ledger_id" field.
+func (_u *RedeemCodeUpdateOne) AddResellerLedgerID(v int64) *RedeemCodeUpdateOne {
+	_u.mutation.AddResellerLedgerID(v)
+	return _u
+}
+
+// ClearResellerLedgerID clears the value of the "reseller_ledger_id" field.
+func (_u *RedeemCodeUpdateOne) ClearResellerLedgerID() *RedeemCodeUpdateOne {
+	_u.mutation.ClearResellerLedgerID()
+	return _u
+}
+
 // SetUserID sets the "user" edge to the User entity by ID.
 func (_u *RedeemCodeUpdateOne) SetUserID(id int64) *RedeemCodeUpdateOne {
 	_u.mutation.SetUserID(id)
@@ -639,6 +818,11 @@ func (_u *RedeemCodeUpdateOne) SetGroup(v *Group) *RedeemCodeUpdateOne {
 	return _u.SetGroupID(v.ID)
 }
 
+// SetCreatedByReseller sets the "created_by_reseller" edge to the User entity.
+func (_u *RedeemCodeUpdateOne) SetCreatedByReseller(v *User) *RedeemCodeUpdateOne {
+	return _u.SetCreatedByResellerID(v.ID)
+}
+
 // Mutation returns the RedeemCodeMutation object of the builder.
 func (_u *RedeemCodeUpdateOne) Mutation() *RedeemCodeMutation {
 	return _u.mutation
@@ -653,6 +837,12 @@ func (_u *RedeemCodeUpdateOne) ClearUser() *RedeemCodeUpdateOne {
 // ClearGroup clears the "group" edge to the Group entity.
 func (_u *RedeemCodeUpdateOne) ClearGroup() *RedeemCodeUpdateOne {
 	_u.mutation.ClearGroup()
+	return _u
+}
+
+// ClearCreatedByReseller clears the "created_by_reseller" edge to the User entity.
+func (_u *RedeemCodeUpdateOne) ClearCreatedByReseller() *RedeemCodeUpdateOne {
+	_u.mutation.ClearCreatedByReseller()
 	return _u
 }
 
@@ -708,6 +898,11 @@ func (_u *RedeemCodeUpdateOne) check() error {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "RedeemCode.type": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.Source(); ok {
+		if err := redeemcode.SourceValidator(v); err != nil {
+			return &ValidationError{Name: "source", err: fmt.Errorf(`ent: validator failed for field "RedeemCode.source": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.Status(); ok {
 		if err := redeemcode.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "RedeemCode.status": %w`, err)}
@@ -751,6 +946,9 @@ func (_u *RedeemCodeUpdateOne) sqlSave(ctx context.Context) (_node *RedeemCode, 
 	if value, ok := _u.mutation.GetType(); ok {
 		_spec.SetField(redeemcode.FieldType, field.TypeString, value)
 	}
+	if value, ok := _u.mutation.Source(); ok {
+		_spec.SetField(redeemcode.FieldSource, field.TypeString, value)
+	}
 	if value, ok := _u.mutation.Value(); ok {
 		_spec.SetField(redeemcode.FieldValue, field.TypeFloat64, value)
 	}
@@ -783,6 +981,15 @@ func (_u *RedeemCodeUpdateOne) sqlSave(ctx context.Context) (_node *RedeemCode, 
 	}
 	if value, ok := _u.mutation.AddedValidityDays(); ok {
 		_spec.AddField(redeemcode.FieldValidityDays, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.ResellerLedgerID(); ok {
+		_spec.SetField(redeemcode.FieldResellerLedgerID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedResellerLedgerID(); ok {
+		_spec.AddField(redeemcode.FieldResellerLedgerID, field.TypeInt64, value)
+	}
+	if _u.mutation.ResellerLedgerIDCleared() {
+		_spec.ClearField(redeemcode.FieldResellerLedgerID, field.TypeInt64)
 	}
 	if _u.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -835,6 +1042,35 @@ func (_u *RedeemCodeUpdateOne) sqlSave(ctx context.Context) (_node *RedeemCode, 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(group.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.CreatedByResellerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   redeemcode.CreatedByResellerTable,
+			Columns: []string{redeemcode.CreatedByResellerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.CreatedByResellerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   redeemcode.CreatedByResellerTable,
+			Columns: []string{redeemcode.CreatedByResellerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt64),
 			},
 		}
 		for _, k := range nodes {

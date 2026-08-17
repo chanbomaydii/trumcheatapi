@@ -1,5 +1,5 @@
 <template>
-  <AppLayout>
+  <component :is="embedded ? 'div' : AppLayout">
     <TablePageLayout>
       <template #filters>
         <div class="flex flex-wrap items-center gap-3">
@@ -17,6 +17,13 @@
             v-model="filters.type"
             :options="filterTypeOptions"
             class="w-36"
+            @change="loadCodes"
+          />
+          <Select
+            v-if="authStore.isRoot"
+            v-model="filters.source"
+            :options="sourceOptions"
+            class="w-40"
             @change="loadCodes"
           />
           <Select
@@ -48,8 +55,11 @@
               <Icon name="edit" size="md" class="mr-2" />
               {{ t('admin.redeem.batchUpdate') }}
             </button>
+            <button v-if="authStore.isRoot" @click="openCDKeyDialog" class="btn btn-secondary">
+              {{ t('codes.createForReseller') }}
+            </button>
             <button @click="showGenerateDialog = true" class="btn btn-primary">
-              {{ t('admin.redeem.generateCodes') }}
+              {{ t('codes.createCDKeys') }}
             </button>
           </div>
         </div>
@@ -168,6 +178,10 @@
             }}</span>
           </template>
 
+          <template #cell-created_by_reseller_id="{ value }">
+            <span class="text-sm text-gray-500 dark:text-dark-400">{{ value || '-' }}</span>
+          </template>
+
           <template #cell-expires_at="{ value, row }">
             <span
               :class="[
@@ -240,7 +254,10 @@
         />
 
         <!-- Batch Actions -->
-        <div v-if="filters.status === 'unused'" class="flex justify-end">
+        <div
+          v-if="filters.status === 'unused' && (!authStore.isRoot || filters.source !== 'all')"
+          class="flex justify-end"
+        >
           <button @click="showDeleteUnusedDialog = true" class="btn btn-danger">
             {{ t('admin.redeem.deleteAllUnused') }}
           </button>
@@ -285,7 +302,7 @@
           <form @submit.prevent="handleGenerateCodes" class="space-y-4">
             <div>
               <label class="input-label">{{ t('admin.redeem.codeType') }}</label>
-              <Select v-model="generateForm.type" :options="typeOptions" />
+              <Select v-model="generateForm.type" :options="typeOptions" :disabled="!authStore.isRoot" />
             </div>
             <!-- 余额/并发类型：显示数值输入 -->
             <div v-if="generateForm.type !== 'subscription' && generateForm.type !== 'invitation'">
@@ -391,7 +408,7 @@
                 v-model.number="generateForm.count"
                 type="number"
                 min="1"
-                max="100"
+                max="1000"
                 required
                 class="input"
               />
@@ -401,7 +418,70 @@
                 {{ t('common.cancel') }}
               </button>
               <button type="submit" :disabled="generating" class="btn btn-primary">
-                {{ generating ? t('admin.redeem.generating') : t('admin.redeem.generate') }}
+                {{ generating ? t('admin.redeem.generating') : t('codes.create') }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </Teleport>
+
+    <Teleport to="body">
+      <div v-if="authStore.isRoot && showCDKeyDialog" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="fixed inset-0 bg-black/50" @click="showCDKeyDialog = false"></div>
+        <div class="relative z-10 w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-dark-800">
+          <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+            {{ t('codes.createForReseller') }}
+          </h2>
+          <form class="space-y-4" @submit.prevent="handleCreateCDKeys">
+            <div>
+              <label class="input-label">{{ t('codes.reseller') }}</label>
+              <Select v-model="cdkeyForm.reseller_id" :options="resellerOptions" :placeholder="t('codes.selectReseller')" />
+            </div>
+            <div>
+              <label class="input-label">{{ t('admin.redeem.count') }}</label>
+              <input v-model.number="cdkeyForm.count" type="number" min="1" max="1000" required class="input" />
+            </div>
+            <div>
+              <label class="input-label">{{ t('admin.redeem.amount') }}</label>
+              <input v-model.number="cdkeyForm.value" type="number" min="0.01" step="0.01" required class="input" />
+            </div>
+            <div>
+              <label class="input-label">{{ t('admin.redeem.codeExpiry') }}</label>
+              <div class="grid grid-cols-2 gap-2 sm:grid-cols-5">
+                <button
+                  v-for="option in redeemCodeExpiryOptions"
+                  :key="option.value"
+                  type="button"
+                  @click="cdkeyForm.expiry_option = option.value"
+                  :class="[
+                    'rounded-lg border px-3 py-2 text-sm transition-colors',
+                    cdkeyForm.expiry_option === option.value
+                      ? 'border-primary-500 bg-primary-50 text-primary-700 dark:border-primary-400 dark:bg-primary-900/20 dark:text-primary-300'
+                      : 'border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-dark-600 dark:text-gray-300 dark:hover:bg-dark-700'
+                  ]"
+                >
+                  {{ option.label }}
+                </button>
+              </div>
+              <input
+                v-if="cdkeyForm.expiry_option === 'custom'"
+                v-model.number="cdkeyForm.custom_expiry_days"
+                type="number"
+                min="1"
+                max="3650"
+                class="input mt-2"
+                :placeholder="t('admin.redeem.customExpiryDays')"
+              />
+            </div>
+            <div class="rounded-lg bg-gray-50 p-3 text-sm text-gray-700 dark:bg-dark-700 dark:text-gray-300">
+              {{ t('codes.totalDebit') }}: ${{ cdkeyTotal.toFixed(2) }}
+              <template v-if="selectedReseller"> · {{ t('codes.balance') }}: ${{ selectedReseller.balance.toFixed(2) }}</template>
+            </div>
+            <div class="flex justify-end gap-3 pt-2">
+              <button type="button" class="btn btn-secondary" @click="showCDKeyDialog = false">{{ t('common.cancel') }}</button>
+              <button type="submit" class="btn btn-primary" :disabled="generating || !cdkeyForm.reseller_id">
+                {{ generating ? t('admin.redeem.generating') : t('codes.create') }}
               </button>
             </div>
           </form>
@@ -604,19 +684,21 @@
         </div>
       </div>
     </Teleport>
-  </AppLayout>
+  </component>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/stores/app'
+import { useAuthStore } from '@/stores/auth'
 import { useClipboard } from '@/composables/useClipboard'
 import { useTableSelection } from '@/composables/useTableSelection'
 import { getPersistedPageSize } from '@/composables/usePersistedPageSize'
 import { adminAPI } from '@/api/admin'
 import { formatDateTime } from '@/utils/format'
 import type {
+  AdminUser,
   RedeemCode,
   RedeemCodeType,
   Group,
@@ -626,6 +708,8 @@ import type {
 } from '@/types'
 import type { Column } from '@/components/common/types'
 import AppLayout from '@/components/layout/AppLayout.vue'
+
+const { embedded = false } = defineProps<{ embedded?: boolean }>()
 import TablePageLayout from '@/components/layout/TablePageLayout.vue'
 import DataTable from '@/components/common/DataTable.vue'
 import Pagination from '@/components/common/Pagination.vue'
@@ -637,6 +721,7 @@ import Icon from '@/components/icons/Icon.vue'
 
 const { t } = useI18n()
 const appStore = useAppStore()
+const authStore = useAuthStore()
 const { copyToClipboard: clipboardCopy } = useClipboard()
 
 interface GroupOption {
@@ -652,6 +737,16 @@ const showGenerateDialog = ref(false)
 const showResultDialog = ref(false)
 const generatedCodes = ref<RedeemCode[]>([])
 const subscriptionGroups = ref<Group[]>([])
+const showCDKeyDialog = ref(false)
+const resellers = ref<AdminUser[]>([])
+const cdkeyForm = reactive({ reseller_id: null as number | null, count: 1, value: 10, expiry_option: 'never' as RedeemCodeExpiryOption, custom_expiry_days: 30 })
+
+const resellerOptions = computed(() => resellers.value.map((reseller) => ({
+  value: reseller.id,
+  label: `${reseller.email} ($${reseller.balance.toFixed(2)})`
+})))
+const selectedReseller = computed(() => resellers.value.find((reseller) => reseller.id === cdkeyForm.reseller_id))
+const cdkeyTotal = computed(() => Number(cdkeyForm.count || 0) * Number(cdkeyForm.value || 0))
 
 // 订阅类型分组选项
 const subscriptionGroupOptions = computed(() => {
@@ -712,7 +807,7 @@ const downloadGeneratedCodes = () => {
   const url = window.URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
-  link.download = `redeem-codes-${new Date().toISOString().split('T')[0]}.txt`
+  link.download = `cdkeys-${new Date().toISOString().split('T')[0]}.txt`
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
@@ -727,8 +822,9 @@ const columns = computed<Column[]>(() => [
   { key: 'status', label: t('admin.redeem.columns.status'), sortable: true },
   { key: 'used_by', label: t('admin.redeem.columns.usedBy') },
   { key: 'used_at', label: t('admin.redeem.columns.usedAt'), sortable: true },
+  ...(authStore.isRoot ? [{ key: 'created_by_reseller_id', label: t('codes.resellerOwner') }] : []),
   { key: 'expires_at', label: t('admin.redeem.columns.expiresAt'), sortable: true },
-  { key: 'actions', label: t('admin.redeem.columns.actions') }
+  { key: 'actions', label: t('admin.redeem.columns.actions') },
 ])
 
 const typeOptions = computed(() => [
@@ -754,6 +850,12 @@ const filterStatusOptions = computed(() => [
   { value: 'disabled', label: t('admin.redeem.status.disabled') }
 ])
 
+const sourceOptions = computed(() => [
+  { value: 'all', label: t('codes.sources.all') },
+  { value: 'system', label: t('codes.sources.system') },
+  { value: 'reseller_cdkey', label: t('codes.sources.reseller') }
+])
+
 const batchStatusOptions = computed(() => [
   { value: 'unused', label: t('admin.redeem.status.unused') },
   { value: 'disabled', label: t('admin.redeem.status.disabled') }
@@ -771,7 +873,8 @@ const batchUpdating = ref(false)
 const searchQuery = ref('')
 const filters = reactive({
   type: '',
-  status: ''
+  status: '',
+  source: 'all' as 'all' | 'system' | 'reseller_cdkey'
 })
 const pagination = reactive({
   page: 1,
@@ -821,7 +924,7 @@ type RedeemCodeExpiryOption = 'never' | '1' | '3' | '7' | 'custom'
 
 const redeemCodeExpiryOptions = computed<{ value: RedeemCodeExpiryOption; label: string }[]>(() => [
   { value: 'never', label: t('admin.redeem.neverExpires') },
-  { value: '1', label: t('admin.redeem.expiryPresetDays', { days: 1 }) },
+  { value: '1', label: t('admin.redeem.expiryPresetDay', { days: 1 }) },
   { value: '3', label: t('admin.redeem.expiryPresetDays', { days: 3 }) },
   { value: '7', label: t('admin.redeem.expiryPresetDays', { days: 7 }) },
   { value: 'custom', label: t('admin.redeem.customExpiry') }
@@ -854,7 +957,8 @@ const buildRedeemQueryFilters = () => ({
   status: (filters.status || undefined) as 'used' | 'expired' | 'unused' | 'disabled' | undefined,
   search: searchQuery.value || undefined,
   sort_by: sortState.sort_by,
-  sort_order: sortState.sort_order
+  sort_order: sortState.sort_order,
+  source: authStore.isRoot ? filters.source : 'system' as const
 })
 
 const loadCodes = async () => {
@@ -1057,6 +1161,56 @@ const handleGenerateCodes = async () => {
   }
 }
 
+const openCDKeyDialog = async () => {
+  try {
+    const firstPage = await adminAPI.users.list(1, 100, { role: 'reseller', status: 'active' })
+    const remainingPages = await Promise.all(
+      Array.from({ length: Math.max(firstPage.pages - 1, 0) }, (_, index) =>
+        adminAPI.users.list(index + 2, 100, { role: 'reseller', status: 'active' })
+      )
+    )
+    resellers.value = [firstPage, ...remainingPages].flatMap((page) => page.items)
+    if (!cdkeyForm.reseller_id && resellers.value.length > 0) {
+      cdkeyForm.reseller_id = resellers.value[0].id
+    }
+    showCDKeyDialog.value = true
+  } catch (error: any) {
+    appStore.showError(error.response?.data?.detail || t('codes.failedToLoadResellers'))
+  }
+}
+
+const handleCreateCDKeys = async () => {
+  if (!cdkeyForm.reseller_id) return
+  const expiresInDays = cdkeyForm.expiry_option === 'never'
+    ? null
+    : cdkeyForm.expiry_option === 'custom'
+      ? Math.floor(cdkeyForm.custom_expiry_days)
+      : Number(cdkeyForm.expiry_option)
+  if (expiresInDays !== null && (expiresInDays < 1 || expiresInDays > 3650)) {
+    appStore.showError(t('admin.redeem.expiryDaysRequired'))
+    return
+  }
+  generating.value = true
+  try {
+    const idempotencyKey = crypto.randomUUID()
+    const result = await adminAPI.redeem.createCDKeysForReseller(
+      cdkeyForm.reseller_id,
+      cdkeyForm.count,
+      cdkeyForm.value,
+      expiresInDays,
+      idempotencyKey
+    )
+    generatedCodes.value = result.codes
+    showCDKeyDialog.value = false
+    showResultDialog.value = true
+    await loadCodes()
+  } catch (error: any) {
+    appStore.showError(error.response?.data?.detail || t('admin.redeem.failedToGenerate'))
+  } finally {
+    generating.value = false
+  }
+}
+
 const copyToClipboard = async (text: string) => {
   const success = await clipboardCopy(text, t('admin.redeem.copied'))
   if (success) {
@@ -1075,7 +1229,7 @@ const handleExportCodes = async () => {
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `redeem-codes-${new Date().toISOString().split('T')[0]}.csv`
+    link.download = `cdkeys-${new Date().toISOString().split('T')[0]}.csv`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -1111,7 +1265,10 @@ const confirmDelete = async () => {
 const confirmDeleteUnused = async () => {
   try {
     // Get all unused codes and delete them
-    const unusedCodesResponse = await adminAPI.redeem.list(1, 1000, { status: 'unused' })
+    const unusedCodesResponse = await adminAPI.redeem.list(1, 1000, {
+      status: 'unused',
+      source: authStore.isRoot ? filters.source : 'system'
+    })
     const unusedCodeIds = unusedCodesResponse.items.map((code) => code.id)
 
     if (unusedCodeIds.length === 0) {

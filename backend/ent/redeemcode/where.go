@@ -65,6 +65,11 @@ func Type(v string) predicate.RedeemCode {
 	return predicate.RedeemCode(sql.FieldEQ(FieldType, v))
 }
 
+// Source applies equality check predicate on the "source" field. It's identical to SourceEQ.
+func Source(v string) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldEQ(FieldSource, v))
+}
+
 // Value applies equality check predicate on the "value" field. It's identical to ValueEQ.
 func Value(v float64) predicate.RedeemCode {
 	return predicate.RedeemCode(sql.FieldEQ(FieldValue, v))
@@ -108,6 +113,16 @@ func GroupID(v int64) predicate.RedeemCode {
 // ValidityDays applies equality check predicate on the "validity_days" field. It's identical to ValidityDaysEQ.
 func ValidityDays(v int) predicate.RedeemCode {
 	return predicate.RedeemCode(sql.FieldEQ(FieldValidityDays, v))
+}
+
+// CreatedByResellerID applies equality check predicate on the "created_by_reseller_id" field. It's identical to CreatedByResellerIDEQ.
+func CreatedByResellerID(v int64) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldEQ(FieldCreatedByResellerID, v))
+}
+
+// ResellerLedgerID applies equality check predicate on the "reseller_ledger_id" field. It's identical to ResellerLedgerIDEQ.
+func ResellerLedgerID(v int64) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldEQ(FieldResellerLedgerID, v))
 }
 
 // CodeEQ applies the EQ predicate on the "code" field.
@@ -238,6 +253,71 @@ func TypeEqualFold(v string) predicate.RedeemCode {
 // TypeContainsFold applies the ContainsFold predicate on the "type" field.
 func TypeContainsFold(v string) predicate.RedeemCode {
 	return predicate.RedeemCode(sql.FieldContainsFold(FieldType, v))
+}
+
+// SourceEQ applies the EQ predicate on the "source" field.
+func SourceEQ(v string) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldEQ(FieldSource, v))
+}
+
+// SourceNEQ applies the NEQ predicate on the "source" field.
+func SourceNEQ(v string) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldNEQ(FieldSource, v))
+}
+
+// SourceIn applies the In predicate on the "source" field.
+func SourceIn(vs ...string) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldIn(FieldSource, vs...))
+}
+
+// SourceNotIn applies the NotIn predicate on the "source" field.
+func SourceNotIn(vs ...string) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldNotIn(FieldSource, vs...))
+}
+
+// SourceGT applies the GT predicate on the "source" field.
+func SourceGT(v string) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldGT(FieldSource, v))
+}
+
+// SourceGTE applies the GTE predicate on the "source" field.
+func SourceGTE(v string) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldGTE(FieldSource, v))
+}
+
+// SourceLT applies the LT predicate on the "source" field.
+func SourceLT(v string) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldLT(FieldSource, v))
+}
+
+// SourceLTE applies the LTE predicate on the "source" field.
+func SourceLTE(v string) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldLTE(FieldSource, v))
+}
+
+// SourceContains applies the Contains predicate on the "source" field.
+func SourceContains(v string) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldContains(FieldSource, v))
+}
+
+// SourceHasPrefix applies the HasPrefix predicate on the "source" field.
+func SourceHasPrefix(v string) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldHasPrefix(FieldSource, v))
+}
+
+// SourceHasSuffix applies the HasSuffix predicate on the "source" field.
+func SourceHasSuffix(v string) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldHasSuffix(FieldSource, v))
+}
+
+// SourceEqualFold applies the EqualFold predicate on the "source" field.
+func SourceEqualFold(v string) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldEqualFold(FieldSource, v))
+}
+
+// SourceContainsFold applies the ContainsFold predicate on the "source" field.
+func SourceContainsFold(v string) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldContainsFold(FieldSource, v))
 }
 
 // ValueEQ applies the EQ predicate on the "value" field.
@@ -660,6 +740,86 @@ func ValidityDaysLTE(v int) predicate.RedeemCode {
 	return predicate.RedeemCode(sql.FieldLTE(FieldValidityDays, v))
 }
 
+// CreatedByResellerIDEQ applies the EQ predicate on the "created_by_reseller_id" field.
+func CreatedByResellerIDEQ(v int64) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldEQ(FieldCreatedByResellerID, v))
+}
+
+// CreatedByResellerIDNEQ applies the NEQ predicate on the "created_by_reseller_id" field.
+func CreatedByResellerIDNEQ(v int64) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldNEQ(FieldCreatedByResellerID, v))
+}
+
+// CreatedByResellerIDIn applies the In predicate on the "created_by_reseller_id" field.
+func CreatedByResellerIDIn(vs ...int64) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldIn(FieldCreatedByResellerID, vs...))
+}
+
+// CreatedByResellerIDNotIn applies the NotIn predicate on the "created_by_reseller_id" field.
+func CreatedByResellerIDNotIn(vs ...int64) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldNotIn(FieldCreatedByResellerID, vs...))
+}
+
+// CreatedByResellerIDIsNil applies the IsNil predicate on the "created_by_reseller_id" field.
+func CreatedByResellerIDIsNil() predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldIsNull(FieldCreatedByResellerID))
+}
+
+// CreatedByResellerIDNotNil applies the NotNil predicate on the "created_by_reseller_id" field.
+func CreatedByResellerIDNotNil() predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldNotNull(FieldCreatedByResellerID))
+}
+
+// ResellerLedgerIDEQ applies the EQ predicate on the "reseller_ledger_id" field.
+func ResellerLedgerIDEQ(v int64) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldEQ(FieldResellerLedgerID, v))
+}
+
+// ResellerLedgerIDNEQ applies the NEQ predicate on the "reseller_ledger_id" field.
+func ResellerLedgerIDNEQ(v int64) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldNEQ(FieldResellerLedgerID, v))
+}
+
+// ResellerLedgerIDIn applies the In predicate on the "reseller_ledger_id" field.
+func ResellerLedgerIDIn(vs ...int64) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldIn(FieldResellerLedgerID, vs...))
+}
+
+// ResellerLedgerIDNotIn applies the NotIn predicate on the "reseller_ledger_id" field.
+func ResellerLedgerIDNotIn(vs ...int64) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldNotIn(FieldResellerLedgerID, vs...))
+}
+
+// ResellerLedgerIDGT applies the GT predicate on the "reseller_ledger_id" field.
+func ResellerLedgerIDGT(v int64) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldGT(FieldResellerLedgerID, v))
+}
+
+// ResellerLedgerIDGTE applies the GTE predicate on the "reseller_ledger_id" field.
+func ResellerLedgerIDGTE(v int64) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldGTE(FieldResellerLedgerID, v))
+}
+
+// ResellerLedgerIDLT applies the LT predicate on the "reseller_ledger_id" field.
+func ResellerLedgerIDLT(v int64) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldLT(FieldResellerLedgerID, v))
+}
+
+// ResellerLedgerIDLTE applies the LTE predicate on the "reseller_ledger_id" field.
+func ResellerLedgerIDLTE(v int64) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldLTE(FieldResellerLedgerID, v))
+}
+
+// ResellerLedgerIDIsNil applies the IsNil predicate on the "reseller_ledger_id" field.
+func ResellerLedgerIDIsNil() predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldIsNull(FieldResellerLedgerID))
+}
+
+// ResellerLedgerIDNotNil applies the NotNil predicate on the "reseller_ledger_id" field.
+func ResellerLedgerIDNotNil() predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldNotNull(FieldResellerLedgerID))
+}
+
 // HasUser applies the HasEdge predicate on the "user" edge.
 func HasUser() predicate.RedeemCode {
 	return predicate.RedeemCode(func(s *sql.Selector) {
@@ -698,6 +858,29 @@ func HasGroup() predicate.RedeemCode {
 func HasGroupWith(preds ...predicate.Group) predicate.RedeemCode {
 	return predicate.RedeemCode(func(s *sql.Selector) {
 		step := newGroupStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasCreatedByReseller applies the HasEdge predicate on the "created_by_reseller" edge.
+func HasCreatedByReseller() predicate.RedeemCode {
+	return predicate.RedeemCode(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, CreatedByResellerTable, CreatedByResellerColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCreatedByResellerWith applies the HasEdge predicate on the "created_by_reseller" edge with a given conditions (other predicates).
+func HasCreatedByResellerWith(preds ...predicate.User) predicate.RedeemCode {
+	return predicate.RedeemCode(func(s *sql.Selector) {
+		step := newCreatedByResellerStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

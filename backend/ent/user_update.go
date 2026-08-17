@@ -462,6 +462,21 @@ func (_u *UserUpdate) AddRedeemCodes(v ...*RedeemCode) *UserUpdate {
 	return _u.AddRedeemCodeIDs(ids...)
 }
 
+// AddCreatedResellerRedeemCodeIDs adds the "created_reseller_redeem_codes" edge to the RedeemCode entity by IDs.
+func (_u *UserUpdate) AddCreatedResellerRedeemCodeIDs(ids ...int64) *UserUpdate {
+	_u.mutation.AddCreatedResellerRedeemCodeIDs(ids...)
+	return _u
+}
+
+// AddCreatedResellerRedeemCodes adds the "created_reseller_redeem_codes" edges to the RedeemCode entity.
+func (_u *UserUpdate) AddCreatedResellerRedeemCodes(v ...*RedeemCode) *UserUpdate {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddCreatedResellerRedeemCodeIDs(ids...)
+}
+
 // AddSubscriptionIDs adds the "subscriptions" edge to the UserSubscription entity by IDs.
 func (_u *UserUpdate) AddSubscriptionIDs(ids ...int64) *UserUpdate {
 	_u.mutation.AddSubscriptionIDs(ids...)
@@ -672,6 +687,27 @@ func (_u *UserUpdate) RemoveRedeemCodes(v ...*RedeemCode) *UserUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveRedeemCodeIDs(ids...)
+}
+
+// ClearCreatedResellerRedeemCodes clears all "created_reseller_redeem_codes" edges to the RedeemCode entity.
+func (_u *UserUpdate) ClearCreatedResellerRedeemCodes() *UserUpdate {
+	_u.mutation.ClearCreatedResellerRedeemCodes()
+	return _u
+}
+
+// RemoveCreatedResellerRedeemCodeIDs removes the "created_reseller_redeem_codes" edge to RedeemCode entities by IDs.
+func (_u *UserUpdate) RemoveCreatedResellerRedeemCodeIDs(ids ...int64) *UserUpdate {
+	_u.mutation.RemoveCreatedResellerRedeemCodeIDs(ids...)
+	return _u
+}
+
+// RemoveCreatedResellerRedeemCodes removes "created_reseller_redeem_codes" edges to RedeemCode entities.
+func (_u *UserUpdate) RemoveCreatedResellerRedeemCodes(v ...*RedeemCode) *UserUpdate {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveCreatedResellerRedeemCodeIDs(ids...)
 }
 
 // ClearSubscriptions clears all "subscriptions" edges to the UserSubscription entity.
@@ -1179,6 +1215,51 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Inverse: false,
 			Table:   user.RedeemCodesTable,
 			Columns: []string{user.RedeemCodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(redeemcode.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.CreatedResellerRedeemCodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CreatedResellerRedeemCodesTable,
+			Columns: []string{user.CreatedResellerRedeemCodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(redeemcode.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedCreatedResellerRedeemCodesIDs(); len(nodes) > 0 && !_u.mutation.CreatedResellerRedeemCodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CreatedResellerRedeemCodesTable,
+			Columns: []string{user.CreatedResellerRedeemCodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(redeemcode.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.CreatedResellerRedeemCodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CreatedResellerRedeemCodesTable,
+			Columns: []string{user.CreatedResellerRedeemCodesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(redeemcode.FieldID, field.TypeInt64),
@@ -2138,6 +2219,21 @@ func (_u *UserUpdateOne) AddRedeemCodes(v ...*RedeemCode) *UserUpdateOne {
 	return _u.AddRedeemCodeIDs(ids...)
 }
 
+// AddCreatedResellerRedeemCodeIDs adds the "created_reseller_redeem_codes" edge to the RedeemCode entity by IDs.
+func (_u *UserUpdateOne) AddCreatedResellerRedeemCodeIDs(ids ...int64) *UserUpdateOne {
+	_u.mutation.AddCreatedResellerRedeemCodeIDs(ids...)
+	return _u
+}
+
+// AddCreatedResellerRedeemCodes adds the "created_reseller_redeem_codes" edges to the RedeemCode entity.
+func (_u *UserUpdateOne) AddCreatedResellerRedeemCodes(v ...*RedeemCode) *UserUpdateOne {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddCreatedResellerRedeemCodeIDs(ids...)
+}
+
 // AddSubscriptionIDs adds the "subscriptions" edge to the UserSubscription entity by IDs.
 func (_u *UserUpdateOne) AddSubscriptionIDs(ids ...int64) *UserUpdateOne {
 	_u.mutation.AddSubscriptionIDs(ids...)
@@ -2348,6 +2444,27 @@ func (_u *UserUpdateOne) RemoveRedeemCodes(v ...*RedeemCode) *UserUpdateOne {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveRedeemCodeIDs(ids...)
+}
+
+// ClearCreatedResellerRedeemCodes clears all "created_reseller_redeem_codes" edges to the RedeemCode entity.
+func (_u *UserUpdateOne) ClearCreatedResellerRedeemCodes() *UserUpdateOne {
+	_u.mutation.ClearCreatedResellerRedeemCodes()
+	return _u
+}
+
+// RemoveCreatedResellerRedeemCodeIDs removes the "created_reseller_redeem_codes" edge to RedeemCode entities by IDs.
+func (_u *UserUpdateOne) RemoveCreatedResellerRedeemCodeIDs(ids ...int64) *UserUpdateOne {
+	_u.mutation.RemoveCreatedResellerRedeemCodeIDs(ids...)
+	return _u
+}
+
+// RemoveCreatedResellerRedeemCodes removes "created_reseller_redeem_codes" edges to RedeemCode entities.
+func (_u *UserUpdateOne) RemoveCreatedResellerRedeemCodes(v ...*RedeemCode) *UserUpdateOne {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveCreatedResellerRedeemCodeIDs(ids...)
 }
 
 // ClearSubscriptions clears all "subscriptions" edges to the UserSubscription entity.
@@ -2885,6 +3002,51 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 			Inverse: false,
 			Table:   user.RedeemCodesTable,
 			Columns: []string{user.RedeemCodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(redeemcode.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.CreatedResellerRedeemCodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CreatedResellerRedeemCodesTable,
+			Columns: []string{user.CreatedResellerRedeemCodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(redeemcode.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedCreatedResellerRedeemCodesIDs(); len(nodes) > 0 && !_u.mutation.CreatedResellerRedeemCodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CreatedResellerRedeemCodesTable,
+			Columns: []string{user.CreatedResellerRedeemCodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(redeemcode.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.CreatedResellerRedeemCodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CreatedResellerRedeemCodesTable,
+			Columns: []string{user.CreatedResellerRedeemCodesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(redeemcode.FieldID, field.TypeInt64),

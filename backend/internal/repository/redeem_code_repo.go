@@ -23,7 +23,7 @@ func NewRedeemCodeRepository(client *dbent.Client) service.RedeemCodeRepository 
 }
 
 func (r *redeemCodeRepository) Create(ctx context.Context, code *service.RedeemCode) error {
-	created, err := r.client.RedeemCode.Create().
+	builder := r.client.RedeemCode.Create().
 		SetCode(code.Code).
 		SetType(code.Type).
 		SetValue(code.Value).
@@ -34,7 +34,12 @@ func (r *redeemCodeRepository) Create(ctx context.Context, code *service.RedeemC
 		SetNillableUsedBy(code.UsedBy).
 		SetNillableUsedAt(code.UsedAt).
 		SetNillableGroupID(code.GroupID).
-		Save(ctx)
+		SetNillableCreatedByResellerID(code.CreatedByResellerID).
+		SetNillableResellerLedgerID(code.ResellerLedgerID)
+	if code.Source != "" {
+		builder.SetSource(code.Source)
+	}
+	created, err := builder.Save(ctx)
 	if err == nil {
 		code.ID = created.ID
 		code.CreatedAt = created.CreatedAt
@@ -60,7 +65,12 @@ func (r *redeemCodeRepository) CreateBatch(ctx context.Context, codes []service.
 			SetNillableExpiresAt(c.ExpiresAt).
 			SetNillableUsedBy(c.UsedBy).
 			SetNillableUsedAt(c.UsedAt).
-			SetNillableGroupID(c.GroupID)
+			SetNillableGroupID(c.GroupID).
+			SetNillableCreatedByResellerID(c.CreatedByResellerID).
+			SetNillableResellerLedgerID(c.ResellerLedgerID)
+		if c.Source != "" {
+			b.SetSource(c.Source)
+		}
 		builders = append(builders, b)
 	}
 
@@ -104,6 +114,11 @@ func (r *redeemCodeRepository) List(ctx context.Context, params pagination.Pagin
 
 func (r *redeemCodeRepository) ListWithFilters(ctx context.Context, params pagination.PaginationParams, codeType, status, search string) ([]service.RedeemCode, *pagination.PaginationResult, error) {
 	q := r.client.RedeemCode.Query()
+	if service.OnlyResellerCDKeysFromContext(ctx) {
+		q = q.Where(redeemcode.SourceEQ(service.RedeemSourceResellerCDKey))
+	} else if service.ExcludeResellerCDKeysFromContext(ctx) {
+		q = q.Where(redeemcode.CreatedByResellerIDIsNil())
+	}
 
 	if codeType != "" {
 		q = q.Where(redeemcode.TypeEQ(codeType))
@@ -413,18 +428,21 @@ func redeemCodeEntityToService(m *dbent.RedeemCode) *service.RedeemCode {
 		return nil
 	}
 	out := &service.RedeemCode{
-		ID:           m.ID,
-		Code:         m.Code,
-		Type:         m.Type,
-		Value:        m.Value,
-		Status:       m.Status,
-		UsedBy:       m.UsedBy,
-		UsedAt:       m.UsedAt,
-		Notes:        derefString(m.Notes),
-		CreatedAt:    m.CreatedAt,
-		ExpiresAt:    m.ExpiresAt,
-		GroupID:      m.GroupID,
-		ValidityDays: m.ValidityDays,
+		ID:                  m.ID,
+		Code:                m.Code,
+		Type:                m.Type,
+		Source:              m.Source,
+		Value:               m.Value,
+		Status:              m.Status,
+		UsedBy:              m.UsedBy,
+		UsedAt:              m.UsedAt,
+		Notes:               derefString(m.Notes),
+		CreatedAt:           m.CreatedAt,
+		ExpiresAt:           m.ExpiresAt,
+		GroupID:             m.GroupID,
+		CreatedByResellerID: m.CreatedByResellerID,
+		ResellerLedgerID:    m.ResellerLedgerID,
+		ValidityDays:        m.ValidityDays,
 	}
 	if m.Edges.User != nil {
 		out.User = userEntityToService(m.Edges.User)

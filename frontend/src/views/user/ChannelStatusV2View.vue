@@ -509,7 +509,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 const appStore = useAppStore()
 const { t, te, locale } = useI18n()
-const isAdmin = computed(() => authStore.isAdmin)
+const isAdmin = computed(() => authStore.canAccessAdminPanel)
 /** Admins always see RPM/TPM; users honor the hide-throughput system setting. */
 const showThroughput = computed(() => isAdmin.value || !isChannelMonitorThroughputHidden())
 

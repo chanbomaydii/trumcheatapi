@@ -63,6 +63,8 @@ export interface UserProfileSourceContext {
   provider_label?: string | null
 }
 
+export type UserRole = 'root' | 'admin' | 'reseller' | 'user'
+
 export interface User {
   id: number
   username: string
@@ -84,7 +86,7 @@ export interface User {
   linuxdo_bound?: boolean
   oidc_bound?: boolean
   wechat_bound?: boolean
-  role: 'admin' | 'user' // User role for authorization
+  role: UserRole // User role for authorization
   balance: number // User balance for API usage
   frozen_balance?: number // Balance currently held by async batch jobs
   concurrency: number // Allowed concurrent requests
@@ -1764,6 +1766,8 @@ export interface RedeemCode {
   validity_days?: number // 订阅类型专用
   user?: User
   group?: Group // 关联的分组
+  source?: 'system' | 'reseller_cdkey'
+  created_by_reseller_id?: number | null
 }
 
 export interface GenerateRedeemCodesRequest {
@@ -1965,7 +1969,7 @@ export interface UpdateUserRequest {
   password?: string
   username?: string
   notes?: string
-  role?: 'admin' | 'user'
+  role?: UserRole
   balance?: number
   concurrency?: number
   rpm_limit?: number
