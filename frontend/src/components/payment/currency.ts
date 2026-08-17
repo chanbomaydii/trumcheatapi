@@ -10,6 +10,7 @@ const PAYMENT_CURRENCY_SYMBOLS: Record<string, string> = {
   HKD: 'HK$',
   TWD: 'NT$',
   KRW: '₩',
+	 VND: '₫',
   AUD: 'A$',
   CAD: 'C$',
   SGD: 'S$',

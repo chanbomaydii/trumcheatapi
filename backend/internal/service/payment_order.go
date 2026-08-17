@@ -80,6 +80,21 @@ func (s *PaymentService) CreateOrder(ctx context.Context, req CreateOrderRequest
 	if err := s.validateSelectedCreateOrderInstance(ctx, req, sel); err != nil {
 		return nil, err
 	}
+	if sel != nil && sel.ProviderKey == payment.TypeRpayMBBank && req.OrderType != payment.OrderTypeBalance {
+		return nil, infraerrors.BadRequest("PAYMENT_METHOD_ORDER_TYPE_UNSUPPORTED", "rpay mbbank only supports balance recharge")
+	}
+	if sel != nil && sel.ProviderKey == payment.TypeRpayMBBank {
+		orderAmount, err = calculateRpayMBBankCreditedBalance(limitAmount, sel.Config)
+		if err != nil {
+			return nil, infraerrors.ServiceUnavailable("PAYMENT_PROVIDER_MISCONFIGURED", "provider_misconfigured")
+		}
+	}
+	if sel != nil && sel.ProviderKey == payment.TypeRpayUSDT {
+		if req.OrderType != payment.OrderTypeBalance {
+			return nil, infraerrors.BadRequest("PAYMENT_METHOD_ORDER_TYPE_UNSUPPORTED", "rpay usdt only supports balance recharge")
+		}
+		orderAmount = limitAmount
+	}
 	selectedCurrency := payment.DefaultPaymentCurrency
 	if sel != nil {
 		selectedCurrency = paymentProviderConfigCurrency(sel.ProviderKey, sel.Config)
@@ -304,6 +319,20 @@ func buildPaymentOrderProviderSnapshot(sel *payment.InstanceSelection, req Creat
 			snapshot["merchant_id"] = accountID
 		}
 		snapshot["currency"] = paymentProviderConfigCurrency(providerKey, sel.Config)
+	}
+	if providerKey == payment.TypeRpayMBBank {
+		if accountNumber := strings.TrimSpace(sel.Config["accountNumber"]); accountNumber != "" {
+			snapshot["merchant_id"] = accountNumber
+		}
+		snapshot["currency"] = "VND"
+	}
+	if providerKey == payment.TypeRpayUSDT {
+		if merchantID := strings.TrimSpace(sel.Config["merchantId"]); merchantID != "" {
+			snapshot["merchant_id"] = merchantID
+		}
+		snapshot["currency"] = "USD"
+		snapshot["network"] = strings.ToLower(strings.TrimSpace(sel.Config["network"]))
+		snapshot["token"] = "USDT"
 	}
 
 	if len(snapshot) == 1 {

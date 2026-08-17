@@ -58,15 +58,15 @@ export default {
     dockerRecreate: '重新创建容器'
   },
 
-  // Recharge / Subscription Page
+	// Recharge Page
   purchase: {
-    title: '充值/订阅',
-    description: '通过内嵌页面完成充值/订阅',
+	title: '充值',
+	description: '通过内嵌页面完成充值',
     openInNewTab: '新窗口打开',
     notEnabledTitle: '该功能未开启',
-    notEnabledDesc: '管理员暂未开启充值/订阅入口，请联系管理员。',
-    notConfiguredTitle: '充值/订阅链接未配置',
-    notConfiguredDesc: '管理员已开启入口，但尚未配置充值/订阅链接，请联系管理员。'
+    notEnabledDesc: '管理员暂未开启充值入口，请联系管理员。',
+    notConfiguredTitle: '充值链接未配置',
+    notConfiguredDesc: '管理员已开启入口，但尚未配置充值链接，请联系管理员。'
   },
 
   // Custom Page (iframe embed)
@@ -312,7 +312,7 @@ export default {
     title: '充值/订阅',
     amountLabel: '充值金额',
     paymentAmount: '支付金额',
-    creditedBalance: '到账余额',
+  creditedBalance: '到账 USD 余额',
     quickAmounts: '快捷金额',
     customAmount: '自定义金额',
     enterAmount: '输入金额',
@@ -326,6 +326,8 @@ export default {
       wxpay: '微信支付',
       stripe: 'Stripe',
       airwallex: 'Airwallex',
+	  rpay_mbbank: 'MBBank 转账',
+	  rpay_usdt: 'USDT（加密货币）',
       card: '银行卡',
       link: 'Link',
       alipay_direct: '支付宝（直连）',
@@ -400,7 +402,7 @@ export default {
       backToRecharge: '返回充值',
       viewOrders: '查看订单',
     },
-    currentBalance: '当前余额',
+  currentBalance: '当前余额',
     groupFallback: '分组 #{id}',
     rechargeAccount: '充值账户',
     activeSubscription: '当前订阅',

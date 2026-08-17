@@ -1,7 +1,10 @@
 package service
 
 import (
+	"fmt"
 	"math"
+	"strconv"
+	"strings"
 
 	"github.com/Wei-Shaw/sub2api/internal/payment"
 	"github.com/shopspring/decimal"
@@ -30,6 +33,17 @@ func calculateCreditedBalance(paymentAmount, multiplier float64) float64 {
 		Mul(decimal.NewFromFloat(normalizeBalanceRechargeMultiplier(multiplier))).
 		Round(2).
 		InexactFloat64()
+}
+
+func calculateRpayMBBankCreditedBalance(paymentAmount float64, config map[string]string) (float64, error) {
+	vndPerUsdt, err := strconv.ParseFloat(strings.TrimSpace(config["vndPerUsdt"]), 64)
+	if err != nil || vndPerUsdt <= 0 || math.IsNaN(vndPerUsdt) || math.IsInf(vndPerUsdt, 0) {
+		return 0, fmt.Errorf("rpay mbbank vndPerUsdt must be a positive number")
+	}
+	return decimal.NewFromFloat(paymentAmount).
+		Div(decimal.NewFromFloat(vndPerUsdt)).
+		Round(2).
+		InexactFloat64(), nil
 }
 
 func calculateGatewayRefundAmount(orderAmount, payAmount, refundAmount float64, currency string) float64 {

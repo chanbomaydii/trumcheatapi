@@ -18,6 +18,8 @@ type paymentOrderProviderSnapshot struct {
 	MerchantAppID      string
 	MerchantID         string
 	Currency           string
+	Network            string
+	Token              string
 }
 
 func psOrderProviderSnapshot(order *dbent.PaymentOrder) *paymentOrderProviderSnapshot {
@@ -33,6 +35,8 @@ func psOrderProviderSnapshot(order *dbent.PaymentOrder) *paymentOrderProviderSna
 		MerchantAppID:      psSnapshotStringValue(order.ProviderSnapshot["merchant_app_id"]),
 		MerchantID:         psSnapshotStringValue(order.ProviderSnapshot["merchant_id"]),
 		Currency:           psSnapshotStringValue(order.ProviderSnapshot["currency"]),
+		Network:            psSnapshotStringValue(order.ProviderSnapshot["network"]),
+		Token:              psSnapshotStringValue(order.ProviderSnapshot["token"]),
 	}
 	if snapshot.SchemaVersion == 0 &&
 		snapshot.ProviderInstanceID == "" &&
@@ -41,6 +45,7 @@ func psOrderProviderSnapshot(order *dbent.PaymentOrder) *paymentOrderProviderSna
 		snapshot.MerchantAppID == "" &&
 		snapshot.MerchantID == "" &&
 		snapshot.Currency == "" {
+		// Network and Token are optional additions to schema version 2 snapshots.
 		return nil
 	}
 	return snapshot
@@ -219,6 +224,29 @@ func validateProviderSnapshotMetadata(order *dbent.PaymentOrder, providerKey str
 		}
 		if actual := strings.TrimSpace(metadata["status"]); actual != "" && !strings.EqualFold(actual, "SUCCEEDED") {
 			return fmt.Errorf("airwallex status mismatch: expected SUCCEEDED, got %s", actual)
+		}
+	case payment.TypeRpayMBBank:
+		if expected := strings.TrimSpace(snapshot.MerchantID); expected != "" {
+			actual := strings.TrimSpace(metadata["account_number"])
+			if actual == "" || actual != expected {
+				return fmt.Errorf("rpay mbbank account number mismatch")
+			}
+		}
+		if expected := strings.TrimSpace(snapshot.Currency); expected != "" && !strings.EqualFold(expected, strings.TrimSpace(metadata["currency"])) {
+			return fmt.Errorf("rpay mbbank currency mismatch")
+		}
+	case payment.TypeRpayUSDT:
+		if expected := strings.TrimSpace(snapshot.MerchantID); expected != "" && expected != strings.TrimSpace(metadata["merchant_id"]) {
+			return fmt.Errorf("rpay usdt merchant mismatch")
+		}
+		if expected := strings.TrimSpace(snapshot.Network); expected != "" && !strings.EqualFold(expected, strings.TrimSpace(metadata["network"])) {
+			return fmt.Errorf("rpay usdt network mismatch")
+		}
+		if expected := strings.TrimSpace(snapshot.Token); expected != "" && !strings.EqualFold(expected, strings.TrimSpace(metadata["token"])) {
+			return fmt.Errorf("rpay usdt token mismatch")
+		}
+		if strings.TrimSpace(metadata["transaction_id"]) == "" {
+			return fmt.Errorf("rpay usdt transaction_id is missing")
 		}
 	}
 

@@ -124,6 +124,7 @@ type MethodLimits struct {
 	PaymentType string  `json:"payment_type"`
 	DisplayName string  `json:"display_name,omitempty"`
 	Currency    string  `json:"currency"`
+	VNDPerUSDT  float64 `json:"vnd_per_usdt,omitempty"`
 	FeeRate     float64 `json:"fee_rate"`
 	DailyLimit  float64 `json:"daily_limit"`
 	SingleMin   float64 `json:"single_min"`

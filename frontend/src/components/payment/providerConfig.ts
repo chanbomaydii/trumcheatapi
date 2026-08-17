@@ -42,13 +42,15 @@ export const PROVIDER_SUPPORTED_TYPES: Record<string, string[]> = {
   wxpay: ['wxpay'],
   stripe: ['card', 'alipay', 'wxpay', 'link'],
   airwallex: ['airwallex'],
+	 rpay_mbbank: ['rpay_mbbank'],
+   rpay_usdt: ['rpay_usdt'],
 }
 
 /** Available payment modes for EasyPay providers. */
 export const EASYPAY_PAYMENT_MODES = ['qrcode', 'popup'] as const
 
 /** Fixed display order for user-facing payment methods */
-export const METHOD_ORDER = ['alipay', 'alipay_direct', 'wxpay', 'wxpay_direct', 'stripe', 'airwallex'] as const
+export const METHOD_ORDER = ['rpay_mbbank', 'rpay_usdt', 'alipay', 'alipay_direct', 'wxpay', 'wxpay_direct', 'stripe', 'airwallex'] as const
 
 export function isBuiltInAlipayMethod(type: string): boolean {
   return type === 'alipay' || type === 'alipay_direct'
@@ -110,6 +112,7 @@ export const WEBHOOK_PATHS: Record<string, string> = {
   wxpay: '/api/v1/payment/webhook/wxpay',
   stripe: '/api/v1/payment/webhook/stripe',
   airwallex: '/api/v1/payment/webhook/airwallex',
+	 rpay_usdt: '/api/v1/payment/webhook/rpay_usdt',
 }
 
 export const RETURN_PATH = '/payment/result'
@@ -119,6 +122,7 @@ export const PROVIDER_CALLBACK_PATHS: Record<string, CallbackPaths> = {
   easypay: { notifyUrl: WEBHOOK_PATHS.easypay, returnUrl: RETURN_PATH },
   alipay: { notifyUrl: WEBHOOK_PATHS.alipay, returnUrl: RETURN_PATH },
   wxpay: { notifyUrl: WEBHOOK_PATHS.wxpay },
+	 rpay_usdt: { notifyUrl: WEBHOOK_PATHS.rpay_usdt },
   // stripe: 不需要回调 URL 配置，Webhook 单独配置。
   // airwallex: 不需要回调 URL 配置，Webhook 在空中云汇后台配置。
 }
@@ -161,6 +165,27 @@ export const PROVIDER_CONFIG_FIELDS: Record<string, ConfigFieldDef[]> = {
     { key: 'currency', label: '', sensitive: false, defaultValue: 'CNY', hintKey: 'admin.settings.payment.field_paymentCurrencyHint', options: PAYMENT_CURRENCY_OPTIONS },
     { key: 'accountId', label: '', sensitive: false, optional: true, clearable: true, hintKey: 'admin.settings.payment.field_accountIdHint' },
   ],
+   rpay_mbbank: [
+     { key: 'password', label: '', sensitive: true },
+     { key: 'accountNumber', label: '', sensitive: false },
+     { key: 'accountName', label: '', sensitive: false, optional: true },
+     { key: 'token', label: '', sensitive: true },
+     { key: 'vndPerUsdt', label: '', sensitive: false, defaultValue: '26000' },
+     { key: 'apiBase', label: '', sensitive: false, defaultValue: 'https://api.rpay.vn' },
+   ],
+   rpay_usdt: [
+     { key: 'merchantId', label: '', sensitive: false },
+     { key: 'apiKey', label: '', sensitive: true },
+     { key: 'network', label: '', sensitive: false, defaultValue: 'tron', options: [
+     { value: 'tron', label: 'TRON (TRC20)' },
+     { value: 'bsc', label: 'BNB Smart Chain (BEP20)' },
+     { value: 'polygon', label: 'Polygon' },
+     { value: 'base', label: 'Base' },
+     ] },
+     { key: 'token', label: '', sensitive: false, defaultValue: 'USDT', options: [{ value: 'USDT', label: 'USDT' }] },
+     { key: 'expireMinutes', label: '', sensitive: false, defaultValue: '30' },
+     { key: 'apiBase', label: '', sensitive: false, defaultValue: 'https://api.rpay.vn/api' },
+   ],
 }
 
 // --- Helpers ---

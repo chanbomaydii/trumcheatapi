@@ -253,7 +253,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { useAppStore, useAuthStore, useOnboardingStore } from '@/stores'
+import { useAppStore, useAuthStore, useOnboardingStore, usePaymentStore } from '@/stores'
 import { useAdminSettingsStore } from '@/stores/adminSettings'
 import LocaleSwitcher from '@/components/common/LocaleSwitcher.vue'
 import SubscriptionProgressMini from '@/components/common/SubscriptionProgressMini.vue'
@@ -261,14 +261,16 @@ import AnnouncementBell from '@/components/common/AnnouncementBell.vue'
 import Icon from '@/components/icons/Icon.vue'
 import { sanitizeUrl } from '@/utils/url'
 import { FeatureFlags, isFeatureFlagEnabled } from '@/utils/featureFlags'
+import { formatPaymentAmount } from '@/components/payment/currency'
 
 const router = useRouter()
 const route = useRoute()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const appStore = useAppStore()
 const authStore = useAuthStore()
 const adminSettingsStore = useAdminSettingsStore()
 const onboardingStore = useOnboardingStore()
+const paymentStore = usePaymentStore()
 
 const user = computed(() => authStore.user)
 const dropdownOpen = ref(false)
@@ -362,8 +364,11 @@ function handleReplayGuide() {
 }
 
 function formatHeaderMoney(value: number) {
-  if (!Number.isFinite(value)) return '$0.00'
-  return `$${value.toFixed(2)}`
+  const normalized = Number.isFinite(value) ? value : 0
+  if (locale.value.toLowerCase().startsWith('vi') && paymentStore.vndPerUsdBalance > 0) {
+    return formatPaymentAmount(normalized * paymentStore.vndPerUsdBalance, 'VND', 'vi-VN')
+  }
+  return formatPaymentAmount(normalized, 'USD', locale.value)
 }
 
 function handleClickOutside(event: MouseEvent) {

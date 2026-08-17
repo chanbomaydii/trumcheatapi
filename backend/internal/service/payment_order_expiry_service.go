@@ -98,10 +98,10 @@ func (s *PaymentOrderExpiryService) runOnce() {
 	defer release()
 
 	reconcileCtx, cancel := context.WithTimeout(context.Background(), expiryCheckTimeout)
-	recovered, err := s.paymentSvc.ReconcilePendingWxpayOrders(reconcileCtx)
+	recovered, err := s.paymentSvc.ReconcilePendingPollingOrders(reconcileCtx)
 	cancel()
 	if err != nil {
-		slog.Warn("[PaymentOrderExpiry] failed to reconcile pending wxpay orders", "error", err)
+		slog.Warn("[PaymentOrderExpiry] failed to reconcile pending polling orders", "error", err)
 	} else if recovered > 0 {
 		slog.Info("[PaymentOrderExpiry] reconciled paid wxpay orders", "count", recovered)
 	}

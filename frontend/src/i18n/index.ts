@@ -1,6 +1,6 @@
 import { createI18n } from 'vue-i18n'
 
-type LocaleCode = 'en' | 'zh'
+type LocaleCode = 'en' | 'vi' | 'zh'
 
 type LocaleMessages = Record<string, any>
 
@@ -9,11 +9,12 @@ const DEFAULT_LOCALE: LocaleCode = 'en'
 
 const localeLoaders: Record<LocaleCode, () => Promise<{ default: LocaleMessages }>> = {
   en: () => import('./locales/en'),
+  vi: () => import('./locales/en'),
   zh: () => import('./locales/zh')
 }
 
 function isLocaleCode(value: string): value is LocaleCode {
-  return value === 'en' || value === 'zh'
+  return value === 'en' || value === 'vi' || value === 'zh'
 }
 
 function getDefaultLocale(): LocaleCode {
@@ -26,6 +27,9 @@ function getDefaultLocale(): LocaleCode {
   if (browserLang.startsWith('zh')) {
     return 'zh'
   }
+  if (browserLang.startsWith('vi')) {
+    return 'vi'
+  }
 
   return DEFAULT_LOCALE
 }
@@ -35,8 +39,8 @@ export const i18n = createI18n({
   locale: getDefaultLocale(),
   fallbackLocale: DEFAULT_LOCALE,
   messages: {},
-  // 禁用 HTML 消息警告 - 引导步骤使用富文本内容（driver.js 支持 HTML）
-  // 这些内容是内部定义的，不存在 XSS 风险
+  // τªüτö¿ HTML µ╢êµü»Φ¡ªσæè - σ╝òσ»╝µ¡ÑΘ¬ñΣ╜┐τö¿σ»îµûçµ£¼σåàσ«╣∩╝êdriver.js µö»µîü HTML∩╝ë
+  // Φ┐ÖΣ║¢σåàσ«╣µÿ»σåàΘâ¿σ«ÜΣ╣ëτÜä∩╝îΣ╕ìσ¡ÿσ£¿ XSS ΘúÄΘÖ⌐
   warnHtmlMessage: false
 })
 
@@ -69,7 +73,7 @@ export async function setLocale(locale: string): Promise<void> {
   localStorage.setItem(LOCALE_KEY, locale)
   document.documentElement.setAttribute('lang', locale)
 
-  // 同步更新浏览器页签标题，使其跟随语言切换
+  // σÉîµ¡Ñµ¢┤µû░µ╡ÅΦºêσÖ¿Θí╡τ¡╛µáçΘóÿ∩╝îΣ╜┐σà╢Φ╖ƒΘÜÅΦ»¡Φ¿Çσêçµìó
   const { resolveRouteDocumentTitle } = await import('@/router/title')
   const { default: router } = await import('@/router')
   const { useAppStore } = await import('@/stores/app')
@@ -92,8 +96,9 @@ export function getLocale(): LocaleCode {
 }
 
 export const availableLocales = [
-  { code: 'en', name: 'English', flag: '🇺🇸' },
-  { code: 'zh', name: '中文', flag: '🇨🇳' }
+  { code: 'en', name: 'English', flag: '≡ƒç║≡ƒç╕' },
+  { code: 'vi', name: 'Tiß║┐ng Viß╗çt', flag: '≡ƒç╗≡ƒç│' },
+  { code: 'zh', name: 'Σ╕¡µûç', flag: '≡ƒç¿≡ƒç│' }
 ] as const
 
 export default i18n

@@ -18,6 +18,8 @@ const (
 	TypeLink         PaymentType = "link"
 	TypeEasyPay      PaymentType = "easypay"
 	TypeAirwallex    PaymentType = "airwallex"
+	TypeRpayMBBank   PaymentType = "rpay_mbbank"
+	TypeRpayUSDT     PaymentType = "rpay_usdt"
 )
 
 // Order status constants shared across payment and service layers.
@@ -86,6 +88,8 @@ func GetBasePaymentType(t string) string {
 		return TypeEasyPay
 	case t == TypeAirwallex:
 		return TypeAirwallex
+	case t == TypeRpayUSDT:
+		return TypeRpayUSDT
 	case t == TypeStripe || t == TypeCard || t == TypeLink:
 		return TypeStripe
 	case len(t) >= len(TypeAlipay) && t[:len(TypeAlipay)] == TypeAlipay:

@@ -5,7 +5,8 @@
       <!-- QR Code mode -->
       <template v-if="qrUrl">
         <div class="rounded-2xl bg-white p-4 shadow-sm dark:bg-dark-800">
-          <canvas ref="qrCanvas" class="mx-auto"></canvas>
+      <img v-if="isRemoteQRImage" :src="qrUrl" alt="VietQR" class="mx-auto h-[220px] w-[220px] object-contain" />
+      <canvas v-else ref="qrCanvas" class="mx-auto"></canvas>
         </div>
         <p v-if="scanHint" class="text-center text-sm text-gray-500 dark:text-gray-400">
           {{ scanHint }}
@@ -107,6 +108,13 @@ const appStore = useAppStore()
 
 const qrCanvas = ref<HTMLCanvasElement | null>(null)
 const qrUrl = ref('')
+const isRemoteQRImage = computed(() => {
+  try {
+    return new URL(qrUrl.value).hostname.toLowerCase() === 'img.vietqr.io'
+  } catch {
+    return false
+  }
+})
 const remainingSeconds = ref(0)
 const expired = ref(false)
 const cancelling = ref(false)
@@ -164,7 +172,7 @@ function reopenPopup() {
 
 async function renderQR() {
   await nextTick()
-  if (!qrCanvas.value || !qrUrl.value) return
+  if (isRemoteQRImage.value || !qrCanvas.value || !qrUrl.value) return
   const logoSrc = getLogoForType()
   await QRCode.toCanvas(qrCanvas.value, qrUrl.value, {
     width: 220,

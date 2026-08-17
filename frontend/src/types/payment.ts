@@ -19,7 +19,7 @@ export type OrderStatus =
   | 'REFUNDED'
   | 'REFUND_FAILED'
 
-export type PaymentType = 'alipay' | 'wxpay' | 'alipay_direct' | 'wxpay_direct' | 'stripe' | 'easypay' | 'airwallex'
+export type PaymentType = 'alipay' | 'wxpay' | 'alipay_direct' | 'wxpay_direct' | 'stripe' | 'easypay' | 'airwallex' | 'rpay_mbbank' | 'rpay_usdt'
 
 export type OrderType = 'balance' | 'subscription'
 
@@ -44,6 +44,7 @@ export interface PaymentConfig {
 export interface MethodLimit {
   currency?: string
   display_name?: string
+	 vnd_per_usdt?: number
   daily_limit: number
   daily_used: number
   daily_remaining: number

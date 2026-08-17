@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"testing"
 
+	dbent "github.com/Wei-Shaw/sub2api/ent"
 	"github.com/Wei-Shaw/sub2api/internal/payment"
 	"github.com/stretchr/testify/require"
 )
@@ -186,6 +187,53 @@ func TestBuildPaymentOrderProviderSnapshot_IncludesProviderCurrency(t *testing.T
 	}, CreateOrderRequest{})
 	require.Equal(t, "USD", airwallexSnapshot["currency"])
 	require.Equal(t, "acct-78", airwallexSnapshot["merchant_id"])
+}
+
+func TestBuildPaymentOrderProviderSnapshot_IncludesRpayUSDTSettlementIdentity(t *testing.T) {
+	t.Parallel()
+
+	snapshot := buildPaymentOrderProviderSnapshot(&payment.InstanceSelection{
+		InstanceID:  "79",
+		ProviderKey: payment.TypeRpayUSDT,
+		Config: map[string]string{
+			"merchantId": "merchant-79",
+			"apiKey":     "do-not-copy",
+			"network":    "TRON",
+			"token":      "USDT",
+		},
+	}, CreateOrderRequest{})
+
+	require.Equal(t, "merchant-79", snapshot["merchant_id"])
+	require.Equal(t, "tron", snapshot["network"])
+	require.Equal(t, "USDT", snapshot["token"])
+	require.Equal(t, "USD", snapshot["currency"])
+	require.NotContains(t, snapshot, "apiKey")
+}
+
+func TestValidateProviderSnapshotMetadata_RpayUSDT(t *testing.T) {
+	t.Parallel()
+
+	order := &dbent.PaymentOrder{ProviderSnapshot: map[string]any{
+		"schema_version": 2,
+		"provider_key":   payment.TypeRpayUSDT,
+		"merchant_id":    "merchant-79",
+		"network":        "tron",
+		"token":          "USDT",
+	}}
+	metadata := map[string]string{
+		"merchant_id":    "merchant-79",
+		"network":        "TRON",
+		"token":          "usdt",
+		"transaction_id": "0xsettlement",
+	}
+	require.NoError(t, validateProviderSnapshotMetadata(order, payment.TypeRpayUSDT, metadata))
+
+	delete(metadata, "transaction_id")
+	require.EqualError(t, validateProviderSnapshotMetadata(order, payment.TypeRpayUSDT, metadata), "rpay usdt transaction_id is missing")
+
+	metadata["transaction_id"] = "0xsettlement"
+	metadata["network"] = "bsc"
+	require.EqualError(t, validateProviderSnapshotMetadata(order, payment.TypeRpayUSDT, metadata), "rpay usdt network mismatch")
 }
 
 func valueOrEmpty(v *string) string {

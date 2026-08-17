@@ -66,6 +66,7 @@ func RegisterPaymentRoutes(
 		webhook.POST("/wxpay", webhookHandler.WxpayNotify)
 		webhook.POST("/stripe", webhookHandler.StripeWebhook)
 		webhook.POST("/airwallex", webhookHandler.AirwallexWebhook)
+		webhook.GET("/rpay_usdt", webhookHandler.RpayUSDTNotify)
 	}
 
 	// --- Admin payment endpoints (admin auth) ---

@@ -67,6 +67,10 @@ func (h *PaymentWebhookHandler) AirwallexWebhook(c *gin.Context) {
 	h.handleNotify(c, payment.TypeAirwallex)
 }
 
+func (h *PaymentWebhookHandler) RpayUSDTNotify(c *gin.Context) {
+	h.handleNotify(c, payment.TypeRpayUSDT)
+}
+
 // handleNotify is the shared logic for all provider webhook handlers.
 func (h *PaymentWebhookHandler) handleNotify(c *gin.Context, providerKey string) {
 	var rawBody string
@@ -110,7 +114,9 @@ func (h *PaymentWebhookHandler) handleNotify(c *gin.Context, providerKey string)
 			truncatedBody = truncatedBody[:webhookLogTruncateLen] + "...(truncated)"
 		}
 		slog.Error("[Payment Webhook] verify failed", "provider", providerKey, "error", err, "method", c.Request.Method, "bodyLen", len(rawBody))
-		slog.Debug("[Payment Webhook] verify failed body", "provider", providerKey, "rawBody", truncatedBody)
+		if providerKey != payment.TypeRpayUSDT {
+			slog.Debug("[Payment Webhook] verify failed body", "provider", providerKey, "rawBody", truncatedBody)
+		}
 		c.String(http.StatusBadRequest, "verify failed")
 		return
 	}
@@ -148,9 +154,12 @@ func (h *PaymentWebhookHandler) handleNotify(c *gin.Context, providerKey string)
 // This allows looking up the correct provider instance before verification.
 func extractOutTradeNo(rawBody, providerKey string) string {
 	switch providerKey {
-	case payment.TypeEasyPay, payment.TypeAlipay:
+	case payment.TypeEasyPay, payment.TypeAlipay, payment.TypeRpayUSDT:
 		values, err := url.ParseQuery(rawBody)
 		if err == nil {
+			if providerKey == payment.TypeRpayUSDT {
+				return values.Get("request_id")
+			}
 			return values.Get("out_trade_no")
 		}
 	case payment.TypeAirwallex:

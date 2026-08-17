@@ -710,6 +710,7 @@ function handleSave() {
     notifyBaseUrl.value = notifyBase
     returnBaseUrl.value = returnBase
     if (paths.notifyUrl) filteredConfig['notifyUrl'] = notifyBase + paths.notifyUrl
+    if (form.provider_key === 'rpay_usdt' && paths.notifyUrl) filteredConfig['callbackUrl'] = notifyBase + paths.notifyUrl
     if (paths.returnUrl) filteredConfig['returnUrl'] = returnBase + paths.returnUrl
   }
 

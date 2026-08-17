@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 
 	dbent "github.com/Wei-Shaw/sub2api/ent"
@@ -34,6 +35,9 @@ func (s *PaymentConfigService) GetAvailableMethodLimits(ctx context.Context) (*M
 		ml := pcAggregateMethodLimits(pt, insts)
 		ml.DisplayName = s.pcAggregateMethodDisplayName(pt, insts)
 		ml.Currency = currency
+		if pt == payment.TypeRpayMBBank {
+			ml.VNDPerUSDT = s.pcRpayMBBankVNDPerUSDT(insts)
+		}
 		resp.Methods[ml.PaymentType] = ml
 	}
 	resp.GlobalMin, resp.GlobalMax = pcComputeGlobalRange(resp.Methods)
@@ -97,9 +101,29 @@ func (s *PaymentConfigService) GetMethodLimits(ctx context.Context, types []stri
 		ml := pcAggregateMethodLimits(pt, matching)
 		ml.DisplayName = s.pcAggregateMethodDisplayName(pt, matching)
 		ml.Currency = currency
+		if pt == payment.TypeRpayMBBank {
+			ml.VNDPerUSDT = s.pcRpayMBBankVNDPerUSDT(matching)
+		}
 		result = append(result, ml)
 	}
 	return result, nil
+}
+
+func (s *PaymentConfigService) pcRpayMBBankVNDPerUSDT(instances []*dbent.PaymentProviderInstance) float64 {
+	for _, inst := range instances {
+		if inst == nil || inst.ProviderKey != payment.TypeRpayMBBank {
+			continue
+		}
+		cfg, err := s.decryptConfig(inst.Config)
+		if err != nil {
+			continue
+		}
+		rate, err := strconv.ParseFloat(strings.TrimSpace(cfg["vndPerUsdt"]), 64)
+		if err == nil && rate > 0 {
+			return rate
+		}
+	}
+	return 0
 }
 
 func (s *PaymentConfigService) ValidateMethodCurrencyConsistency(ctx context.Context, paymentType string) (string, error) {

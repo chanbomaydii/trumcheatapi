@@ -291,6 +291,23 @@ func TestCalculateCreditedBalanceStillUsesRechargeMultiplier(t *testing.T) {
 	}
 }
 
+func TestCalculateRpayMBBankCreditedBalanceUsesPinnedVNDPerUSDT(t *testing.T) {
+	got, err := calculateRpayMBBankCreditedBalance(26000, map[string]string{"vndPerUsdt": "26000"})
+	if err != nil || got != 1.0 {
+		t.Fatalf("calculateRpayMBBankCreditedBalance(26000, 26000) = %v, %v; want 1.0, nil", got, err)
+	}
+
+	got, err = calculateRpayMBBankCreditedBalance(100000, map[string]string{"vndPerUsdt": "25500"})
+	if err != nil || got != 3.92 {
+		t.Fatalf("calculateRpayMBBankCreditedBalance(100000, 25500) = %v, %v; want 3.92, nil", got, err)
+	}
+
+	_, err = calculateRpayMBBankCreditedBalance(26000, map[string]string{"vndPerUsdt": "0"})
+	if err == nil {
+		t.Fatal("calculateRpayMBBankCreditedBalance accepted zero exchange rate")
+	}
+}
+
 func TestCalculateCreateOrderPayAmountRejectsFractionalZeroDecimal(t *testing.T) {
 	t.Parallel()
 

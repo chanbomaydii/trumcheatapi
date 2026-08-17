@@ -18,7 +18,7 @@
           ]"
           @click="selectAmount(amt)"
         >
-          {{ amt }}
+      {{ formatQuickAmountLabel(amt) }}
         </button>
       </div>
     </div>
@@ -30,7 +30,7 @@
       </label>
       <div class="relative">
         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500">
-          $
+		  {{ amountSymbol }}
         </span>
         <input
           type="text"
@@ -54,10 +54,12 @@ const props = withDefaults(defineProps<{
   modelValue: number | null
   min?: number
   max?: number
+	 currency?: string
 }>(), {
   amounts: () => [10, 20, 50, 100, 200, 500, 1000, 2000, 5000],
   min: 0,
   max: 0,
+	 currency: 'USD',
 })
 
 const emit = defineEmits<{
@@ -67,6 +69,10 @@ const emit = defineEmits<{
 const { t } = useI18n()
 
 const customText = ref('')
+const normalizedCurrency = computed(() => String(props.currency || 'USD').trim().toUpperCase())
+const amountSymbol = computed(() => normalizedCurrency.value === 'VND' ? '₫' : normalizedCurrency.value === 'USD' ? '$' : normalizedCurrency.value)
+const fractionDigits = computed(() => normalizedCurrency.value === 'VND' ? 0 : 2)
+const numberLocale = computed(() => normalizedCurrency.value === 'VND' ? 'vi-VN' : undefined)
 
 // 0 = no limit
 const filteredAmounts = computed(() =>
@@ -74,22 +80,36 @@ const filteredAmounts = computed(() =>
 )
 
 const placeholderText = computed(() => {
-  if (props.min > 0 && props.max > 0) return `${props.min} - ${props.max}`
-  if (props.min > 0) return `≥ ${props.min}`
-  if (props.max > 0) return `≤ ${props.max}`
+  if (props.min > 0 && props.max > 0) return `${formatQuickAmount(props.min)} - ${formatQuickAmount(props.max)}`
+  if (props.min > 0) return `≥ ${formatQuickAmount(props.min)}`
+  if (props.max > 0) return `≤ ${formatQuickAmount(props.max)}`
   return t('payment.enterAmount')
 })
 
-const AMOUNT_PATTERN = /^\d*(\.\d{0,2})?$/
+function formatQuickAmount(amount: number): string {
+  return new Intl.NumberFormat(numberLocale.value, { maximumFractionDigits: fractionDigits.value }).format(amount)
+}
+
+function formatQuickAmountLabel(amount: number): string {
+  return `${formatQuickAmount(amount)}${amountSymbol.value}`
+}
 
 function selectAmount(amt: number) {
-  customText.value = String(amt)
+  customText.value = formatQuickAmount(amt)
   emit('update:modelValue', amt)
 }
 
 function handleInput(e: Event) {
   const val = (e.target as HTMLInputElement).value
-  if (!AMOUNT_PATTERN.test(val)) return
+  if (normalizedCurrency.value === 'VND') {
+    const digits = val.replace(/\./g, '')
+    if (!/^\d*$/.test(digits)) return
+    customText.value = digits === '' ? '' : formatQuickAmount(Number(digits))
+    emit('update:modelValue', digits === '' || Number(digits) <= 0 ? null : Number(digits))
+    return
+  }
+  const pattern = fractionDigits.value === 0 ? /^\d*$/ : /^\d*(\.\d{0,2})?$/
+  if (!pattern.test(val)) return
   customText.value = val
   if (val === '') {
     emit('update:modelValue', null)
@@ -104,8 +124,18 @@ function handleInput(e: Event) {
 }
 
 watch(() => props.modelValue, (v) => {
+  if (v === null) {
+    customText.value = ''
+    return
+  }
   if (v !== null && String(v) !== customText.value) {
-    customText.value = String(v)
+    customText.value = normalizedCurrency.value === 'VND' ? formatQuickAmount(v) : String(v)
   }
 }, { immediate: true })
+
+watch(normalizedCurrency, () => {
+  customText.value = props.modelValue === null
+    ? ''
+    : normalizedCurrency.value === 'VND' ? formatQuickAmount(props.modelValue) : String(props.modelValue)
+})
 </script>

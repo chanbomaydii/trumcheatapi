@@ -178,6 +178,12 @@ func TestExtractOutTradeNo(t *testing.T) {
 			rawBody:     `{"name":"payment_intent.succeeded","data":{"object":{"merchant_order_id":"sub2_awx_123"}}}`,
 			want:        "sub2_awx_123",
 		},
+		{
+			name:        "rpay usdt callback",
+			providerKey: payment.TypeRpayUSDT,
+			rawBody:     "request_id=sub2_usdt_123&status=completed&api_key=secret",
+			want:        "sub2_usdt_123",
+		},
 	}
 
 	for _, tt := range tests {

@@ -17,6 +17,8 @@ export const usePaymentStore = defineStore('payment', () => {
   const currentOrder = ref<PaymentOrder | null>(null)
   /** Available subscription plans */
   const plans = ref<SubscriptionPlan[]>([])
+  /** Display-only VND conversion rate learned from checkout methods. */
+  const vndPerUsdBalance = ref(0)
 
   const configLoading = ref(false)
   const configLoaded = ref(false)
@@ -86,16 +88,22 @@ export const usePaymentStore = defineStore('payment', () => {
     currentOrder.value = null
   }
 
+  function setVndPerUsdBalance(rate: number) {
+    vndPerUsdBalance.value = Number.isFinite(rate) && rate > 0 ? rate : 0
+  }
+
   return {
     config,
     currentOrder,
     plans,
+    vndPerUsdBalance,
     configLoading,
     configLoaded,
     fetchConfig,
     fetchPlans,
     createOrder,
     pollOrderStatus,
-    clearCurrentOrder
+    clearCurrentOrder,
+    setVndPerUsdBalance,
   }
 })

@@ -303,9 +303,8 @@ func (s *PaymentService) VerifyOrderByOutTradeNo(ctx context.Context, outTradeNo
 	return o, nil
 }
 
-// ReconcilePendingWxpayOrders actively checks recent pending WeChat orders so
-// missed provider notifications do not wait until order expiry to fulfill.
-func (s *PaymentService) ReconcilePendingWxpayOrders(ctx context.Context) (int, error) {
+// ReconcilePendingPollingOrders checks providers that require active status polling.
+func (s *PaymentService) ReconcilePendingPollingOrders(ctx context.Context) (int, error) {
 	now := time.Now()
 	orders, err := s.entClient.PaymentOrder.Query().
 		Where(
@@ -316,13 +315,17 @@ func (s *PaymentService) ReconcilePendingWxpayOrders(ctx context.Context) (int, 
 				paymentorder.PaymentTypeHasPrefix(payment.TypeWxpay+"_"),
 				paymentorder.ProviderKeyEQ(payment.TypeWxpay),
 				paymentorder.ProviderKeyHasPrefix(payment.TypeWxpay+"_"),
+				paymentorder.PaymentTypeEQ(payment.TypeRpayMBBank),
+				paymentorder.ProviderKeyEQ(payment.TypeRpayMBBank),
+				paymentorder.PaymentTypeEQ(payment.TypeRpayUSDT),
+				paymentorder.ProviderKeyEQ(payment.TypeRpayUSDT),
 			),
 		).
 		Order(dbent.Asc(paymentorder.FieldCreatedAt)).
 		Limit(pendingWxpayReconcileLimit).
 		All(ctx)
 	if err != nil {
-		return 0, fmt.Errorf("query pending wxpay orders: %w", err)
+		return 0, fmt.Errorf("query pending polling orders: %w", err)
 	}
 
 	recovered := 0
@@ -332,6 +335,10 @@ func (s *PaymentService) ReconcilePendingWxpayOrders(ctx context.Context) (int, 
 		}
 	}
 	return recovered, nil
+}
+
+func (s *PaymentService) ReconcilePendingWxpayOrders(ctx context.Context) (int, error) {
+	return s.ReconcilePendingPollingOrders(ctx)
 }
 
 // VerifyOrderPublic returns the currently persisted public order state without

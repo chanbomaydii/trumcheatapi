@@ -59,16 +59,16 @@ export default {
     dockerRecreate: 'Recreate the container'
   },
 
-  // Recharge / Subscription Page
+	// Recharge Page
   purchase: {
-    title: 'Recharge / Subscription',
-    description: 'Recharge balance or purchase subscription via the embedded page',
+	title: 'Recharge',
+	description: 'Recharge balance via the embedded page',
     openInNewTab: 'Open in new tab',
     notEnabledTitle: 'Feature not enabled',
-    notEnabledDesc: 'The administrator has not enabled the recharge/subscription entry. Please contact admin.',
-    notConfiguredTitle: 'Recharge / Subscription URL not configured',
+    notEnabledDesc: 'The administrator has not enabled the recharge entry. Please contact admin.',
+    notConfiguredTitle: 'Recharge URL not configured',
     notConfiguredDesc:
-      'The administrator enabled the entry but has not configured a recharge/subscription URL. Please contact admin.'
+	  'The administrator enabled the entry but has not configured a recharge URL. Please contact admin.'
   },
 
   // Custom Page (iframe embed)
@@ -288,7 +288,7 @@ export default {
     title: 'Recharge / Subscription',
     amountLabel: 'Amount',
     paymentAmount: 'Payment Amount',
-    creditedBalance: 'Credited Balance',
+  creditedBalance: 'USD Balance Credited',
     quickAmounts: 'Quick Amounts',
     customAmount: 'Custom Amount',
     enterAmount: 'Enter amount',
@@ -302,6 +302,8 @@ export default {
       wxpay: 'WeChat Pay',
       stripe: 'Stripe',
       airwallex: 'Airwallex',
+	  rpay_mbbank: 'MBBank transfer',
+	  rpay_usdt: 'USDT (Crypto)',
       card: 'Card',
       link: 'Link',
       alipay_direct: 'Alipay (Direct)',
@@ -376,7 +378,7 @@ export default {
       backToRecharge: 'Back to Recharge',
       viewOrders: 'View Orders',
     },
-    currentBalance: 'Current Balance',
+  currentBalance: 'Current Balance',
     groupFallback: 'Group #{id}',
     rechargeAccount: 'Recharge Account',
     activeSubscription: 'Active Subscription',
