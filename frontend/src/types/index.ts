@@ -529,7 +529,7 @@ export type GroupPlatform = 'anthropic' | 'openai' | 'gemini' | 'antigravity' | 
 
 export type VideoModelPrices = Record<string, Record<string, number>>
 
-export type SubscriptionType = 'standard' | 'subscription'
+export type SubscriptionType = 'standard' | 'subscription' | 'token'
 
 export interface OpenAIMessagesDispatchModelConfig {
   opus_mapped_model?: string
@@ -555,6 +555,8 @@ export interface Group {
   is_exclusive: boolean
   status: 'active' | 'inactive'
   subscription_type: SubscriptionType
+  token_limit: number
+  token_price_per_million_per_day: number
   daily_limit_usd: number | null
   weekly_limit_usd: number | null
   monthly_limit_usd: number | null
@@ -711,6 +713,12 @@ export interface ApiKey {
   last_used_ip: string | null
   quota: number // Quota limit in USD (0 = unlimited)
   quota_used: number // Used quota amount in USD
+  token_quota: number
+  token_used: number
+  token_unit_price: number
+  token_duration_days: number
+  token_purchase_price: number
+  token_purchased_at: string | null
   expires_at: string | null // Expiration time (null = never expires)
   created_at: string
   updated_at: string
@@ -738,6 +746,8 @@ export interface CreateApiKeyRequest {
   ip_blacklist?: string[]
   quota?: number // Quota limit in USD (0 = unlimited)
   expires_in_days?: number // Days until expiry (null = never expires)
+  token_amount?: number
+  duration_days?: number
   rate_limit_5h?: number
   rate_limit_1d?: number
   rate_limit_7d?: number
@@ -765,6 +775,8 @@ export interface CreateGroupRequest {
   rate_multiplier?: number
   is_exclusive?: boolean
   subscription_type?: SubscriptionType
+  token_limit?: number
+  token_price_per_million_per_day?: number
   daily_limit_usd?: number | null
   weekly_limit_usd?: number | null
   monthly_limit_usd?: number | null

@@ -41,6 +41,18 @@ const (
 	FieldQuota = "quota"
 	// FieldQuotaUsed holds the string denoting the quota_used field in the database.
 	FieldQuotaUsed = "quota_used"
+	// FieldTokenQuota holds the string denoting the token_quota field in the database.
+	FieldTokenQuota = "token_quota"
+	// FieldTokenUsed holds the string denoting the token_used field in the database.
+	FieldTokenUsed = "token_used"
+	// FieldTokenUnitPrice holds the string denoting the token_unit_price field in the database.
+	FieldTokenUnitPrice = "token_unit_price"
+	// FieldTokenDurationDays holds the string denoting the token_duration_days field in the database.
+	FieldTokenDurationDays = "token_duration_days"
+	// FieldTokenPurchasePrice holds the string denoting the token_purchase_price field in the database.
+	FieldTokenPurchasePrice = "token_purchase_price"
+	// FieldTokenPurchasedAt holds the string denoting the token_purchased_at field in the database.
+	FieldTokenPurchasedAt = "token_purchased_at"
 	// FieldExpiresAt holds the string denoting the expires_at field in the database.
 	FieldExpiresAt = "expires_at"
 	// FieldRateLimit5h holds the string denoting the rate_limit_5h field in the database.
@@ -108,6 +120,12 @@ var Columns = []string{
 	FieldIPBlacklist,
 	FieldQuota,
 	FieldQuotaUsed,
+	FieldTokenQuota,
+	FieldTokenUsed,
+	FieldTokenUnitPrice,
+	FieldTokenDurationDays,
+	FieldTokenPurchasePrice,
+	FieldTokenPurchasedAt,
 	FieldExpiresAt,
 	FieldRateLimit5h,
 	FieldRateLimit1d,
@@ -156,6 +174,26 @@ var (
 	DefaultQuota float64
 	// DefaultQuotaUsed holds the default value on creation for the "quota_used" field.
 	DefaultQuotaUsed float64
+	// DefaultTokenQuota holds the default value on creation for the "token_quota" field.
+	DefaultTokenQuota int64
+	// TokenQuotaValidator is a validator for the "token_quota" field. It is called by the builders before save.
+	TokenQuotaValidator func(int64) error
+	// DefaultTokenUsed holds the default value on creation for the "token_used" field.
+	DefaultTokenUsed int64
+	// TokenUsedValidator is a validator for the "token_used" field. It is called by the builders before save.
+	TokenUsedValidator func(int64) error
+	// DefaultTokenUnitPrice holds the default value on creation for the "token_unit_price" field.
+	DefaultTokenUnitPrice float64
+	// TokenUnitPriceValidator is a validator for the "token_unit_price" field. It is called by the builders before save.
+	TokenUnitPriceValidator func(float64) error
+	// DefaultTokenDurationDays holds the default value on creation for the "token_duration_days" field.
+	DefaultTokenDurationDays int
+	// TokenDurationDaysValidator is a validator for the "token_duration_days" field. It is called by the builders before save.
+	TokenDurationDaysValidator func(int) error
+	// DefaultTokenPurchasePrice holds the default value on creation for the "token_purchase_price" field.
+	DefaultTokenPurchasePrice float64
+	// TokenPurchasePriceValidator is a validator for the "token_purchase_price" field. It is called by the builders before save.
+	TokenPurchasePriceValidator func(float64) error
 	// DefaultRateLimit5h holds the default value on creation for the "rate_limit_5h" field.
 	DefaultRateLimit5h float64
 	// DefaultRateLimit1d holds the default value on creation for the "rate_limit_1d" field.
@@ -231,6 +269,36 @@ func ByQuota(opts ...sql.OrderTermOption) OrderOption {
 // ByQuotaUsed orders the results by the quota_used field.
 func ByQuotaUsed(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldQuotaUsed, opts...).ToFunc()
+}
+
+// ByTokenQuota orders the results by the token_quota field.
+func ByTokenQuota(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTokenQuota, opts...).ToFunc()
+}
+
+// ByTokenUsed orders the results by the token_used field.
+func ByTokenUsed(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTokenUsed, opts...).ToFunc()
+}
+
+// ByTokenUnitPrice orders the results by the token_unit_price field.
+func ByTokenUnitPrice(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTokenUnitPrice, opts...).ToFunc()
+}
+
+// ByTokenDurationDays orders the results by the token_duration_days field.
+func ByTokenDurationDays(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTokenDurationDays, opts...).ToFunc()
+}
+
+// ByTokenPurchasePrice orders the results by the token_purchase_price field.
+func ByTokenPurchasePrice(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTokenPurchasePrice, opts...).ToFunc()
+}
+
+// ByTokenPurchasedAt orders the results by the token_purchased_at field.
+func ByTokenPurchasedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTokenPurchasedAt, opts...).ToFunc()
 }
 
 // ByExpiresAt orders the results by the expires_at field.

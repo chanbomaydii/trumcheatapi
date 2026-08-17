@@ -209,17 +209,19 @@ type AdminBoundAuthIdentityChannel struct {
 }
 
 type CreateGroupInput struct {
-	Name                      string
-	Description               string
-	Platform                  string
-	RateMultiplier            float64
-	IsExclusive               bool
-	SubscriptionType          string   // standard/subscription
-	DailyLimitUSD             *float64 // 日限额 (USD)
-	WeeklyLimitUSD            *float64 // 周限额 (USD)
-	MonthlyLimitUSD           *float64 // 月限额 (USD)
-	LongContextPricingEnabled bool
-	ModelPricing              []ChannelModelPricing
+	Name                       string
+	Description                string
+	Platform                   string
+	RateMultiplier             float64
+	IsExclusive                bool
+	SubscriptionType           string // standard/subscription/token
+	TokenLimit                 int64  // legacy fixed quota, retained for compatibility
+	TokenPricePerMillionPerDay float64
+	DailyLimitUSD              *float64 // 日限额 (USD)
+	WeeklyLimitUSD             *float64 // 周限额 (USD)
+	MonthlyLimitUSD            *float64 // 月限额 (USD)
+	LongContextPricingEnabled  bool
+	ModelPricing               []ChannelModelPricing
 	// 图片生成计费配置（仅 antigravity 平台使用）
 	AllowImageGeneration         bool
 	AllowBatchImageGeneration    bool
@@ -283,18 +285,20 @@ type CreateGroupInput struct {
 }
 
 type UpdateGroupInput struct {
-	Name                      string
-	Description               *string
-	Platform                  string
-	RateMultiplier            *float64 // 使用指针以支持设置为0
-	IsExclusive               *bool
-	Status                    string
-	SubscriptionType          string   // standard/subscription
-	DailyLimitUSD             *float64 // 日限额 (USD)
-	WeeklyLimitUSD            *float64 // 周限额 (USD)
-	MonthlyLimitUSD           *float64 // 月限额 (USD)
-	LongContextPricingEnabled *bool
-	ModelPricing              *[]ChannelModelPricing
+	Name                       string
+	Description                *string
+	Platform                   string
+	RateMultiplier             *float64 // 使用指针以支持设置为0
+	IsExclusive                *bool
+	Status                     string
+	SubscriptionType           string   // standard/subscription/token
+	TokenLimit                 *int64   // nil = no change
+	TokenPricePerMillionPerDay *float64 // nil = no change
+	DailyLimitUSD              *float64 // 日限额 (USD)
+	WeeklyLimitUSD             *float64 // 周限额 (USD)
+	MonthlyLimitUSD            *float64 // 月限额 (USD)
+	LongContextPricingEnabled  *bool
+	ModelPricing               *[]ChannelModelPricing
 	// 图片生成计费配置（仅 antigravity 平台使用）
 	AllowImageGeneration         *bool
 	AllowBatchImageGeneration    *bool

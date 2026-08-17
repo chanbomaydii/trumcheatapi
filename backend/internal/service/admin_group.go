@@ -318,6 +318,9 @@ func (s *adminServiceImpl) CreateGroup(ctx context.Context, input *CreateGroupIn
 	if subscriptionType == "" {
 		subscriptionType = SubscriptionTypeStandard
 	}
+	if subscriptionType == SubscriptionTypeToken && input.TokenPricePerMillionPerDay <= 0 {
+		return nil, errors.New("token_price_per_million_per_day must be > 0 for token groups")
+	}
 
 	// 限额字段：nil/负数 表示"无限制"，0 表示"不允许用量"，正数表示具体限额
 	dailyLimit := normalizeLimit(input.DailyLimitUSD)
@@ -460,6 +463,8 @@ func (s *adminServiceImpl) CreateGroup(ctx context.Context, input *CreateGroupIn
 		IsExclusive:                     input.IsExclusive,
 		Status:                          StatusActive,
 		SubscriptionType:                subscriptionType,
+		TokenLimit:                      input.TokenLimit,
+		TokenPricePerMillionPerDay:      input.TokenPricePerMillionPerDay,
 		DailyLimitUSD:                   dailyLimit,
 		WeeklyLimitUSD:                  weeklyLimit,
 		MonthlyLimitUSD:                 monthlyLimit,
@@ -679,6 +684,20 @@ func (s *adminServiceImpl) UpdateGroup(ctx context.Context, id int64, input *Upd
 	// 订阅相关字段
 	if input.SubscriptionType != "" {
 		group.SubscriptionType = input.SubscriptionType
+	}
+	if input.TokenLimit != nil {
+		group.TokenLimit = *input.TokenLimit
+	}
+	if input.TokenPricePerMillionPerDay != nil {
+		group.TokenPricePerMillionPerDay = *input.TokenPricePerMillionPerDay
+	}
+	if group.SubscriptionType == SubscriptionTypeToken {
+		if group.TokenPricePerMillionPerDay <= 0 {
+			return nil, errors.New("token_price_per_million_per_day must be > 0 for token groups")
+		}
+	} else {
+		group.TokenLimit = 0
+		group.TokenPricePerMillionPerDay = 0
 	}
 	// 限额字段：nil/负数 表示"无限制"，0 表示"不允许用量"，正数表示具体限额
 	// 前端始终发送这三个字段，无需 nil 守卫

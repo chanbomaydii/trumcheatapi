@@ -130,6 +130,16 @@ func SubscriptionType(v string) predicate.Group {
 	return predicate.Group(sql.FieldEQ(FieldSubscriptionType, v))
 }
 
+// TokenLimit applies equality check predicate on the "token_limit" field. It's identical to TokenLimitEQ.
+func TokenLimit(v int64) predicate.Group {
+	return predicate.Group(sql.FieldEQ(FieldTokenLimit, v))
+}
+
+// TokenPricePerMillionPerDay applies equality check predicate on the "token_price_per_million_per_day" field. It's identical to TokenPricePerMillionPerDayEQ.
+func TokenPricePerMillionPerDay(v float64) predicate.Group {
+	return predicate.Group(sql.FieldEQ(FieldTokenPricePerMillionPerDay, v))
+}
+
 // DailyLimitUsd applies equality check predicate on the "daily_limit_usd" field. It's identical to DailyLimitUsdEQ.
 func DailyLimitUsd(v float64) predicate.Group {
 	return predicate.Group(sql.FieldEQ(FieldDailyLimitUsd, v))
@@ -1098,6 +1108,86 @@ func SubscriptionTypeEqualFold(v string) predicate.Group {
 // SubscriptionTypeContainsFold applies the ContainsFold predicate on the "subscription_type" field.
 func SubscriptionTypeContainsFold(v string) predicate.Group {
 	return predicate.Group(sql.FieldContainsFold(FieldSubscriptionType, v))
+}
+
+// TokenLimitEQ applies the EQ predicate on the "token_limit" field.
+func TokenLimitEQ(v int64) predicate.Group {
+	return predicate.Group(sql.FieldEQ(FieldTokenLimit, v))
+}
+
+// TokenLimitNEQ applies the NEQ predicate on the "token_limit" field.
+func TokenLimitNEQ(v int64) predicate.Group {
+	return predicate.Group(sql.FieldNEQ(FieldTokenLimit, v))
+}
+
+// TokenLimitIn applies the In predicate on the "token_limit" field.
+func TokenLimitIn(vs ...int64) predicate.Group {
+	return predicate.Group(sql.FieldIn(FieldTokenLimit, vs...))
+}
+
+// TokenLimitNotIn applies the NotIn predicate on the "token_limit" field.
+func TokenLimitNotIn(vs ...int64) predicate.Group {
+	return predicate.Group(sql.FieldNotIn(FieldTokenLimit, vs...))
+}
+
+// TokenLimitGT applies the GT predicate on the "token_limit" field.
+func TokenLimitGT(v int64) predicate.Group {
+	return predicate.Group(sql.FieldGT(FieldTokenLimit, v))
+}
+
+// TokenLimitGTE applies the GTE predicate on the "token_limit" field.
+func TokenLimitGTE(v int64) predicate.Group {
+	return predicate.Group(sql.FieldGTE(FieldTokenLimit, v))
+}
+
+// TokenLimitLT applies the LT predicate on the "token_limit" field.
+func TokenLimitLT(v int64) predicate.Group {
+	return predicate.Group(sql.FieldLT(FieldTokenLimit, v))
+}
+
+// TokenLimitLTE applies the LTE predicate on the "token_limit" field.
+func TokenLimitLTE(v int64) predicate.Group {
+	return predicate.Group(sql.FieldLTE(FieldTokenLimit, v))
+}
+
+// TokenPricePerMillionPerDayEQ applies the EQ predicate on the "token_price_per_million_per_day" field.
+func TokenPricePerMillionPerDayEQ(v float64) predicate.Group {
+	return predicate.Group(sql.FieldEQ(FieldTokenPricePerMillionPerDay, v))
+}
+
+// TokenPricePerMillionPerDayNEQ applies the NEQ predicate on the "token_price_per_million_per_day" field.
+func TokenPricePerMillionPerDayNEQ(v float64) predicate.Group {
+	return predicate.Group(sql.FieldNEQ(FieldTokenPricePerMillionPerDay, v))
+}
+
+// TokenPricePerMillionPerDayIn applies the In predicate on the "token_price_per_million_per_day" field.
+func TokenPricePerMillionPerDayIn(vs ...float64) predicate.Group {
+	return predicate.Group(sql.FieldIn(FieldTokenPricePerMillionPerDay, vs...))
+}
+
+// TokenPricePerMillionPerDayNotIn applies the NotIn predicate on the "token_price_per_million_per_day" field.
+func TokenPricePerMillionPerDayNotIn(vs ...float64) predicate.Group {
+	return predicate.Group(sql.FieldNotIn(FieldTokenPricePerMillionPerDay, vs...))
+}
+
+// TokenPricePerMillionPerDayGT applies the GT predicate on the "token_price_per_million_per_day" field.
+func TokenPricePerMillionPerDayGT(v float64) predicate.Group {
+	return predicate.Group(sql.FieldGT(FieldTokenPricePerMillionPerDay, v))
+}
+
+// TokenPricePerMillionPerDayGTE applies the GTE predicate on the "token_price_per_million_per_day" field.
+func TokenPricePerMillionPerDayGTE(v float64) predicate.Group {
+	return predicate.Group(sql.FieldGTE(FieldTokenPricePerMillionPerDay, v))
+}
+
+// TokenPricePerMillionPerDayLT applies the LT predicate on the "token_price_per_million_per_day" field.
+func TokenPricePerMillionPerDayLT(v float64) predicate.Group {
+	return predicate.Group(sql.FieldLT(FieldTokenPricePerMillionPerDay, v))
+}
+
+// TokenPricePerMillionPerDayLTE applies the LTE predicate on the "token_price_per_million_per_day" field.
+func TokenPricePerMillionPerDayLTE(v float64) predicate.Group {
+	return predicate.Group(sql.FieldLTE(FieldTokenPricePerMillionPerDay, v))
 }
 
 // DailyLimitUsdEQ applies the EQ predicate on the "daily_limit_usd" field.

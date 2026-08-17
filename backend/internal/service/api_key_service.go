@@ -24,14 +24,16 @@ import (
 )
 
 var (
-	ErrAPIKeyNotFound       = infraerrors.NotFound("API_KEY_NOT_FOUND", "api key not found")
-	ErrGroupNotAllowed      = infraerrors.Forbidden("GROUP_NOT_ALLOWED", "user is not allowed to bind this group")
-	ErrAPIKeyExists         = infraerrors.Conflict("API_KEY_EXISTS", "api key already exists")
-	ErrAPIKeyTooShort       = infraerrors.BadRequest("API_KEY_TOO_SHORT", "api key must be at least 16 characters")
-	ErrAPIKeyInvalidChars   = infraerrors.BadRequest("API_KEY_INVALID_CHARS", "api key can only contain letters, numbers, underscores, and hyphens")
-	ErrAPIKeyRateLimited    = infraerrors.TooManyRequests("API_KEY_RATE_LIMITED", "too many failed attempts, please try again later")
-	ErrAPIKeyAuthOverloaded = infraerrors.ServiceUnavailable("API_KEY_AUTH_OVERLOADED", "api key authentication is temporarily overloaded")
-	ErrInvalidIPPattern     = infraerrors.BadRequest("INVALID_IP_PATTERN", "invalid IP or CIDR pattern")
+	ErrAPIKeyNotFound              = infraerrors.NotFound("API_KEY_NOT_FOUND", "api key not found")
+	ErrGroupNotAllowed             = infraerrors.Forbidden("GROUP_NOT_ALLOWED", "user is not allowed to bind this group")
+	ErrAPIKeyExists                = infraerrors.Conflict("API_KEY_EXISTS", "api key already exists")
+	ErrAPIKeyTooShort              = infraerrors.BadRequest("API_KEY_TOO_SHORT", "api key must be at least 16 characters")
+	ErrAPIKeyInvalidChars          = infraerrors.BadRequest("API_KEY_INVALID_CHARS", "api key can only contain letters, numbers, underscores, and hyphens")
+	ErrAPIKeyRateLimited           = infraerrors.TooManyRequests("API_KEY_RATE_LIMITED", "too many failed attempts, please try again later")
+	ErrAPIKeyAuthOverloaded        = infraerrors.ServiceUnavailable("API_KEY_AUTH_OVERLOADED", "api key authentication is temporarily overloaded")
+	ErrTokenKeyPurchaseUnavailable = infraerrors.ServiceUnavailable("TOKEN_KEY_PURCHASE_UNAVAILABLE", "prepaid token key purchase is unavailable")
+	ErrTokenKeyPurchaseLocked      = infraerrors.BadRequest("TOKEN_KEY_PURCHASE_LOCKED", "prepaid token key group, quota, limits, and expiration cannot be changed")
+	ErrInvalidIPPattern            = infraerrors.BadRequest("INVALID_IP_PATTERN", "invalid IP or CIDR pattern")
 	// ErrAPIKeyExpired        = infraerrors.Forbidden("API_KEY_EXPIRED", "api key has expired")
 	ErrAPIKeyExpired = infraerrors.Forbidden("API_KEY_EXPIRED", "api key 已过期")
 	// ErrAPIKeyQuotaExhausted = infraerrors.TooManyRequests("API_KEY_QUOTA_EXHAUSTED", "api key quota exhausted")
@@ -61,11 +63,13 @@ const (
 // 若编辑 Key 时无条件整行回写，并发累计的配额与限流计数就会被旧快照覆盖。
 // 因此调用方必须显式声明要改的列。
 type APIKeyUpdateFields struct {
-	Name      bool
-	Status    bool
-	Quota     bool
-	GroupID   bool
-	ExpiresAt bool
+	Name       bool
+	Status     bool
+	Quota      bool
+	GroupID    bool
+	ExpiresAt  bool
+	TokenQuota bool
+	TokenUsed  bool
 	// QuotaUsed 仅供"重置配额用量"路径声明；常规计费走 IncrementQuotaUsed。
 	QuotaUsed bool
 	// RateLimits 覆盖 rate_limit_5h / _1d / _7d 三个阈值。
@@ -123,6 +127,10 @@ type APIKeyRepository interface {
 
 type apiKeyAllByUserIDLister interface {
 	ListAllByUserID(ctx context.Context, userID int64, filters APIKeyListFilters) ([]APIKey, error)
+}
+
+type tokenKeyPurchaser interface {
+	PurchaseTokenKey(ctx context.Context, key *APIKey, purchasePrice float64) error
 }
 
 // APIKeyRateLimitData holds rate limit usage and window state for an API key.
@@ -218,6 +226,8 @@ type CreateAPIKeyRequest struct {
 	// Quota fields
 	Quota         float64 `json:"quota"`           // Quota limit in USD (0 = unlimited)
 	ExpiresInDays *int    `json:"expires_in_days"` // Days until expiry (nil = never expires)
+	TokenAmount   int64   `json:"token_amount"`
+	DurationDays  int     `json:"duration_days"`
 
 	// Rate limit fields (0 = unlimited)
 	RateLimit5h float64 `json:"rate_limit_5h"`
@@ -483,6 +493,7 @@ func (s *APIKeyService) Create(ctx context.Context, userID int64, req CreateAPIK
 	}
 
 	// 验证分组权限（如果指定了分组）
+	var selectedGroup *Group
 	if req.GroupID != nil {
 		group, err := s.groupRepo.GetByID(ctx, *req.GroupID)
 		if err != nil {
@@ -493,6 +504,7 @@ func (s *APIKeyService) Create(ctx context.Context, userID int64, req CreateAPIK
 		if !s.canUserBindGroup(ctx, user, group) {
 			return nil, ErrGroupNotAllowed
 		}
+		selectedGroup = group
 	}
 
 	var key string
@@ -544,6 +556,30 @@ func (s *APIKeyService) Create(ctx context.Context, userID int64, req CreateAPIK
 		RateLimit5h: req.RateLimit5h,
 		RateLimit1d: req.RateLimit1d,
 		RateLimit7d: req.RateLimit7d,
+	}
+	if selectedGroup != nil && selectedGroup.IsTokenType() {
+		purchasePrice, priceErr := CalculateTokenKeyPrice(req.TokenAmount, req.DurationDays, selectedGroup.TokenPricePerMillionPerDay)
+		if priceErr != nil {
+			return nil, priceErr
+		}
+		purchasedAt := time.Now()
+		expiresAt := purchasedAt.AddDate(0, 0, req.DurationDays)
+		apiKey.TokenQuota = req.TokenAmount
+		apiKey.TokenUnitPrice = selectedGroup.TokenPricePerMillionPerDay
+		apiKey.TokenDurationDays = req.DurationDays
+		apiKey.TokenPurchasePrice = purchasePrice
+		apiKey.TokenPurchasedAt = &purchasedAt
+		apiKey.ExpiresAt = &expiresAt
+		purchaser, ok := s.apiKeyRepo.(tokenKeyPurchaser)
+		if !ok {
+			return nil, ErrTokenKeyPurchaseUnavailable
+		}
+		if err := purchaser.PurchaseTokenKey(ctx, apiKey, purchasePrice); err != nil {
+			return nil, fmt.Errorf("purchase token api key: %w", err)
+		}
+		s.InvalidateAuthCacheByKey(ctx, apiKey.Key)
+		s.compileAPIKeyIPRules(apiKey)
+		return apiKey, nil
 	}
 
 	// Set expiration time if specified
@@ -769,6 +805,9 @@ func (s *APIKeyService) Update(ctx context.Context, id int64, userID int64, req 
 	if apiKey.UserID != userID {
 		return nil, ErrInsufficientPerms
 	}
+	if apiKey.TokenQuota > 0 && (req.GroupID != nil || req.Quota != nil || req.ResetQuota != nil || req.ExpiresAt != nil || req.ClearExpiration || req.RateLimit5h != nil || req.RateLimit1d != nil || req.RateLimit7d != nil || req.ResetRateLimitUsage != nil) {
+		return nil, ErrTokenKeyPurchaseLocked
+	}
 
 	// 验证 IP 白名单格式
 	if req.IPWhitelist != nil && len(*req.IPWhitelist) > 0 {
@@ -815,6 +854,16 @@ func (s *APIKeyService) Update(ctx context.Context, id int64, userID int64, req 
 
 		apiKey.GroupID = req.GroupID
 		fields.GroupID = true
+		apiKey.TokenUsed = 0
+		apiKey.TokenQuota = 0
+		if group.IsTokenType() {
+			apiKey.TokenQuota = group.TokenLimit
+		}
+		fields.TokenQuota = true
+		fields.TokenUsed = true
+		if apiKey.Status == StatusAPIKeyQuotaExhausted {
+			apiKey.Status = StatusAPIKeyActive
+		}
 	}
 
 	if req.Status != nil {
@@ -837,7 +886,9 @@ func (s *APIKeyService) Update(ctx context.Context, id int64, userID int64, req 
 	}
 	if req.ResetQuota != nil && *req.ResetQuota {
 		apiKey.QuotaUsed = 0
+		apiKey.TokenUsed = 0
 		fields.QuotaUsed = true
+		fields.TokenUsed = true
 		// If resetting quota and status was quota_exhausted, reactivate
 		if apiKey.Status == StatusAPIKeyQuotaExhausted {
 			apiKey.Status = StatusActive
@@ -1109,7 +1160,7 @@ func (s *APIKeyService) CheckAPIKeyQuotaAndExpiry(apiKey *APIKey) error {
 	}
 
 	// Check quota
-	if apiKey.IsQuotaExhausted() {
+	if apiKey.IsQuotaExhausted() || apiKey.IsTokenQuotaExhausted() {
 		return ErrAPIKeyQuotaExhausted
 	}
 

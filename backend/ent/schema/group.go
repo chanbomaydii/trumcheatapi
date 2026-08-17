@@ -82,6 +82,15 @@ func (Group) Fields() []ent.Field {
 		field.String("subscription_type").
 			MaxLen(20).
 			Default(domain.SubscriptionTypeStandard),
+		field.Int64("token_limit").
+			Default(0).
+			Min(0).
+			Comment("Legacy fixed token quota; retained for migration compatibility"),
+		field.Float("token_price_per_million_per_day").
+			SchemaType(map[string]string{dialect.Postgres: "decimal(20,8)"}).
+			Default(0).
+			Min(0).
+			Comment("Prepaid token key price in USD per million tokens per day"),
 		field.Float("daily_limit_usd").
 			Optional().
 			Nillable().

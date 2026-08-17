@@ -162,15 +162,22 @@
                   'inline-block rounded-full px-2 py-0.5 text-xs font-medium',
                   row.subscription_type === 'subscription'
                     ? 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400'
-                    : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300',
+                    : row.subscription_type === 'token'
+                      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                      : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300',
                 ]"
               >
                 {{
                   row.subscription_type === "subscription"
                     ? t("admin.groups.subscription.subscription")
-                    : t("admin.groups.subscription.standard")
+                    : row.subscription_type === "token"
+                      ? t("admin.groups.subscription.token")
+                      : t("admin.groups.subscription.standard")
                 }}
               </span>
+              <div v-if="row.subscription_type === 'token'" class="text-xs text-gray-500 dark:text-gray-400">
+                ${{ row.token_price_per_million_per_day.toFixed(4) }} / MTok / day
+              </div>
               <!-- Subscription Limits - compact single line -->
               <div
                 v-if="row.subscription_type === 'subscription'"
@@ -761,6 +768,17 @@
                 :placeholder="t('admin.groups.subscription.noLimit')"
               />
             </div>
+          </div>
+          <div
+            v-if="createForm.subscription_type === 'token'"
+            class="border-l-2 border-primary-200 pl-4 dark:border-primary-800"
+          >
+            <label class="input-label">Prepaid token price</label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+              <input v-model.number="createForm.token_price_per_million_per_day" type="number" step="0.00000001" min="0.00000001" required class="input pl-7" />
+            </div>
+            <p class="input-hint">USD per 1 MTok per day. The purchase price is tokens × days × this rate.</p>
           </div>
         </div>
 
@@ -2487,6 +2505,17 @@
                 :placeholder="t('admin.groups.subscription.noLimit')"
               />
             </div>
+          </div>
+          <div
+            v-if="editForm.subscription_type === 'token'"
+            class="border-l-2 border-primary-200 pl-4 dark:border-primary-800"
+          >
+            <label class="input-label">Prepaid token price</label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+              <input v-model.number="editForm.token_price_per_million_per_day" type="number" step="0.00000001" min="0.00000001" required class="input pl-7" />
+            </div>
+            <p class="input-hint">USD per 1 MTok per day. Existing keys keep their purchase snapshot.</p>
           </div>
         </div>
 
@@ -4787,6 +4816,7 @@ const editStatusOptions = computed(() => [
 const subscriptionTypeOptions = computed(() => [
   { value: "standard", label: t("admin.groups.subscription.standard") },
   { value: "subscription", label: t("admin.groups.subscription.subscription") },
+  { value: "token", label: t("admin.groups.subscription.token") },
 ]);
 
 // 降级分组选项（创建时）- 仅包含 anthropic 平台且未启用 claude_code_only 的分组
@@ -5024,6 +5054,8 @@ const createForm = reactive({
   rate_multiplier: 1.0,
   is_exclusive: false,
   subscription_type: "standard" as SubscriptionType,
+  token_limit: 0,
+  token_price_per_million_per_day: 0,
   daily_limit_usd: null as number | null,
   weekly_limit_usd: null as number | null,
   monthly_limit_usd: null as number | null,
@@ -5385,6 +5417,8 @@ const editForm = reactive({
   is_exclusive: false,
   status: "active" as "active" | "inactive",
   subscription_type: "standard" as SubscriptionType,
+  token_limit: 0,
+  token_price_per_million_per_day: 0,
   daily_limit_usd: null as number | null,
   weekly_limit_usd: null as number | null,
   monthly_limit_usd: null as number | null,
@@ -5844,6 +5878,8 @@ const closeCreateModal = () => {
   createForm.rate_multiplier = 1.0;
   createForm.is_exclusive = false;
   createForm.subscription_type = "standard";
+  createForm.token_limit = 0;
+  createForm.token_price_per_million_per_day = 0;
   createForm.daily_limit_usd = null;
   createForm.weekly_limit_usd = null;
   createForm.monthly_limit_usd = null;
@@ -6086,6 +6122,8 @@ const handleEdit = async (group: AdminGroup) => {
   editForm.is_exclusive = group.is_exclusive;
   editForm.status = group.status;
   editForm.subscription_type = group.subscription_type || "standard";
+  editForm.token_limit = group.token_limit || 0;
+  editForm.token_price_per_million_per_day = group.token_price_per_million_per_day || 0;
   editForm.daily_limit_usd = group.daily_limit_usd;
   editForm.weekly_limit_usd = group.weekly_limit_usd;
   editForm.monthly_limit_usd = group.monthly_limit_usd;

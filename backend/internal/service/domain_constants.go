@@ -165,6 +165,7 @@ const (
 const (
 	SubscriptionTypeStandard     = domain.SubscriptionTypeStandard     // 标准计费模式（按余额扣费）
 	SubscriptionTypeSubscription = domain.SubscriptionTypeSubscription // 订阅模式（按限额控制）
+	SubscriptionTypeToken        = domain.SubscriptionTypeToken        // Token 配额模式（扣余额并限制 Key token）
 )
 
 // Subscription status constants

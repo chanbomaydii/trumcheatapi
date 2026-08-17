@@ -51,21 +51,27 @@ type AdminUser struct {
 }
 
 type APIKey struct {
-	ID          int64      `json:"id"`
-	UserID      int64      `json:"user_id"`
-	Key         string     `json:"key"`
-	Name        string     `json:"name"`
-	GroupID     *int64     `json:"group_id"`
-	Status      string     `json:"status"`
-	IPWhitelist []string   `json:"ip_whitelist"`
-	IPBlacklist []string   `json:"ip_blacklist"`
-	LastUsedAt  *time.Time `json:"last_used_at"`
-	LastUsedIP  *string    `json:"last_used_ip"`
-	Quota       float64    `json:"quota"`      // Quota limit in USD (0 = unlimited)
-	QuotaUsed   float64    `json:"quota_used"` // Used quota amount in USD
-	ExpiresAt   *time.Time `json:"expires_at"` // Expiration time (nil = never expires)
-	CreatedAt   time.Time  `json:"created_at"`
-	UpdatedAt   time.Time  `json:"updated_at"`
+	ID                 int64      `json:"id"`
+	UserID             int64      `json:"user_id"`
+	Key                string     `json:"key"`
+	Name               string     `json:"name"`
+	GroupID            *int64     `json:"group_id"`
+	Status             string     `json:"status"`
+	IPWhitelist        []string   `json:"ip_whitelist"`
+	IPBlacklist        []string   `json:"ip_blacklist"`
+	LastUsedAt         *time.Time `json:"last_used_at"`
+	LastUsedIP         *string    `json:"last_used_ip"`
+	Quota              float64    `json:"quota"`      // Quota limit in USD (0 = unlimited)
+	QuotaUsed          float64    `json:"quota_used"` // Used quota amount in USD
+	TokenQuota         int64      `json:"token_quota"`
+	TokenUsed          int64      `json:"token_used"`
+	TokenUnitPrice     float64    `json:"token_unit_price"`
+	TokenDurationDays  int        `json:"token_duration_days"`
+	TokenPurchasePrice float64    `json:"token_purchase_price"`
+	TokenPurchasedAt   *time.Time `json:"token_purchased_at"`
+	ExpiresAt          *time.Time `json:"expires_at"` // Expiration time (nil = never expires)
+	CreatedAt          time.Time  `json:"created_at"`
+	UpdatedAt          time.Time  `json:"updated_at"`
 	// CurrentConcurrency is the real-time active request count for this API key.
 	CurrentConcurrency int `json:"current_concurrency"`
 
@@ -96,11 +102,13 @@ type Group struct {
 	IsExclusive    bool    `json:"is_exclusive"`
 	Status         string  `json:"status"`
 
-	SubscriptionType          string   `json:"subscription_type"`
-	DailyLimitUSD             *float64 `json:"daily_limit_usd"`
-	WeeklyLimitUSD            *float64 `json:"weekly_limit_usd"`
-	MonthlyLimitUSD           *float64 `json:"monthly_limit_usd"`
-	LongContextPricingEnabled bool     `json:"long_context_pricing_enabled"`
+	SubscriptionType           string   `json:"subscription_type"`
+	TokenLimit                 int64    `json:"token_limit"`
+	TokenPricePerMillionPerDay float64  `json:"token_price_per_million_per_day"`
+	DailyLimitUSD              *float64 `json:"daily_limit_usd"`
+	WeeklyLimitUSD             *float64 `json:"weekly_limit_usd"`
+	MonthlyLimitUSD            *float64 `json:"monthly_limit_usd"`
+	LongContextPricingEnabled  bool     `json:"long_context_pricing_enabled"`
 
 	// 图片生成计费配置（仅 antigravity 平台使用）
 	AllowImageGeneration         bool    `json:"allow_image_generation"`

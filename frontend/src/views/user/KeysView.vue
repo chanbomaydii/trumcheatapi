@@ -226,6 +226,17 @@
                   />
                 </div>
               </div>
+              <div v-if="row.token_quota > 0" class="mt-1.5">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-gray-500 dark:text-gray-400">Tokens:</span>
+                  <span :class="row.token_used >= row.token_quota ? 'text-red-500' : row.token_used >= row.token_quota * 0.8 ? 'text-yellow-500' : 'text-gray-600 dark:text-gray-300'">
+                    {{ row.token_used.toLocaleString() }} / {{ row.token_quota.toLocaleString() }}
+                  </span>
+                </div>
+                <div class="mt-1 h-1.5 overflow-hidden rounded-full bg-gray-200 dark:bg-dark-600">
+                  <div class="h-full rounded-full" :class="row.token_used >= row.token_quota ? 'bg-red-500' : row.token_used >= row.token_quota * 0.8 ? 'bg-yellow-500' : 'bg-primary-500'" :style="{ width: Math.min((row.token_used / row.token_quota) * 100, 100) + '%' }"></div>
+                </div>
+              </div>
             </div>
           </template>
 
@@ -466,7 +477,16 @@
 
         <div>
           <label class="input-label">{{ t('keys.groupLabel') }}</label>
+          <div v-if="selectedTokenKeyGroup" class="rounded-lg border border-gray-200 px-3 py-2 dark:border-dark-600">
+            <GroupBadge
+              :name="selectedTokenKeyGroup.name"
+              :platform="selectedTokenKeyGroup.platform"
+              :subscription-type="selectedTokenKeyGroup.subscription_type"
+              :rate-multiplier="selectedTokenKeyGroup.rate_multiplier"
+            />
+          </div>
           <Select
+            v-else
             v-model="formData.group_id"
             :options="groupOptions"
             :placeholder="t('keys.selectGroup')"
@@ -595,8 +615,75 @@
           </div>
         </div>
 
+        <div v-if="isTokenKeyForm" class="space-y-4 border-t pt-4">
+          <div v-if="showEditModal && selectedKey" class="rounded-lg bg-gray-50 p-4 text-sm dark:bg-dark-700">
+            <div class="flex justify-between"><span>Token quota</span><strong>{{ (selectedKey.token_quota / 1_000_000).toLocaleString() }} MTok</strong></div>
+            <div class="mt-2 flex justify-between"><span>Expiration</span><strong>{{ selectedKey.expires_at ? formatDateTime(selectedKey.expires_at) : '-' }}</strong></div>
+            <div class="mt-2 flex justify-between"><span>Paid</span><strong>${{ selectedKey.token_purchase_price.toFixed(8) }}</strong></div>
+          </div>
+          <template v-else>
+            <div>
+              <label class="input-label">Token amount</label>
+              <div class="relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">T</span>
+                <input v-model.number="formData.token_millions" type="number" step="1" min="1" required class="input pl-8 pr-20" :class="{ 'border-red-500 dark:border-red-500': !isTokenAmountValid }" placeholder="Enter token amount" />
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-500">MTok</span>
+              </div>
+              <p :class="isTokenAmountValid ? 'input-hint' : 'mt-1 text-sm text-red-500'">Minimum purchase is 1 MTok. 1 MTok = 1,000,000 tokens.</p>
+            </div>
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <label class="input-label mb-0">{{ t('keys.expiration') }}</label>
+                <button type="button" class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-default rounded-full border-2 border-transparent bg-primary-600">
+                  <span class="pointer-events-none inline-block h-4 w-4 translate-x-4 rounded-full bg-white shadow" />
+                </button>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  v-for="days in [7, 30, 90]"
+                  :key="days"
+                  type="button"
+                  @click="setExpirationDays(days)"
+                  :class="[
+                    'rounded-lg px-3 py-1.5 text-sm transition-colors',
+                    formData.expiration_preset === String(days)
+                      ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-dark-700 dark:text-gray-400 dark:hover:bg-dark-600'
+                  ]"
+                >
+                  {{ t('keys.expiresInDays', { days }) }}
+                </button>
+                <button
+                  type="button"
+                  @click="formData.expiration_preset = 'custom'"
+                  :class="[
+                    'rounded-lg px-3 py-1.5 text-sm transition-colors',
+                    formData.expiration_preset === 'custom'
+                      ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-dark-700 dark:text-gray-400 dark:hover:bg-dark-600'
+                  ]"
+                >
+                  {{ t('keys.customDate') }}
+                </button>
+              </div>
+              <div>
+                <label class="input-label">{{ t('keys.expirationDate') }}</label>
+                <input v-model="formData.expiration_date" type="datetime-local" required class="input" />
+                <p class="input-hint">{{ t('keys.expirationDateHint') }}</p>
+              </div>
+            </div>
+            <div v-if="isTokenPurchaseValid" class="rounded-lg border border-gray-200 p-4 dark:border-dark-600">
+              <div class="text-sm text-gray-500">{{ formData.token_millions }} MTok × {{ tokenDurationDays }} days × ${{ selectedTokenGroup?.token_price_per_million_per_day || 0 }}</div>
+              <div class="mt-2 flex items-center justify-between">
+                <span class="font-medium text-gray-700 dark:text-gray-300">Purchase price</span>
+                <strong class="text-lg text-gray-900 dark:text-white">${{ tokenPurchasePrice.toFixed(8) }}</strong>
+              </div>
+            </div>
+          </template>
+        </div>
+
         <!-- Quota Limit Section -->
-        <div class="space-y-3">
+        <div v-if="showEditModal && !isTokenKeyForm" class="space-y-3">
           <label class="input-label">{{ t('keys.quotaLimit') }}</label>
           <!-- Switch commented out - always show input, 0 = unlimited
           <div class="flex items-center justify-between">
@@ -636,7 +723,7 @@
             </div>
 
             <!-- Quota used display (only in edit mode) -->
-            <div v-if="showEditModal && selectedKey && selectedKey.quota > 0">
+            <div v-if="showEditModal && selectedKey && (selectedKey.quota > 0 || selectedKey.token_quota > 0)">
               <label class="input-label">{{ t('keys.quotaUsed') }}</label>
               <div class="flex items-center gap-2">
                 <div class="flex-1 rounded-lg bg-gray-100 px-3 py-2 dark:bg-dark-700">
@@ -662,7 +749,7 @@
         </div>
 
         <!-- Rate Limit Section -->
-        <div class="space-y-3">
+        <div v-if="showEditModal && !isTokenKeyForm" class="space-y-3">
           <div class="flex items-center justify-between">
             <label class="input-label mb-0">{{ t('keys.rateLimitSection') }}</label>
             <button
@@ -836,7 +923,7 @@
         </div>
 
         <!-- Expiration Section -->
-        <div class="space-y-3">
+        <div v-if="!isTokenKeyForm" class="space-y-3">
           <div class="flex items-center justify-between">
             <label class="input-label mb-0">{{ t('keys.expiration') }}</label>
             <button
@@ -916,7 +1003,7 @@
           <button
             form="key-form"
             type="submit"
-            :disabled="submitting"
+            :disabled="submitting || (!showEditModal && isTokenKeyForm && !isTokenPurchaseValid)"
             class="btn btn-primary"
             data-tour="key-form-submit"
           >
@@ -1117,7 +1204,7 @@
 </template>
 
 <script setup lang="ts">
-	import { ref, reactive, computed, onMounted, onUnmounted, type ComponentPublicInstance } from 'vue'
+  import { ref, reactive, computed, watch, onMounted, onUnmounted, type ComponentPublicInstance } from 'vue'
 	import { useI18n } from 'vue-i18n'
 	import { useAppStore } from '@/stores/app'
 	import { useOnboardingStore } from '@/stores/onboarding'
@@ -1346,7 +1433,9 @@ const formData = ref({
   rate_limit_7d: null as number | null,
   enable_expiration: false,
   expiration_preset: '30' as '7' | '30' | '90' | 'custom',
-  expiration_date: ''
+  expiration_date: '',
+  token_millions: 10,
+  duration_days: 1
 })
 
 // 自定义Key验证
@@ -1423,6 +1512,23 @@ const groupOptions = computed(() =>
     platform: group.platform
   }))
 )
+
+const selectedTokenGroup = computed(() => groups.value.find(group => group.id === formData.value.group_id && group.subscription_type === 'token') || null)
+const selectedTokenKeyGroup = computed(() => showEditModal.value && (selectedKey.value?.token_quota || 0) > 0 ? selectedKey.value?.group || null : null)
+const isTokenKeyForm = computed(() => (selectedKey.value?.token_quota || 0) > 0 || (!showEditModal.value && selectedTokenGroup.value !== null))
+const isTokenAmountValid = computed(() => Number.isFinite(Number(formData.value.token_millions)) && Number(formData.value.token_millions) >= 1)
+const tokenExpirationDate = computed(() => formData.value.expiration_date ? new Date(formData.value.expiration_date) : null)
+const isTokenDurationValid = computed(() => tokenExpirationDate.value !== null && Number.isFinite(tokenExpirationDate.value.getTime()) && tokenExpirationDate.value.getTime() > Date.now())
+const tokenDurationDays = computed(() => isTokenDurationValid.value ? Math.max(1, Math.ceil((tokenExpirationDate.value!.getTime() - Date.now()) / 86400000)) : 0)
+const isTokenPurchaseValid = computed(() => isTokenAmountValid.value && isTokenDurationValid.value && (selectedTokenGroup.value?.token_price_per_million_per_day || 0) > 0)
+const tokenPurchasePrice = computed(() => Math.max(0, Number(formData.value.token_millions || 0)) * tokenDurationDays.value * (selectedTokenGroup.value?.token_price_per_million_per_day || 0))
+
+watch(selectedTokenGroup, (group, previousGroup) => {
+  if (group && !previousGroup && !showEditModal.value) {
+    formData.value.enable_expiration = true
+    setExpirationDays(30)
+  }
+})
 
 // Group dropdown search
 const groupSearchQuery = ref('')
@@ -1529,6 +1635,7 @@ const loadPublicSettings = async () => {
   }
 }
 
+
 const openUseKeyModal = (key: ApiKey) => {
   selectedKey.value = key
   showUseKeyModal.value = true
@@ -1578,7 +1685,9 @@ const editKey = (key: ApiKey) => {
     rate_limit_7d: key.rate_limit_7d || null,
     enable_expiration: hasExpiration,
     expiration_preset: 'custom',
-    expiration_date: key.expires_at ? formatDateTimeLocal(key.expires_at) : ''
+    expiration_date: key.expires_at ? formatDateTimeLocal(key.expires_at) : '',
+    token_millions: key.token_quota > 0 ? key.token_quota / 1_000_000 : 10,
+    duration_days: key.token_duration_days || 1
   }
   showEditModal.value = true
 }
@@ -1597,6 +1706,7 @@ const toggleKeyStatus = async (key: ApiKey) => {
 }
 
 const openGroupSelector = (key: ApiKey) => {
+  if (key.token_quota > 0) return
   if (groupSelectorKeyId.value === key.id) {
     groupSelectorKeyId.value = null
     dropdownPosition.value = null
@@ -1718,7 +1828,11 @@ const handleSubmit = async () => {
   submitting.value = true
   try {
     if (showEditModal.value && selectedKey.value) {
-      const updates: UpdateApiKeyRequest = {
+      const updates: UpdateApiKeyRequest = isTokenKeyForm.value ? {
+        name: formData.value.name,
+        ip_whitelist: ipWhitelist,
+        ip_blacklist: ipBlacklist,
+      } : {
         name: formData.value.name,
         group_id: formData.value.group_id,
         ip_whitelist: ipWhitelist,
@@ -1744,7 +1858,11 @@ const handleSubmit = async () => {
         ipBlacklist,
         quota,
         expiresInDays,
-        rateLimitData
+        rateLimitData,
+        selectedTokenGroup.value ? {
+          token_amount: Math.round(formData.value.token_millions * 1_000_000),
+          duration_days: tokenDurationDays.value
+        } : undefined
       )
       appStore.showSuccess(t('keys.keyCreatedSuccess'))
       // Only advance tour if active, on submit step, and creation succeeded
@@ -1755,7 +1873,7 @@ const handleSubmit = async () => {
     closeModals()
     loadApiKeys()
   } catch (error: any) {
-    const errorMsg = error.response?.data?.detail || t('keys.failedToSave')
+    const errorMsg = error?.message || error?.response?.data?.message || t('keys.failedToSave')
     appStore.showError(errorMsg)
     // Don't advance tour on error
   } finally {
@@ -1804,7 +1922,9 @@ const closeModals = () => {
     rate_limit_7d: null,
     enable_expiration: false,
     expiration_preset: '30',
-    expiration_date: ''
+    expiration_date: '',
+    token_millions: 10,
+    duration_days: 1
   }
 }
 

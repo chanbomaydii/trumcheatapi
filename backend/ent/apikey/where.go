@@ -110,6 +110,36 @@ func QuotaUsed(v float64) predicate.APIKey {
 	return predicate.APIKey(sql.FieldEQ(FieldQuotaUsed, v))
 }
 
+// TokenQuota applies equality check predicate on the "token_quota" field. It's identical to TokenQuotaEQ.
+func TokenQuota(v int64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldEQ(FieldTokenQuota, v))
+}
+
+// TokenUsed applies equality check predicate on the "token_used" field. It's identical to TokenUsedEQ.
+func TokenUsed(v int64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldEQ(FieldTokenUsed, v))
+}
+
+// TokenUnitPrice applies equality check predicate on the "token_unit_price" field. It's identical to TokenUnitPriceEQ.
+func TokenUnitPrice(v float64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldEQ(FieldTokenUnitPrice, v))
+}
+
+// TokenDurationDays applies equality check predicate on the "token_duration_days" field. It's identical to TokenDurationDaysEQ.
+func TokenDurationDays(v int) predicate.APIKey {
+	return predicate.APIKey(sql.FieldEQ(FieldTokenDurationDays, v))
+}
+
+// TokenPurchasePrice applies equality check predicate on the "token_purchase_price" field. It's identical to TokenPurchasePriceEQ.
+func TokenPurchasePrice(v float64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldEQ(FieldTokenPurchasePrice, v))
+}
+
+// TokenPurchasedAt applies equality check predicate on the "token_purchased_at" field. It's identical to TokenPurchasedAtEQ.
+func TokenPurchasedAt(v time.Time) predicate.APIKey {
+	return predicate.APIKey(sql.FieldEQ(FieldTokenPurchasedAt, v))
+}
+
 // ExpiresAt applies equality check predicate on the "expires_at" field. It's identical to ExpiresAtEQ.
 func ExpiresAt(v time.Time) predicate.APIKey {
 	return predicate.APIKey(sql.FieldEQ(FieldExpiresAt, v))
@@ -683,6 +713,256 @@ func QuotaUsedLT(v float64) predicate.APIKey {
 // QuotaUsedLTE applies the LTE predicate on the "quota_used" field.
 func QuotaUsedLTE(v float64) predicate.APIKey {
 	return predicate.APIKey(sql.FieldLTE(FieldQuotaUsed, v))
+}
+
+// TokenQuotaEQ applies the EQ predicate on the "token_quota" field.
+func TokenQuotaEQ(v int64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldEQ(FieldTokenQuota, v))
+}
+
+// TokenQuotaNEQ applies the NEQ predicate on the "token_quota" field.
+func TokenQuotaNEQ(v int64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldNEQ(FieldTokenQuota, v))
+}
+
+// TokenQuotaIn applies the In predicate on the "token_quota" field.
+func TokenQuotaIn(vs ...int64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldIn(FieldTokenQuota, vs...))
+}
+
+// TokenQuotaNotIn applies the NotIn predicate on the "token_quota" field.
+func TokenQuotaNotIn(vs ...int64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldNotIn(FieldTokenQuota, vs...))
+}
+
+// TokenQuotaGT applies the GT predicate on the "token_quota" field.
+func TokenQuotaGT(v int64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldGT(FieldTokenQuota, v))
+}
+
+// TokenQuotaGTE applies the GTE predicate on the "token_quota" field.
+func TokenQuotaGTE(v int64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldGTE(FieldTokenQuota, v))
+}
+
+// TokenQuotaLT applies the LT predicate on the "token_quota" field.
+func TokenQuotaLT(v int64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldLT(FieldTokenQuota, v))
+}
+
+// TokenQuotaLTE applies the LTE predicate on the "token_quota" field.
+func TokenQuotaLTE(v int64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldLTE(FieldTokenQuota, v))
+}
+
+// TokenUsedEQ applies the EQ predicate on the "token_used" field.
+func TokenUsedEQ(v int64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldEQ(FieldTokenUsed, v))
+}
+
+// TokenUsedNEQ applies the NEQ predicate on the "token_used" field.
+func TokenUsedNEQ(v int64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldNEQ(FieldTokenUsed, v))
+}
+
+// TokenUsedIn applies the In predicate on the "token_used" field.
+func TokenUsedIn(vs ...int64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldIn(FieldTokenUsed, vs...))
+}
+
+// TokenUsedNotIn applies the NotIn predicate on the "token_used" field.
+func TokenUsedNotIn(vs ...int64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldNotIn(FieldTokenUsed, vs...))
+}
+
+// TokenUsedGT applies the GT predicate on the "token_used" field.
+func TokenUsedGT(v int64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldGT(FieldTokenUsed, v))
+}
+
+// TokenUsedGTE applies the GTE predicate on the "token_used" field.
+func TokenUsedGTE(v int64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldGTE(FieldTokenUsed, v))
+}
+
+// TokenUsedLT applies the LT predicate on the "token_used" field.
+func TokenUsedLT(v int64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldLT(FieldTokenUsed, v))
+}
+
+// TokenUsedLTE applies the LTE predicate on the "token_used" field.
+func TokenUsedLTE(v int64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldLTE(FieldTokenUsed, v))
+}
+
+// TokenUnitPriceEQ applies the EQ predicate on the "token_unit_price" field.
+func TokenUnitPriceEQ(v float64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldEQ(FieldTokenUnitPrice, v))
+}
+
+// TokenUnitPriceNEQ applies the NEQ predicate on the "token_unit_price" field.
+func TokenUnitPriceNEQ(v float64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldNEQ(FieldTokenUnitPrice, v))
+}
+
+// TokenUnitPriceIn applies the In predicate on the "token_unit_price" field.
+func TokenUnitPriceIn(vs ...float64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldIn(FieldTokenUnitPrice, vs...))
+}
+
+// TokenUnitPriceNotIn applies the NotIn predicate on the "token_unit_price" field.
+func TokenUnitPriceNotIn(vs ...float64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldNotIn(FieldTokenUnitPrice, vs...))
+}
+
+// TokenUnitPriceGT applies the GT predicate on the "token_unit_price" field.
+func TokenUnitPriceGT(v float64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldGT(FieldTokenUnitPrice, v))
+}
+
+// TokenUnitPriceGTE applies the GTE predicate on the "token_unit_price" field.
+func TokenUnitPriceGTE(v float64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldGTE(FieldTokenUnitPrice, v))
+}
+
+// TokenUnitPriceLT applies the LT predicate on the "token_unit_price" field.
+func TokenUnitPriceLT(v float64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldLT(FieldTokenUnitPrice, v))
+}
+
+// TokenUnitPriceLTE applies the LTE predicate on the "token_unit_price" field.
+func TokenUnitPriceLTE(v float64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldLTE(FieldTokenUnitPrice, v))
+}
+
+// TokenDurationDaysEQ applies the EQ predicate on the "token_duration_days" field.
+func TokenDurationDaysEQ(v int) predicate.APIKey {
+	return predicate.APIKey(sql.FieldEQ(FieldTokenDurationDays, v))
+}
+
+// TokenDurationDaysNEQ applies the NEQ predicate on the "token_duration_days" field.
+func TokenDurationDaysNEQ(v int) predicate.APIKey {
+	return predicate.APIKey(sql.FieldNEQ(FieldTokenDurationDays, v))
+}
+
+// TokenDurationDaysIn applies the In predicate on the "token_duration_days" field.
+func TokenDurationDaysIn(vs ...int) predicate.APIKey {
+	return predicate.APIKey(sql.FieldIn(FieldTokenDurationDays, vs...))
+}
+
+// TokenDurationDaysNotIn applies the NotIn predicate on the "token_duration_days" field.
+func TokenDurationDaysNotIn(vs ...int) predicate.APIKey {
+	return predicate.APIKey(sql.FieldNotIn(FieldTokenDurationDays, vs...))
+}
+
+// TokenDurationDaysGT applies the GT predicate on the "token_duration_days" field.
+func TokenDurationDaysGT(v int) predicate.APIKey {
+	return predicate.APIKey(sql.FieldGT(FieldTokenDurationDays, v))
+}
+
+// TokenDurationDaysGTE applies the GTE predicate on the "token_duration_days" field.
+func TokenDurationDaysGTE(v int) predicate.APIKey {
+	return predicate.APIKey(sql.FieldGTE(FieldTokenDurationDays, v))
+}
+
+// TokenDurationDaysLT applies the LT predicate on the "token_duration_days" field.
+func TokenDurationDaysLT(v int) predicate.APIKey {
+	return predicate.APIKey(sql.FieldLT(FieldTokenDurationDays, v))
+}
+
+// TokenDurationDaysLTE applies the LTE predicate on the "token_duration_days" field.
+func TokenDurationDaysLTE(v int) predicate.APIKey {
+	return predicate.APIKey(sql.FieldLTE(FieldTokenDurationDays, v))
+}
+
+// TokenPurchasePriceEQ applies the EQ predicate on the "token_purchase_price" field.
+func TokenPurchasePriceEQ(v float64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldEQ(FieldTokenPurchasePrice, v))
+}
+
+// TokenPurchasePriceNEQ applies the NEQ predicate on the "token_purchase_price" field.
+func TokenPurchasePriceNEQ(v float64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldNEQ(FieldTokenPurchasePrice, v))
+}
+
+// TokenPurchasePriceIn applies the In predicate on the "token_purchase_price" field.
+func TokenPurchasePriceIn(vs ...float64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldIn(FieldTokenPurchasePrice, vs...))
+}
+
+// TokenPurchasePriceNotIn applies the NotIn predicate on the "token_purchase_price" field.
+func TokenPurchasePriceNotIn(vs ...float64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldNotIn(FieldTokenPurchasePrice, vs...))
+}
+
+// TokenPurchasePriceGT applies the GT predicate on the "token_purchase_price" field.
+func TokenPurchasePriceGT(v float64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldGT(FieldTokenPurchasePrice, v))
+}
+
+// TokenPurchasePriceGTE applies the GTE predicate on the "token_purchase_price" field.
+func TokenPurchasePriceGTE(v float64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldGTE(FieldTokenPurchasePrice, v))
+}
+
+// TokenPurchasePriceLT applies the LT predicate on the "token_purchase_price" field.
+func TokenPurchasePriceLT(v float64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldLT(FieldTokenPurchasePrice, v))
+}
+
+// TokenPurchasePriceLTE applies the LTE predicate on the "token_purchase_price" field.
+func TokenPurchasePriceLTE(v float64) predicate.APIKey {
+	return predicate.APIKey(sql.FieldLTE(FieldTokenPurchasePrice, v))
+}
+
+// TokenPurchasedAtEQ applies the EQ predicate on the "token_purchased_at" field.
+func TokenPurchasedAtEQ(v time.Time) predicate.APIKey {
+	return predicate.APIKey(sql.FieldEQ(FieldTokenPurchasedAt, v))
+}
+
+// TokenPurchasedAtNEQ applies the NEQ predicate on the "token_purchased_at" field.
+func TokenPurchasedAtNEQ(v time.Time) predicate.APIKey {
+	return predicate.APIKey(sql.FieldNEQ(FieldTokenPurchasedAt, v))
+}
+
+// TokenPurchasedAtIn applies the In predicate on the "token_purchased_at" field.
+func TokenPurchasedAtIn(vs ...time.Time) predicate.APIKey {
+	return predicate.APIKey(sql.FieldIn(FieldTokenPurchasedAt, vs...))
+}
+
+// TokenPurchasedAtNotIn applies the NotIn predicate on the "token_purchased_at" field.
+func TokenPurchasedAtNotIn(vs ...time.Time) predicate.APIKey {
+	return predicate.APIKey(sql.FieldNotIn(FieldTokenPurchasedAt, vs...))
+}
+
+// TokenPurchasedAtGT applies the GT predicate on the "token_purchased_at" field.
+func TokenPurchasedAtGT(v time.Time) predicate.APIKey {
+	return predicate.APIKey(sql.FieldGT(FieldTokenPurchasedAt, v))
+}
+
+// TokenPurchasedAtGTE applies the GTE predicate on the "token_purchased_at" field.
+func TokenPurchasedAtGTE(v time.Time) predicate.APIKey {
+	return predicate.APIKey(sql.FieldGTE(FieldTokenPurchasedAt, v))
+}
+
+// TokenPurchasedAtLT applies the LT predicate on the "token_purchased_at" field.
+func TokenPurchasedAtLT(v time.Time) predicate.APIKey {
+	return predicate.APIKey(sql.FieldLT(FieldTokenPurchasedAt, v))
+}
+
+// TokenPurchasedAtLTE applies the LTE predicate on the "token_purchased_at" field.
+func TokenPurchasedAtLTE(v time.Time) predicate.APIKey {
+	return predicate.APIKey(sql.FieldLTE(FieldTokenPurchasedAt, v))
+}
+
+// TokenPurchasedAtIsNil applies the IsNil predicate on the "token_purchased_at" field.
+func TokenPurchasedAtIsNil() predicate.APIKey {
+	return predicate.APIKey(sql.FieldIsNull(FieldTokenPurchasedAt))
+}
+
+// TokenPurchasedAtNotNil applies the NotNil predicate on the "token_purchased_at" field.
+func TokenPurchasedAtNotNil() predicate.APIKey {
+	return predicate.APIKey(sql.FieldNotNull(FieldTokenPurchasedAt))
 }
 
 // ExpiresAtEQ applies the EQ predicate on the "expires_at" field.

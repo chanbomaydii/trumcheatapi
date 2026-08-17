@@ -48,9 +48,15 @@ type APIKey struct {
 	CurrentConcurrency  int
 
 	// Quota fields
-	Quota     float64    // Quota limit in USD (0 = unlimited)
-	QuotaUsed float64    // Used quota amount
-	ExpiresAt *time.Time // Expiration time (nil = never expires)
+	Quota              float64    // Quota limit in USD (0 = unlimited)
+	QuotaUsed          float64    // Used quota amount
+	TokenQuota         int64      // Token quota snapshot (0 = unlimited)
+	TokenUsed          int64      // Billable tokens consumed
+	TokenUnitPrice     float64    // USD per million tokens per day at purchase time
+	TokenDurationDays  int        // Purchased validity in days
+	TokenPurchasePrice float64    // Total USD charged at purchase time
+	TokenPurchasedAt   *time.Time // Purchase commit time
+	ExpiresAt          *time.Time // Expiration time (nil = never expires)
 
 	// Rate limit fields
 	RateLimit5h   float64    // Rate limit in USD per 5h (0 = unlimited)
@@ -87,6 +93,10 @@ func (k *APIKey) IsQuotaExhausted() bool {
 		return false // unlimited
 	}
 	return k.QuotaUsed >= k.Quota
+}
+
+func (k *APIKey) IsTokenQuotaExhausted() bool {
+	return k.TokenQuota > 0 && k.TokenUsed >= k.TokenQuota
 }
 
 // GetQuotaRemaining returns remaining quota (-1 for unlimited)

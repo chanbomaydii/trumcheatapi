@@ -46,6 +46,10 @@ const (
 	FieldPlatform = "platform"
 	// FieldSubscriptionType holds the string denoting the subscription_type field in the database.
 	FieldSubscriptionType = "subscription_type"
+	// FieldTokenLimit holds the string denoting the token_limit field in the database.
+	FieldTokenLimit = "token_limit"
+	// FieldTokenPricePerMillionPerDay holds the string denoting the token_price_per_million_per_day field in the database.
+	FieldTokenPricePerMillionPerDay = "token_price_per_million_per_day"
 	// FieldDailyLimitUsd holds the string denoting the daily_limit_usd field in the database.
 	FieldDailyLimitUsd = "daily_limit_usd"
 	// FieldWeeklyLimitUsd holds the string denoting the weekly_limit_usd field in the database.
@@ -230,6 +234,8 @@ var Columns = []string{
 	FieldDuplicateOperationID,
 	FieldPlatform,
 	FieldSubscriptionType,
+	FieldTokenLimit,
+	FieldTokenPricePerMillionPerDay,
 	FieldDailyLimitUsd,
 	FieldWeeklyLimitUsd,
 	FieldMonthlyLimitUsd,
@@ -344,6 +350,14 @@ var (
 	DefaultSubscriptionType string
 	// SubscriptionTypeValidator is a validator for the "subscription_type" field. It is called by the builders before save.
 	SubscriptionTypeValidator func(string) error
+	// DefaultTokenLimit holds the default value on creation for the "token_limit" field.
+	DefaultTokenLimit int64
+	// TokenLimitValidator is a validator for the "token_limit" field. It is called by the builders before save.
+	TokenLimitValidator func(int64) error
+	// DefaultTokenPricePerMillionPerDay holds the default value on creation for the "token_price_per_million_per_day" field.
+	DefaultTokenPricePerMillionPerDay float64
+	// TokenPricePerMillionPerDayValidator is a validator for the "token_price_per_million_per_day" field. It is called by the builders before save.
+	TokenPricePerMillionPerDayValidator func(float64) error
 	// DefaultDefaultValidityDays holds the default value on creation for the "default_validity_days" field.
 	DefaultDefaultValidityDays int
 	// DefaultAllowImageGeneration holds the default value on creation for the "allow_image_generation" field.
@@ -495,6 +509,16 @@ func ByPlatform(opts ...sql.OrderTermOption) OrderOption {
 // BySubscriptionType orders the results by the subscription_type field.
 func BySubscriptionType(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSubscriptionType, opts...).ToFunc()
+}
+
+// ByTokenLimit orders the results by the token_limit field.
+func ByTokenLimit(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTokenLimit, opts...).ToFunc()
+}
+
+// ByTokenPricePerMillionPerDay orders the results by the token_price_per_million_per_day field.
+func ByTokenPricePerMillionPerDay(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTokenPricePerMillionPerDay, opts...).ToFunc()
 }
 
 // ByDailyLimitUsd orders the results by the daily_limit_usd field.

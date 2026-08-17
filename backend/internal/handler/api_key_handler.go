@@ -39,6 +39,8 @@ type CreateAPIKeyRequest struct {
 	IPBlacklist   []string `json:"ip_blacklist"`    // IP 黑名单
 	Quota         *float64 `json:"quota"`           // 配额限制 (USD)
 	ExpiresInDays *int     `json:"expires_in_days"` // 过期天数
+	TokenAmount   int64    `json:"token_amount"`
+	DurationDays  int      `json:"duration_days"`
 
 	// Rate limit fields (0 = unlimited)
 	RateLimit5h *float64 `json:"rate_limit_5h"`
@@ -203,6 +205,8 @@ func (h *APIKeyHandler) Create(c *gin.Context) {
 		IPWhitelist:   req.IPWhitelist,
 		IPBlacklist:   req.IPBlacklist,
 		ExpiresInDays: req.ExpiresInDays,
+		TokenAmount:   req.TokenAmount,
+		DurationDays:  req.DurationDays,
 	}
 	if req.Quota != nil {
 		svcReq.Quota = *req.Quota

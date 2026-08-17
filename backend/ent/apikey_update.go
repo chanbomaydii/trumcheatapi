@@ -232,6 +232,131 @@ func (_u *APIKeyUpdate) AddQuotaUsed(v float64) *APIKeyUpdate {
 	return _u
 }
 
+// SetTokenQuota sets the "token_quota" field.
+func (_u *APIKeyUpdate) SetTokenQuota(v int64) *APIKeyUpdate {
+	_u.mutation.ResetTokenQuota()
+	_u.mutation.SetTokenQuota(v)
+	return _u
+}
+
+// SetNillableTokenQuota sets the "token_quota" field if the given value is not nil.
+func (_u *APIKeyUpdate) SetNillableTokenQuota(v *int64) *APIKeyUpdate {
+	if v != nil {
+		_u.SetTokenQuota(*v)
+	}
+	return _u
+}
+
+// AddTokenQuota adds value to the "token_quota" field.
+func (_u *APIKeyUpdate) AddTokenQuota(v int64) *APIKeyUpdate {
+	_u.mutation.AddTokenQuota(v)
+	return _u
+}
+
+// SetTokenUsed sets the "token_used" field.
+func (_u *APIKeyUpdate) SetTokenUsed(v int64) *APIKeyUpdate {
+	_u.mutation.ResetTokenUsed()
+	_u.mutation.SetTokenUsed(v)
+	return _u
+}
+
+// SetNillableTokenUsed sets the "token_used" field if the given value is not nil.
+func (_u *APIKeyUpdate) SetNillableTokenUsed(v *int64) *APIKeyUpdate {
+	if v != nil {
+		_u.SetTokenUsed(*v)
+	}
+	return _u
+}
+
+// AddTokenUsed adds value to the "token_used" field.
+func (_u *APIKeyUpdate) AddTokenUsed(v int64) *APIKeyUpdate {
+	_u.mutation.AddTokenUsed(v)
+	return _u
+}
+
+// SetTokenUnitPrice sets the "token_unit_price" field.
+func (_u *APIKeyUpdate) SetTokenUnitPrice(v float64) *APIKeyUpdate {
+	_u.mutation.ResetTokenUnitPrice()
+	_u.mutation.SetTokenUnitPrice(v)
+	return _u
+}
+
+// SetNillableTokenUnitPrice sets the "token_unit_price" field if the given value is not nil.
+func (_u *APIKeyUpdate) SetNillableTokenUnitPrice(v *float64) *APIKeyUpdate {
+	if v != nil {
+		_u.SetTokenUnitPrice(*v)
+	}
+	return _u
+}
+
+// AddTokenUnitPrice adds value to the "token_unit_price" field.
+func (_u *APIKeyUpdate) AddTokenUnitPrice(v float64) *APIKeyUpdate {
+	_u.mutation.AddTokenUnitPrice(v)
+	return _u
+}
+
+// SetTokenDurationDays sets the "token_duration_days" field.
+func (_u *APIKeyUpdate) SetTokenDurationDays(v int) *APIKeyUpdate {
+	_u.mutation.ResetTokenDurationDays()
+	_u.mutation.SetTokenDurationDays(v)
+	return _u
+}
+
+// SetNillableTokenDurationDays sets the "token_duration_days" field if the given value is not nil.
+func (_u *APIKeyUpdate) SetNillableTokenDurationDays(v *int) *APIKeyUpdate {
+	if v != nil {
+		_u.SetTokenDurationDays(*v)
+	}
+	return _u
+}
+
+// AddTokenDurationDays adds value to the "token_duration_days" field.
+func (_u *APIKeyUpdate) AddTokenDurationDays(v int) *APIKeyUpdate {
+	_u.mutation.AddTokenDurationDays(v)
+	return _u
+}
+
+// SetTokenPurchasePrice sets the "token_purchase_price" field.
+func (_u *APIKeyUpdate) SetTokenPurchasePrice(v float64) *APIKeyUpdate {
+	_u.mutation.ResetTokenPurchasePrice()
+	_u.mutation.SetTokenPurchasePrice(v)
+	return _u
+}
+
+// SetNillableTokenPurchasePrice sets the "token_purchase_price" field if the given value is not nil.
+func (_u *APIKeyUpdate) SetNillableTokenPurchasePrice(v *float64) *APIKeyUpdate {
+	if v != nil {
+		_u.SetTokenPurchasePrice(*v)
+	}
+	return _u
+}
+
+// AddTokenPurchasePrice adds value to the "token_purchase_price" field.
+func (_u *APIKeyUpdate) AddTokenPurchasePrice(v float64) *APIKeyUpdate {
+	_u.mutation.AddTokenPurchasePrice(v)
+	return _u
+}
+
+// SetTokenPurchasedAt sets the "token_purchased_at" field.
+func (_u *APIKeyUpdate) SetTokenPurchasedAt(v time.Time) *APIKeyUpdate {
+	_u.mutation.SetTokenPurchasedAt(v)
+	return _u
+}
+
+// SetNillableTokenPurchasedAt sets the "token_purchased_at" field if the given value is not nil.
+func (_u *APIKeyUpdate) SetNillableTokenPurchasedAt(v *time.Time) *APIKeyUpdate {
+	if v != nil {
+		_u.SetTokenPurchasedAt(*v)
+	}
+	return _u
+}
+
+// ClearTokenPurchasedAt clears the value of the "token_purchased_at" field.
+func (_u *APIKeyUpdate) ClearTokenPurchasedAt() *APIKeyUpdate {
+	_u.mutation.ClearTokenPurchasedAt()
+	return _u
+}
+
 // SetExpiresAt sets the "expires_at" field.
 func (_u *APIKeyUpdate) SetExpiresAt(v time.Time) *APIKeyUpdate {
 	_u.mutation.SetExpiresAt(v)
@@ -560,6 +685,31 @@ func (_u *APIKeyUpdate) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "APIKey.status": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.TokenQuota(); ok {
+		if err := apikey.TokenQuotaValidator(v); err != nil {
+			return &ValidationError{Name: "token_quota", err: fmt.Errorf(`ent: validator failed for field "APIKey.token_quota": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.TokenUsed(); ok {
+		if err := apikey.TokenUsedValidator(v); err != nil {
+			return &ValidationError{Name: "token_used", err: fmt.Errorf(`ent: validator failed for field "APIKey.token_used": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.TokenUnitPrice(); ok {
+		if err := apikey.TokenUnitPriceValidator(v); err != nil {
+			return &ValidationError{Name: "token_unit_price", err: fmt.Errorf(`ent: validator failed for field "APIKey.token_unit_price": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.TokenDurationDays(); ok {
+		if err := apikey.TokenDurationDaysValidator(v); err != nil {
+			return &ValidationError{Name: "token_duration_days", err: fmt.Errorf(`ent: validator failed for field "APIKey.token_duration_days": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.TokenPurchasePrice(); ok {
+		if err := apikey.TokenPurchasePriceValidator(v); err != nil {
+			return &ValidationError{Name: "token_purchase_price", err: fmt.Errorf(`ent: validator failed for field "APIKey.token_purchase_price": %w`, err)}
+		}
+	}
 	if _u.mutation.UserCleared() && len(_u.mutation.UserIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "APIKey.user"`)
 	}
@@ -635,6 +785,42 @@ func (_u *APIKeyUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.AddedQuotaUsed(); ok {
 		_spec.AddField(apikey.FieldQuotaUsed, field.TypeFloat64, value)
+	}
+	if value, ok := _u.mutation.TokenQuota(); ok {
+		_spec.SetField(apikey.FieldTokenQuota, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedTokenQuota(); ok {
+		_spec.AddField(apikey.FieldTokenQuota, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.TokenUsed(); ok {
+		_spec.SetField(apikey.FieldTokenUsed, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedTokenUsed(); ok {
+		_spec.AddField(apikey.FieldTokenUsed, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.TokenUnitPrice(); ok {
+		_spec.SetField(apikey.FieldTokenUnitPrice, field.TypeFloat64, value)
+	}
+	if value, ok := _u.mutation.AddedTokenUnitPrice(); ok {
+		_spec.AddField(apikey.FieldTokenUnitPrice, field.TypeFloat64, value)
+	}
+	if value, ok := _u.mutation.TokenDurationDays(); ok {
+		_spec.SetField(apikey.FieldTokenDurationDays, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedTokenDurationDays(); ok {
+		_spec.AddField(apikey.FieldTokenDurationDays, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.TokenPurchasePrice(); ok {
+		_spec.SetField(apikey.FieldTokenPurchasePrice, field.TypeFloat64, value)
+	}
+	if value, ok := _u.mutation.AddedTokenPurchasePrice(); ok {
+		_spec.AddField(apikey.FieldTokenPurchasePrice, field.TypeFloat64, value)
+	}
+	if value, ok := _u.mutation.TokenPurchasedAt(); ok {
+		_spec.SetField(apikey.FieldTokenPurchasedAt, field.TypeTime, value)
+	}
+	if _u.mutation.TokenPurchasedAtCleared() {
+		_spec.ClearField(apikey.FieldTokenPurchasedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.ExpiresAt(); ok {
 		_spec.SetField(apikey.FieldExpiresAt, field.TypeTime, value)
@@ -1019,6 +1205,131 @@ func (_u *APIKeyUpdateOne) AddQuotaUsed(v float64) *APIKeyUpdateOne {
 	return _u
 }
 
+// SetTokenQuota sets the "token_quota" field.
+func (_u *APIKeyUpdateOne) SetTokenQuota(v int64) *APIKeyUpdateOne {
+	_u.mutation.ResetTokenQuota()
+	_u.mutation.SetTokenQuota(v)
+	return _u
+}
+
+// SetNillableTokenQuota sets the "token_quota" field if the given value is not nil.
+func (_u *APIKeyUpdateOne) SetNillableTokenQuota(v *int64) *APIKeyUpdateOne {
+	if v != nil {
+		_u.SetTokenQuota(*v)
+	}
+	return _u
+}
+
+// AddTokenQuota adds value to the "token_quota" field.
+func (_u *APIKeyUpdateOne) AddTokenQuota(v int64) *APIKeyUpdateOne {
+	_u.mutation.AddTokenQuota(v)
+	return _u
+}
+
+// SetTokenUsed sets the "token_used" field.
+func (_u *APIKeyUpdateOne) SetTokenUsed(v int64) *APIKeyUpdateOne {
+	_u.mutation.ResetTokenUsed()
+	_u.mutation.SetTokenUsed(v)
+	return _u
+}
+
+// SetNillableTokenUsed sets the "token_used" field if the given value is not nil.
+func (_u *APIKeyUpdateOne) SetNillableTokenUsed(v *int64) *APIKeyUpdateOne {
+	if v != nil {
+		_u.SetTokenUsed(*v)
+	}
+	return _u
+}
+
+// AddTokenUsed adds value to the "token_used" field.
+func (_u *APIKeyUpdateOne) AddTokenUsed(v int64) *APIKeyUpdateOne {
+	_u.mutation.AddTokenUsed(v)
+	return _u
+}
+
+// SetTokenUnitPrice sets the "token_unit_price" field.
+func (_u *APIKeyUpdateOne) SetTokenUnitPrice(v float64) *APIKeyUpdateOne {
+	_u.mutation.ResetTokenUnitPrice()
+	_u.mutation.SetTokenUnitPrice(v)
+	return _u
+}
+
+// SetNillableTokenUnitPrice sets the "token_unit_price" field if the given value is not nil.
+func (_u *APIKeyUpdateOne) SetNillableTokenUnitPrice(v *float64) *APIKeyUpdateOne {
+	if v != nil {
+		_u.SetTokenUnitPrice(*v)
+	}
+	return _u
+}
+
+// AddTokenUnitPrice adds value to the "token_unit_price" field.
+func (_u *APIKeyUpdateOne) AddTokenUnitPrice(v float64) *APIKeyUpdateOne {
+	_u.mutation.AddTokenUnitPrice(v)
+	return _u
+}
+
+// SetTokenDurationDays sets the "token_duration_days" field.
+func (_u *APIKeyUpdateOne) SetTokenDurationDays(v int) *APIKeyUpdateOne {
+	_u.mutation.ResetTokenDurationDays()
+	_u.mutation.SetTokenDurationDays(v)
+	return _u
+}
+
+// SetNillableTokenDurationDays sets the "token_duration_days" field if the given value is not nil.
+func (_u *APIKeyUpdateOne) SetNillableTokenDurationDays(v *int) *APIKeyUpdateOne {
+	if v != nil {
+		_u.SetTokenDurationDays(*v)
+	}
+	return _u
+}
+
+// AddTokenDurationDays adds value to the "token_duration_days" field.
+func (_u *APIKeyUpdateOne) AddTokenDurationDays(v int) *APIKeyUpdateOne {
+	_u.mutation.AddTokenDurationDays(v)
+	return _u
+}
+
+// SetTokenPurchasePrice sets the "token_purchase_price" field.
+func (_u *APIKeyUpdateOne) SetTokenPurchasePrice(v float64) *APIKeyUpdateOne {
+	_u.mutation.ResetTokenPurchasePrice()
+	_u.mutation.SetTokenPurchasePrice(v)
+	return _u
+}
+
+// SetNillableTokenPurchasePrice sets the "token_purchase_price" field if the given value is not nil.
+func (_u *APIKeyUpdateOne) SetNillableTokenPurchasePrice(v *float64) *APIKeyUpdateOne {
+	if v != nil {
+		_u.SetTokenPurchasePrice(*v)
+	}
+	return _u
+}
+
+// AddTokenPurchasePrice adds value to the "token_purchase_price" field.
+func (_u *APIKeyUpdateOne) AddTokenPurchasePrice(v float64) *APIKeyUpdateOne {
+	_u.mutation.AddTokenPurchasePrice(v)
+	return _u
+}
+
+// SetTokenPurchasedAt sets the "token_purchased_at" field.
+func (_u *APIKeyUpdateOne) SetTokenPurchasedAt(v time.Time) *APIKeyUpdateOne {
+	_u.mutation.SetTokenPurchasedAt(v)
+	return _u
+}
+
+// SetNillableTokenPurchasedAt sets the "token_purchased_at" field if the given value is not nil.
+func (_u *APIKeyUpdateOne) SetNillableTokenPurchasedAt(v *time.Time) *APIKeyUpdateOne {
+	if v != nil {
+		_u.SetTokenPurchasedAt(*v)
+	}
+	return _u
+}
+
+// ClearTokenPurchasedAt clears the value of the "token_purchased_at" field.
+func (_u *APIKeyUpdateOne) ClearTokenPurchasedAt() *APIKeyUpdateOne {
+	_u.mutation.ClearTokenPurchasedAt()
+	return _u
+}
+
 // SetExpiresAt sets the "expires_at" field.
 func (_u *APIKeyUpdateOne) SetExpiresAt(v time.Time) *APIKeyUpdateOne {
 	_u.mutation.SetExpiresAt(v)
@@ -1360,6 +1671,31 @@ func (_u *APIKeyUpdateOne) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "APIKey.status": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.TokenQuota(); ok {
+		if err := apikey.TokenQuotaValidator(v); err != nil {
+			return &ValidationError{Name: "token_quota", err: fmt.Errorf(`ent: validator failed for field "APIKey.token_quota": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.TokenUsed(); ok {
+		if err := apikey.TokenUsedValidator(v); err != nil {
+			return &ValidationError{Name: "token_used", err: fmt.Errorf(`ent: validator failed for field "APIKey.token_used": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.TokenUnitPrice(); ok {
+		if err := apikey.TokenUnitPriceValidator(v); err != nil {
+			return &ValidationError{Name: "token_unit_price", err: fmt.Errorf(`ent: validator failed for field "APIKey.token_unit_price": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.TokenDurationDays(); ok {
+		if err := apikey.TokenDurationDaysValidator(v); err != nil {
+			return &ValidationError{Name: "token_duration_days", err: fmt.Errorf(`ent: validator failed for field "APIKey.token_duration_days": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.TokenPurchasePrice(); ok {
+		if err := apikey.TokenPurchasePriceValidator(v); err != nil {
+			return &ValidationError{Name: "token_purchase_price", err: fmt.Errorf(`ent: validator failed for field "APIKey.token_purchase_price": %w`, err)}
+		}
+	}
 	if _u.mutation.UserCleared() && len(_u.mutation.UserIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "APIKey.user"`)
 	}
@@ -1452,6 +1788,42 @@ func (_u *APIKeyUpdateOne) sqlSave(ctx context.Context) (_node *APIKey, err erro
 	}
 	if value, ok := _u.mutation.AddedQuotaUsed(); ok {
 		_spec.AddField(apikey.FieldQuotaUsed, field.TypeFloat64, value)
+	}
+	if value, ok := _u.mutation.TokenQuota(); ok {
+		_spec.SetField(apikey.FieldTokenQuota, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedTokenQuota(); ok {
+		_spec.AddField(apikey.FieldTokenQuota, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.TokenUsed(); ok {
+		_spec.SetField(apikey.FieldTokenUsed, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedTokenUsed(); ok {
+		_spec.AddField(apikey.FieldTokenUsed, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.TokenUnitPrice(); ok {
+		_spec.SetField(apikey.FieldTokenUnitPrice, field.TypeFloat64, value)
+	}
+	if value, ok := _u.mutation.AddedTokenUnitPrice(); ok {
+		_spec.AddField(apikey.FieldTokenUnitPrice, field.TypeFloat64, value)
+	}
+	if value, ok := _u.mutation.TokenDurationDays(); ok {
+		_spec.SetField(apikey.FieldTokenDurationDays, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedTokenDurationDays(); ok {
+		_spec.AddField(apikey.FieldTokenDurationDays, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.TokenPurchasePrice(); ok {
+		_spec.SetField(apikey.FieldTokenPurchasePrice, field.TypeFloat64, value)
+	}
+	if value, ok := _u.mutation.AddedTokenPurchasePrice(); ok {
+		_spec.AddField(apikey.FieldTokenPurchasePrice, field.TypeFloat64, value)
+	}
+	if value, ok := _u.mutation.TokenPurchasedAt(); ok {
+		_spec.SetField(apikey.FieldTokenPurchasedAt, field.TypeTime, value)
+	}
+	if _u.mutation.TokenPurchasedAtCleared() {
+		_spec.ClearField(apikey.FieldTokenPurchasedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.ExpiresAt(); ok {
 		_spec.SetField(apikey.FieldExpiresAt, field.TypeTime, value)

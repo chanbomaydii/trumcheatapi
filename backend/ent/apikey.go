@@ -46,6 +46,18 @@ type APIKey struct {
 	Quota float64 `json:"quota,omitempty"`
 	// Used quota amount in USD
 	QuotaUsed float64 `json:"quota_used,omitempty"`
+	// Token quota snapshot for token groups; 0 = unlimited
+	TokenQuota int64 `json:"token_quota,omitempty"`
+	// Billable tokens consumed by this API key
+	TokenUsed int64 `json:"token_used,omitempty"`
+	// Snapshot USD price per million tokens per day
+	TokenUnitPrice float64 `json:"token_unit_price,omitempty"`
+	// Purchased validity in days
+	TokenDurationDays int `json:"token_duration_days,omitempty"`
+	// Total USD charged when the prepaid token key was created
+	TokenPurchasePrice float64 `json:"token_purchase_price,omitempty"`
+	// Time the prepaid token key purchase committed
+	TokenPurchasedAt *time.Time `json:"token_purchased_at,omitempty"`
 	// Expiration time for this API key (null = never expires)
 	ExpiresAt *time.Time `json:"expires_at,omitempty"`
 	// Rate limit in USD per 5 hours (0 = unlimited)
@@ -123,13 +135,13 @@ func (*APIKey) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case apikey.FieldIPWhitelist, apikey.FieldIPBlacklist:
 			values[i] = new([]byte)
-		case apikey.FieldQuota, apikey.FieldQuotaUsed, apikey.FieldRateLimit5h, apikey.FieldRateLimit1d, apikey.FieldRateLimit7d, apikey.FieldUsage5h, apikey.FieldUsage1d, apikey.FieldUsage7d:
+		case apikey.FieldQuota, apikey.FieldQuotaUsed, apikey.FieldTokenUnitPrice, apikey.FieldTokenPurchasePrice, apikey.FieldRateLimit5h, apikey.FieldRateLimit1d, apikey.FieldRateLimit7d, apikey.FieldUsage5h, apikey.FieldUsage1d, apikey.FieldUsage7d:
 			values[i] = new(sql.NullFloat64)
-		case apikey.FieldID, apikey.FieldUserID, apikey.FieldGroupID:
+		case apikey.FieldID, apikey.FieldUserID, apikey.FieldGroupID, apikey.FieldTokenQuota, apikey.FieldTokenUsed, apikey.FieldTokenDurationDays:
 			values[i] = new(sql.NullInt64)
 		case apikey.FieldKey, apikey.FieldName, apikey.FieldStatus:
 			values[i] = new(sql.NullString)
-		case apikey.FieldCreatedAt, apikey.FieldUpdatedAt, apikey.FieldDeletedAt, apikey.FieldLastUsedAt, apikey.FieldExpiresAt, apikey.FieldWindow5hStart, apikey.FieldWindow1dStart, apikey.FieldWindow7dStart:
+		case apikey.FieldCreatedAt, apikey.FieldUpdatedAt, apikey.FieldDeletedAt, apikey.FieldLastUsedAt, apikey.FieldTokenPurchasedAt, apikey.FieldExpiresAt, apikey.FieldWindow5hStart, apikey.FieldWindow1dStart, apikey.FieldWindow7dStart:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -236,6 +248,43 @@ func (_m *APIKey) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field quota_used", values[i])
 			} else if value.Valid {
 				_m.QuotaUsed = value.Float64
+			}
+		case apikey.FieldTokenQuota:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field token_quota", values[i])
+			} else if value.Valid {
+				_m.TokenQuota = value.Int64
+			}
+		case apikey.FieldTokenUsed:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field token_used", values[i])
+			} else if value.Valid {
+				_m.TokenUsed = value.Int64
+			}
+		case apikey.FieldTokenUnitPrice:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field token_unit_price", values[i])
+			} else if value.Valid {
+				_m.TokenUnitPrice = value.Float64
+			}
+		case apikey.FieldTokenDurationDays:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field token_duration_days", values[i])
+			} else if value.Valid {
+				_m.TokenDurationDays = int(value.Int64)
+			}
+		case apikey.FieldTokenPurchasePrice:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field token_purchase_price", values[i])
+			} else if value.Valid {
+				_m.TokenPurchasePrice = value.Float64
+			}
+		case apikey.FieldTokenPurchasedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field token_purchased_at", values[i])
+			} else if value.Valid {
+				_m.TokenPurchasedAt = new(time.Time)
+				*_m.TokenPurchasedAt = value.Time
 			}
 		case apikey.FieldExpiresAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -396,6 +445,26 @@ func (_m *APIKey) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("quota_used=")
 	builder.WriteString(fmt.Sprintf("%v", _m.QuotaUsed))
+	builder.WriteString(", ")
+	builder.WriteString("token_quota=")
+	builder.WriteString(fmt.Sprintf("%v", _m.TokenQuota))
+	builder.WriteString(", ")
+	builder.WriteString("token_used=")
+	builder.WriteString(fmt.Sprintf("%v", _m.TokenUsed))
+	builder.WriteString(", ")
+	builder.WriteString("token_unit_price=")
+	builder.WriteString(fmt.Sprintf("%v", _m.TokenUnitPrice))
+	builder.WriteString(", ")
+	builder.WriteString("token_duration_days=")
+	builder.WriteString(fmt.Sprintf("%v", _m.TokenDurationDays))
+	builder.WriteString(", ")
+	builder.WriteString("token_purchase_price=")
+	builder.WriteString(fmt.Sprintf("%v", _m.TokenPurchasePrice))
+	builder.WriteString(", ")
+	if v := _m.TokenPurchasedAt; v != nil {
+		builder.WriteString("token_purchased_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	if v := _m.ExpiresAt; v != nil {
 		builder.WriteString("expires_at=")

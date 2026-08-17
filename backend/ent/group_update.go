@@ -237,6 +237,48 @@ func (_u *GroupUpdate) SetNillableSubscriptionType(v *string) *GroupUpdate {
 	return _u
 }
 
+// SetTokenLimit sets the "token_limit" field.
+func (_u *GroupUpdate) SetTokenLimit(v int64) *GroupUpdate {
+	_u.mutation.ResetTokenLimit()
+	_u.mutation.SetTokenLimit(v)
+	return _u
+}
+
+// SetNillableTokenLimit sets the "token_limit" field if the given value is not nil.
+func (_u *GroupUpdate) SetNillableTokenLimit(v *int64) *GroupUpdate {
+	if v != nil {
+		_u.SetTokenLimit(*v)
+	}
+	return _u
+}
+
+// AddTokenLimit adds value to the "token_limit" field.
+func (_u *GroupUpdate) AddTokenLimit(v int64) *GroupUpdate {
+	_u.mutation.AddTokenLimit(v)
+	return _u
+}
+
+// SetTokenPricePerMillionPerDay sets the "token_price_per_million_per_day" field.
+func (_u *GroupUpdate) SetTokenPricePerMillionPerDay(v float64) *GroupUpdate {
+	_u.mutation.ResetTokenPricePerMillionPerDay()
+	_u.mutation.SetTokenPricePerMillionPerDay(v)
+	return _u
+}
+
+// SetNillableTokenPricePerMillionPerDay sets the "token_price_per_million_per_day" field if the given value is not nil.
+func (_u *GroupUpdate) SetNillableTokenPricePerMillionPerDay(v *float64) *GroupUpdate {
+	if v != nil {
+		_u.SetTokenPricePerMillionPerDay(*v)
+	}
+	return _u
+}
+
+// AddTokenPricePerMillionPerDay adds value to the "token_price_per_million_per_day" field.
+func (_u *GroupUpdate) AddTokenPricePerMillionPerDay(v float64) *GroupUpdate {
+	_u.mutation.AddTokenPricePerMillionPerDay(v)
+	return _u
+}
+
 // SetDailyLimitUsd sets the "daily_limit_usd" field.
 func (_u *GroupUpdate) SetDailyLimitUsd(v float64) *GroupUpdate {
 	_u.mutation.ResetDailyLimitUsd()
@@ -1457,6 +1499,16 @@ func (_u *GroupUpdate) check() error {
 			return &ValidationError{Name: "subscription_type", err: fmt.Errorf(`ent: validator failed for field "Group.subscription_type": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.TokenLimit(); ok {
+		if err := group.TokenLimitValidator(v); err != nil {
+			return &ValidationError{Name: "token_limit", err: fmt.Errorf(`ent: validator failed for field "Group.token_limit": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.TokenPricePerMillionPerDay(); ok {
+		if err := group.TokenPricePerMillionPerDayValidator(v); err != nil {
+			return &ValidationError{Name: "token_price_per_million_per_day", err: fmt.Errorf(`ent: validator failed for field "Group.token_price_per_million_per_day": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.SearchPricePer1k(); ok {
 		if err := group.SearchPricePer1kValidator(v); err != nil {
 			return &ValidationError{Name: "search_price_per_1k", err: fmt.Errorf(`ent: validator failed for field "Group.search_price_per_1k": %w`, err)}
@@ -1555,6 +1607,18 @@ func (_u *GroupUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.SubscriptionType(); ok {
 		_spec.SetField(group.FieldSubscriptionType, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.TokenLimit(); ok {
+		_spec.SetField(group.FieldTokenLimit, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedTokenLimit(); ok {
+		_spec.AddField(group.FieldTokenLimit, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.TokenPricePerMillionPerDay(); ok {
+		_spec.SetField(group.FieldTokenPricePerMillionPerDay, field.TypeFloat64, value)
+	}
+	if value, ok := _u.mutation.AddedTokenPricePerMillionPerDay(); ok {
+		_spec.AddField(group.FieldTokenPricePerMillionPerDay, field.TypeFloat64, value)
 	}
 	if value, ok := _u.mutation.DailyLimitUsd(); ok {
 		_spec.SetField(group.FieldDailyLimitUsd, field.TypeFloat64, value)
@@ -2355,6 +2419,48 @@ func (_u *GroupUpdateOne) SetNillableSubscriptionType(v *string) *GroupUpdateOne
 	if v != nil {
 		_u.SetSubscriptionType(*v)
 	}
+	return _u
+}
+
+// SetTokenLimit sets the "token_limit" field.
+func (_u *GroupUpdateOne) SetTokenLimit(v int64) *GroupUpdateOne {
+	_u.mutation.ResetTokenLimit()
+	_u.mutation.SetTokenLimit(v)
+	return _u
+}
+
+// SetNillableTokenLimit sets the "token_limit" field if the given value is not nil.
+func (_u *GroupUpdateOne) SetNillableTokenLimit(v *int64) *GroupUpdateOne {
+	if v != nil {
+		_u.SetTokenLimit(*v)
+	}
+	return _u
+}
+
+// AddTokenLimit adds value to the "token_limit" field.
+func (_u *GroupUpdateOne) AddTokenLimit(v int64) *GroupUpdateOne {
+	_u.mutation.AddTokenLimit(v)
+	return _u
+}
+
+// SetTokenPricePerMillionPerDay sets the "token_price_per_million_per_day" field.
+func (_u *GroupUpdateOne) SetTokenPricePerMillionPerDay(v float64) *GroupUpdateOne {
+	_u.mutation.ResetTokenPricePerMillionPerDay()
+	_u.mutation.SetTokenPricePerMillionPerDay(v)
+	return _u
+}
+
+// SetNillableTokenPricePerMillionPerDay sets the "token_price_per_million_per_day" field if the given value is not nil.
+func (_u *GroupUpdateOne) SetNillableTokenPricePerMillionPerDay(v *float64) *GroupUpdateOne {
+	if v != nil {
+		_u.SetTokenPricePerMillionPerDay(*v)
+	}
+	return _u
+}
+
+// AddTokenPricePerMillionPerDay adds value to the "token_price_per_million_per_day" field.
+func (_u *GroupUpdateOne) AddTokenPricePerMillionPerDay(v float64) *GroupUpdateOne {
+	_u.mutation.AddTokenPricePerMillionPerDay(v)
 	return _u
 }
 
@@ -3591,6 +3697,16 @@ func (_u *GroupUpdateOne) check() error {
 			return &ValidationError{Name: "subscription_type", err: fmt.Errorf(`ent: validator failed for field "Group.subscription_type": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.TokenLimit(); ok {
+		if err := group.TokenLimitValidator(v); err != nil {
+			return &ValidationError{Name: "token_limit", err: fmt.Errorf(`ent: validator failed for field "Group.token_limit": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.TokenPricePerMillionPerDay(); ok {
+		if err := group.TokenPricePerMillionPerDayValidator(v); err != nil {
+			return &ValidationError{Name: "token_price_per_million_per_day", err: fmt.Errorf(`ent: validator failed for field "Group.token_price_per_million_per_day": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.SearchPricePer1k(); ok {
 		if err := group.SearchPricePer1kValidator(v); err != nil {
 			return &ValidationError{Name: "search_price_per_1k", err: fmt.Errorf(`ent: validator failed for field "Group.search_price_per_1k": %w`, err)}
@@ -3706,6 +3822,18 @@ func (_u *GroupUpdateOne) sqlSave(ctx context.Context) (_node *Group, err error)
 	}
 	if value, ok := _u.mutation.SubscriptionType(); ok {
 		_spec.SetField(group.FieldSubscriptionType, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.TokenLimit(); ok {
+		_spec.SetField(group.FieldTokenLimit, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedTokenLimit(); ok {
+		_spec.AddField(group.FieldTokenLimit, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.TokenPricePerMillionPerDay(); ok {
+		_spec.SetField(group.FieldTokenPricePerMillionPerDay, field.TypeFloat64, value)
+	}
+	if value, ok := _u.mutation.AddedTokenPricePerMillionPerDay(); ok {
+		_spec.AddField(group.FieldTokenPricePerMillionPerDay, field.TypeFloat64, value)
 	}
 	if value, ok := _u.mutation.DailyLimitUsd(); ok {
 		_spec.SetField(group.FieldDailyLimitUsd, field.TypeFloat64, value)

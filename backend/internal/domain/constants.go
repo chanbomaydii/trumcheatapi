@@ -80,6 +80,7 @@ const (
 const (
 	SubscriptionTypeStandard     = "standard"     // 标准计费模式（按余额扣费）
 	SubscriptionTypeSubscription = "subscription" // 订阅模式（按限额控制）
+	SubscriptionTypeToken        = "token"        // Token 配额模式（扣余额并限制 Key token 用量）
 )
 
 // Subscription status constants

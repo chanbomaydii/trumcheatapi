@@ -27,10 +27,13 @@ import (
 type apiKeyRepository struct {
 	client *dbent.Client
 	sql    sqlExecutor
+	db     *sql.DB
 }
 
 func NewAPIKeyRepository(client *dbent.Client, sqlDB *sql.DB) service.APIKeyRepository {
-	return newAPIKeyRepositoryWithSQL(client, sqlDB)
+	repo := newAPIKeyRepositoryWithSQL(client, sqlDB)
+	repo.db = sqlDB
+	return repo
 }
 
 func newAPIKeyRepositoryWithSQL(client *dbent.Client, sqlq sqlExecutor) *apiKeyRepository {
@@ -52,6 +55,12 @@ func (r *apiKeyRepository) Create(ctx context.Context, key *service.APIKey) erro
 		SetNillableLastUsedAt(key.LastUsedAt).
 		SetQuota(key.Quota).
 		SetQuotaUsed(key.QuotaUsed).
+		SetTokenQuota(key.TokenQuota).
+		SetTokenUsed(key.TokenUsed).
+		SetTokenUnitPrice(key.TokenUnitPrice).
+		SetTokenDurationDays(key.TokenDurationDays).
+		SetTokenPurchasePrice(key.TokenPurchasePrice).
+		SetNillableTokenPurchasedAt(key.TokenPurchasedAt).
 		SetNillableExpiresAt(key.ExpiresAt).
 		SetRateLimit5h(key.RateLimit5h).
 		SetRateLimit1d(key.RateLimit1d).
@@ -72,6 +81,54 @@ func (r *apiKeyRepository) Create(ctx context.Context, key *service.APIKey) erro
 		key.UpdatedAt = created.UpdatedAt
 	}
 	return translatePersistenceError(err, nil, service.ErrAPIKeyExists)
+}
+
+func (r *apiKeyRepository) PurchaseTokenKey(ctx context.Context, key *service.APIKey, purchasePrice float64) (_ error) {
+	if r == nil || r.db == nil {
+		return errors.New("api key repository sql is nil")
+	}
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	var newBalance float64
+	err = tx.QueryRowContext(ctx, `
+		UPDATE users
+		SET balance = balance - $1, updated_at = NOW()
+		WHERE id = $2 AND deleted_at IS NULL AND balance >= $1
+		RETURNING balance
+	`, purchasePrice, key.UserID).Scan(&newBalance)
+	if errors.Is(err, sql.ErrNoRows) {
+		return service.ErrInsufficientBalance
+	}
+	if err != nil {
+		return err
+	}
+
+	whitelist, err := json.Marshal(key.IPWhitelist)
+	if err != nil {
+		return err
+	}
+	blacklist, err := json.Marshal(key.IPBlacklist)
+	if err != nil {
+		return err
+	}
+	err = tx.QueryRowContext(ctx, `
+		INSERT INTO api_keys (
+			user_id, key, name, group_id, status, ip_whitelist, ip_blacklist,
+			token_quota, token_used, token_unit_price, token_duration_days,
+			token_purchase_price, token_purchased_at, expires_at, created_at, updated_at
+		) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,0,$9,$10,$11,$12,$13,NOW(),NOW())
+		RETURNING id, created_at, updated_at
+	`, key.UserID, key.Key, key.Name, key.GroupID, key.Status, string(whitelist), string(blacklist),
+		key.TokenQuota, key.TokenUnitPrice, key.TokenDurationDays, key.TokenPurchasePrice,
+		key.TokenPurchasedAt, key.ExpiresAt).Scan(&key.ID, &key.CreatedAt, &key.UpdatedAt)
+	if err != nil {
+		return translatePersistenceError(err, nil, service.ErrAPIKeyExists)
+	}
+	return tx.Commit()
 }
 
 func (r *apiKeyRepository) GetByID(ctx context.Context, id int64) (*service.APIKey, error) {
@@ -140,6 +197,8 @@ func (r *apiKeyRepository) GetByKeyForAuth(ctx context.Context, key string) (*se
 			apikey.FieldIPBlacklist,
 			apikey.FieldQuota,
 			apikey.FieldQuotaUsed,
+			apikey.FieldTokenQuota,
+			apikey.FieldTokenUsed,
 			apikey.FieldExpiresAt,
 			apikey.FieldRateLimit5h,
 			apikey.FieldRateLimit1d,
@@ -176,6 +235,7 @@ func (r *apiKeyRepository) GetByKeyForAuth(ctx context.Context, key string) (*se
 				group.FieldIsExclusive,
 				group.FieldStatus,
 				group.FieldSubscriptionType,
+				group.FieldTokenLimit,
 				group.FieldRateMultiplier,
 				group.FieldDailyLimitUsd,
 				group.FieldWeeklyLimitUsd,
@@ -264,6 +324,12 @@ func (r *apiKeyRepository) Update(ctx context.Context, key *service.APIKey, fiel
 	}
 	if fields.QuotaUsed {
 		builder.SetQuotaUsed(key.QuotaUsed)
+	}
+	if fields.TokenQuota {
+		builder.SetTokenQuota(key.TokenQuota)
+	}
+	if fields.TokenUsed {
+		builder.SetTokenUsed(key.TokenUsed)
 	}
 	if fields.RateLimits {
 		builder.
@@ -868,29 +934,35 @@ func apiKeyEntityToService(m *dbent.APIKey) *service.APIKey {
 		return nil
 	}
 	out := &service.APIKey{
-		ID:            m.ID,
-		UserID:        m.UserID,
-		Key:           m.Key,
-		Name:          m.Name,
-		Status:        m.Status,
-		IPWhitelist:   m.IPWhitelist,
-		IPBlacklist:   m.IPBlacklist,
-		LastUsedAt:    m.LastUsedAt,
-		CreatedAt:     m.CreatedAt,
-		UpdatedAt:     m.UpdatedAt,
-		GroupID:       m.GroupID,
-		Quota:         m.Quota,
-		QuotaUsed:     m.QuotaUsed,
-		ExpiresAt:     m.ExpiresAt,
-		RateLimit5h:   m.RateLimit5h,
-		RateLimit1d:   m.RateLimit1d,
-		RateLimit7d:   m.RateLimit7d,
-		Usage5h:       m.Usage5h,
-		Usage1d:       m.Usage1d,
-		Usage7d:       m.Usage7d,
-		Window5hStart: m.Window5hStart,
-		Window1dStart: m.Window1dStart,
-		Window7dStart: m.Window7dStart,
+		ID:                 m.ID,
+		UserID:             m.UserID,
+		Key:                m.Key,
+		Name:               m.Name,
+		Status:             m.Status,
+		IPWhitelist:        m.IPWhitelist,
+		IPBlacklist:        m.IPBlacklist,
+		LastUsedAt:         m.LastUsedAt,
+		CreatedAt:          m.CreatedAt,
+		UpdatedAt:          m.UpdatedAt,
+		GroupID:            m.GroupID,
+		Quota:              m.Quota,
+		QuotaUsed:          m.QuotaUsed,
+		TokenQuota:         m.TokenQuota,
+		TokenUsed:          m.TokenUsed,
+		TokenUnitPrice:     m.TokenUnitPrice,
+		TokenDurationDays:  m.TokenDurationDays,
+		TokenPurchasePrice: m.TokenPurchasePrice,
+		TokenPurchasedAt:   m.TokenPurchasedAt,
+		ExpiresAt:          m.ExpiresAt,
+		RateLimit5h:        m.RateLimit5h,
+		RateLimit1d:        m.RateLimit1d,
+		RateLimit7d:        m.RateLimit7d,
+		Usage5h:            m.Usage5h,
+		Usage1d:            m.Usage1d,
+		Usage7d:            m.Usage7d,
+		Window5hStart:      m.Window5hStart,
+		Window1dStart:      m.Window1dStart,
+		Window7dStart:      m.Window7dStart,
 	}
 	if m.Edges.User != nil {
 		out.User = userEntityToService(m.Edges.User)
@@ -969,6 +1041,8 @@ func groupEntityToService(g *dbent.Group) *service.Group {
 		Hydrated:                        true,
 		DuplicateOperationID:            derefString(g.DuplicateOperationID),
 		SubscriptionType:                g.SubscriptionType,
+		TokenLimit:                      g.TokenLimit,
+		TokenPricePerMillionPerDay:      g.TokenPricePerMillionPerDay,
 		DailyLimitUSD:                   g.DailyLimitUsd,
 		WeeklyLimitUSD:                  g.WeeklyLimitUsd,
 		MonthlyLimitUSD:                 g.MonthlyLimitUsd,

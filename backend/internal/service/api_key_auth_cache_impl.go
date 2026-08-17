@@ -14,7 +14,7 @@ import (
 	"github.com/dgraph-io/ristretto"
 )
 
-const apiKeyAuthSnapshotVersion = 19 // v19: group search/audio/video_model_prices billing fields (force refresh of pre-fix snapshots)
+const apiKeyAuthSnapshotVersion = 20 // v20: token group and per-key token quota fields
 
 type apiKeyAuthCacheConfig struct {
 	l1Size        int
@@ -346,6 +346,8 @@ func (s *APIKeyService) snapshotFromAPIKey(ctx context.Context, apiKey *APIKey) 
 		IPBlacklist: apiKey.IPBlacklist,
 		Quota:       apiKey.Quota,
 		QuotaUsed:   apiKey.QuotaUsed,
+		TokenQuota:  apiKey.TokenQuota,
+		TokenUsed:   apiKey.TokenUsed,
 		ExpiresAt:   apiKey.ExpiresAt,
 		RateLimit5h: apiKey.RateLimit5h,
 		RateLimit1d: apiKey.RateLimit1d,
@@ -384,6 +386,7 @@ func (s *APIKeyService) snapshotFromAPIKey(ctx context.Context, apiKey *APIKey) 
 			IsExclusive:                     apiKey.Group.IsExclusive,
 			Status:                          apiKey.Group.Status,
 			SubscriptionType:                apiKey.Group.SubscriptionType,
+			TokenLimit:                      apiKey.Group.TokenLimit,
 			RateMultiplier:                  apiKey.Group.RateMultiplier,
 			DailyLimitUSD:                   apiKey.Group.DailyLimitUSD,
 			WeeklyLimitUSD:                  apiKey.Group.WeeklyLimitUSD,
@@ -448,6 +451,8 @@ func (s *APIKeyService) snapshotToAPIKey(key string, snapshot *APIKeyAuthSnapsho
 		IPBlacklist: snapshot.IPBlacklist,
 		Quota:       snapshot.Quota,
 		QuotaUsed:   snapshot.QuotaUsed,
+		TokenQuota:  snapshot.TokenQuota,
+		TokenUsed:   snapshot.TokenUsed,
 		ExpiresAt:   snapshot.ExpiresAt,
 		RateLimit5h: snapshot.RateLimit5h,
 		RateLimit1d: snapshot.RateLimit1d,
@@ -479,6 +484,7 @@ func (s *APIKeyService) snapshotToAPIKey(key string, snapshot *APIKeyAuthSnapsho
 			Status:                          snapshot.Group.Status,
 			Hydrated:                        true,
 			SubscriptionType:                snapshot.Group.SubscriptionType,
+			TokenLimit:                      snapshot.Group.TokenLimit,
 			RateMultiplier:                  snapshot.Group.RateMultiplier,
 			DailyLimitUSD:                   snapshot.Group.DailyLimitUSD,
 			WeeklyLimitUSD:                  snapshot.Group.WeeklyLimitUSD,

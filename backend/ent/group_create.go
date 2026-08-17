@@ -232,6 +232,34 @@ func (_c *GroupCreate) SetNillableSubscriptionType(v *string) *GroupCreate {
 	return _c
 }
 
+// SetTokenLimit sets the "token_limit" field.
+func (_c *GroupCreate) SetTokenLimit(v int64) *GroupCreate {
+	_c.mutation.SetTokenLimit(v)
+	return _c
+}
+
+// SetNillableTokenLimit sets the "token_limit" field if the given value is not nil.
+func (_c *GroupCreate) SetNillableTokenLimit(v *int64) *GroupCreate {
+	if v != nil {
+		_c.SetTokenLimit(*v)
+	}
+	return _c
+}
+
+// SetTokenPricePerMillionPerDay sets the "token_price_per_million_per_day" field.
+func (_c *GroupCreate) SetTokenPricePerMillionPerDay(v float64) *GroupCreate {
+	_c.mutation.SetTokenPricePerMillionPerDay(v)
+	return _c
+}
+
+// SetNillableTokenPricePerMillionPerDay sets the "token_price_per_million_per_day" field if the given value is not nil.
+func (_c *GroupCreate) SetNillableTokenPricePerMillionPerDay(v *float64) *GroupCreate {
+	if v != nil {
+		_c.SetTokenPricePerMillionPerDay(*v)
+	}
+	return _c
+}
+
 // SetDailyLimitUsd sets the "daily_limit_usd" field.
 func (_c *GroupCreate) SetDailyLimitUsd(v float64) *GroupCreate {
 	_c.mutation.SetDailyLimitUsd(v)
@@ -1027,6 +1055,14 @@ func (_c *GroupCreate) defaults() error {
 		v := group.DefaultSubscriptionType
 		_c.mutation.SetSubscriptionType(v)
 	}
+	if _, ok := _c.mutation.TokenLimit(); !ok {
+		v := group.DefaultTokenLimit
+		_c.mutation.SetTokenLimit(v)
+	}
+	if _, ok := _c.mutation.TokenPricePerMillionPerDay(); !ok {
+		v := group.DefaultTokenPricePerMillionPerDay
+		_c.mutation.SetTokenPricePerMillionPerDay(v)
+	}
 	if _, ok := _c.mutation.DefaultValidityDays(); !ok {
 		v := group.DefaultDefaultValidityDays
 		_c.mutation.SetDefaultValidityDays(v)
@@ -1213,6 +1249,22 @@ func (_c *GroupCreate) check() error {
 	if v, ok := _c.mutation.SubscriptionType(); ok {
 		if err := group.SubscriptionTypeValidator(v); err != nil {
 			return &ValidationError{Name: "subscription_type", err: fmt.Errorf(`ent: validator failed for field "Group.subscription_type": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.TokenLimit(); !ok {
+		return &ValidationError{Name: "token_limit", err: errors.New(`ent: missing required field "Group.token_limit"`)}
+	}
+	if v, ok := _c.mutation.TokenLimit(); ok {
+		if err := group.TokenLimitValidator(v); err != nil {
+			return &ValidationError{Name: "token_limit", err: fmt.Errorf(`ent: validator failed for field "Group.token_limit": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.TokenPricePerMillionPerDay(); !ok {
+		return &ValidationError{Name: "token_price_per_million_per_day", err: errors.New(`ent: missing required field "Group.token_price_per_million_per_day"`)}
+	}
+	if v, ok := _c.mutation.TokenPricePerMillionPerDay(); ok {
+		if err := group.TokenPricePerMillionPerDayValidator(v); err != nil {
+			return &ValidationError{Name: "token_price_per_million_per_day", err: fmt.Errorf(`ent: validator failed for field "Group.token_price_per_million_per_day": %w`, err)}
 		}
 	}
 	if _, ok := _c.mutation.DefaultValidityDays(); !ok {
@@ -1415,6 +1467,14 @@ func (_c *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.SubscriptionType(); ok {
 		_spec.SetField(group.FieldSubscriptionType, field.TypeString, value)
 		_node.SubscriptionType = value
+	}
+	if value, ok := _c.mutation.TokenLimit(); ok {
+		_spec.SetField(group.FieldTokenLimit, field.TypeInt64, value)
+		_node.TokenLimit = value
+	}
+	if value, ok := _c.mutation.TokenPricePerMillionPerDay(); ok {
+		_spec.SetField(group.FieldTokenPricePerMillionPerDay, field.TypeFloat64, value)
+		_node.TokenPricePerMillionPerDay = value
 	}
 	if value, ok := _c.mutation.DailyLimitUsd(); ok {
 		_spec.SetField(group.FieldDailyLimitUsd, field.TypeFloat64, value)
@@ -1937,6 +1997,42 @@ func (u *GroupUpsert) SetSubscriptionType(v string) *GroupUpsert {
 // UpdateSubscriptionType sets the "subscription_type" field to the value that was provided on create.
 func (u *GroupUpsert) UpdateSubscriptionType() *GroupUpsert {
 	u.SetExcluded(group.FieldSubscriptionType)
+	return u
+}
+
+// SetTokenLimit sets the "token_limit" field.
+func (u *GroupUpsert) SetTokenLimit(v int64) *GroupUpsert {
+	u.Set(group.FieldTokenLimit, v)
+	return u
+}
+
+// UpdateTokenLimit sets the "token_limit" field to the value that was provided on create.
+func (u *GroupUpsert) UpdateTokenLimit() *GroupUpsert {
+	u.SetExcluded(group.FieldTokenLimit)
+	return u
+}
+
+// AddTokenLimit adds v to the "token_limit" field.
+func (u *GroupUpsert) AddTokenLimit(v int64) *GroupUpsert {
+	u.Add(group.FieldTokenLimit, v)
+	return u
+}
+
+// SetTokenPricePerMillionPerDay sets the "token_price_per_million_per_day" field.
+func (u *GroupUpsert) SetTokenPricePerMillionPerDay(v float64) *GroupUpsert {
+	u.Set(group.FieldTokenPricePerMillionPerDay, v)
+	return u
+}
+
+// UpdateTokenPricePerMillionPerDay sets the "token_price_per_million_per_day" field to the value that was provided on create.
+func (u *GroupUpsert) UpdateTokenPricePerMillionPerDay() *GroupUpsert {
+	u.SetExcluded(group.FieldTokenPricePerMillionPerDay)
+	return u
+}
+
+// AddTokenPricePerMillionPerDay adds v to the "token_price_per_million_per_day" field.
+func (u *GroupUpsert) AddTokenPricePerMillionPerDay(v float64) *GroupUpsert {
+	u.Add(group.FieldTokenPricePerMillionPerDay, v)
 	return u
 }
 
@@ -3023,6 +3119,48 @@ func (u *GroupUpsertOne) SetSubscriptionType(v string) *GroupUpsertOne {
 func (u *GroupUpsertOne) UpdateSubscriptionType() *GroupUpsertOne {
 	return u.Update(func(s *GroupUpsert) {
 		s.UpdateSubscriptionType()
+	})
+}
+
+// SetTokenLimit sets the "token_limit" field.
+func (u *GroupUpsertOne) SetTokenLimit(v int64) *GroupUpsertOne {
+	return u.Update(func(s *GroupUpsert) {
+		s.SetTokenLimit(v)
+	})
+}
+
+// AddTokenLimit adds v to the "token_limit" field.
+func (u *GroupUpsertOne) AddTokenLimit(v int64) *GroupUpsertOne {
+	return u.Update(func(s *GroupUpsert) {
+		s.AddTokenLimit(v)
+	})
+}
+
+// UpdateTokenLimit sets the "token_limit" field to the value that was provided on create.
+func (u *GroupUpsertOne) UpdateTokenLimit() *GroupUpsertOne {
+	return u.Update(func(s *GroupUpsert) {
+		s.UpdateTokenLimit()
+	})
+}
+
+// SetTokenPricePerMillionPerDay sets the "token_price_per_million_per_day" field.
+func (u *GroupUpsertOne) SetTokenPricePerMillionPerDay(v float64) *GroupUpsertOne {
+	return u.Update(func(s *GroupUpsert) {
+		s.SetTokenPricePerMillionPerDay(v)
+	})
+}
+
+// AddTokenPricePerMillionPerDay adds v to the "token_price_per_million_per_day" field.
+func (u *GroupUpsertOne) AddTokenPricePerMillionPerDay(v float64) *GroupUpsertOne {
+	return u.Update(func(s *GroupUpsert) {
+		s.AddTokenPricePerMillionPerDay(v)
+	})
+}
+
+// UpdateTokenPricePerMillionPerDay sets the "token_price_per_million_per_day" field to the value that was provided on create.
+func (u *GroupUpsertOne) UpdateTokenPricePerMillionPerDay() *GroupUpsertOne {
+	return u.Update(func(s *GroupUpsert) {
+		s.UpdateTokenPricePerMillionPerDay()
 	})
 }
 
@@ -4413,6 +4551,48 @@ func (u *GroupUpsertBulk) SetSubscriptionType(v string) *GroupUpsertBulk {
 func (u *GroupUpsertBulk) UpdateSubscriptionType() *GroupUpsertBulk {
 	return u.Update(func(s *GroupUpsert) {
 		s.UpdateSubscriptionType()
+	})
+}
+
+// SetTokenLimit sets the "token_limit" field.
+func (u *GroupUpsertBulk) SetTokenLimit(v int64) *GroupUpsertBulk {
+	return u.Update(func(s *GroupUpsert) {
+		s.SetTokenLimit(v)
+	})
+}
+
+// AddTokenLimit adds v to the "token_limit" field.
+func (u *GroupUpsertBulk) AddTokenLimit(v int64) *GroupUpsertBulk {
+	return u.Update(func(s *GroupUpsert) {
+		s.AddTokenLimit(v)
+	})
+}
+
+// UpdateTokenLimit sets the "token_limit" field to the value that was provided on create.
+func (u *GroupUpsertBulk) UpdateTokenLimit() *GroupUpsertBulk {
+	return u.Update(func(s *GroupUpsert) {
+		s.UpdateTokenLimit()
+	})
+}
+
+// SetTokenPricePerMillionPerDay sets the "token_price_per_million_per_day" field.
+func (u *GroupUpsertBulk) SetTokenPricePerMillionPerDay(v float64) *GroupUpsertBulk {
+	return u.Update(func(s *GroupUpsert) {
+		s.SetTokenPricePerMillionPerDay(v)
+	})
+}
+
+// AddTokenPricePerMillionPerDay adds v to the "token_price_per_million_per_day" field.
+func (u *GroupUpsertBulk) AddTokenPricePerMillionPerDay(v float64) *GroupUpsertBulk {
+	return u.Update(func(s *GroupUpsert) {
+		s.AddTokenPricePerMillionPerDay(v)
+	})
+}
+
+// UpdateTokenPricePerMillionPerDay sets the "token_price_per_million_per_day" field to the value that was provided on create.
+func (u *GroupUpsertBulk) UpdateTokenPricePerMillionPerDay() *GroupUpsertBulk {
+	return u.Update(func(s *GroupUpsert) {
+		s.UpdateTokenPricePerMillionPerDay()
 	})
 }
 

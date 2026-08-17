@@ -195,6 +195,14 @@ func (r *usageBillingRepository) applyUsageBillingEffects(ctx context.Context, t
 		result.APIKeyQuotaExhausted = exhausted
 	}
 
+	if cmd.APIKeyTokenCount > 0 {
+		exhausted, err := incrementUsageBillingAPIKeyTokens(ctx, tx, cmd.APIKeyID, cmd.APIKeyTokenCount)
+		if err != nil {
+			return err
+		}
+		result.APIKeyTokenExhausted = exhausted
+	}
+
 	if cmd.APIKeyRateLimitCost > 0 {
 		if err := incrementUsageBillingAPIKeyRateLimit(ctx, tx, cmd.APIKeyID, cmd.APIKeyRateLimitCost); err != nil {
 			return err
@@ -210,6 +218,25 @@ func (r *usageBillingRepository) applyUsageBillingEffects(ctx context.Context, t
 	}
 
 	return nil
+}
+
+func incrementUsageBillingAPIKeyTokens(ctx context.Context, tx *sql.Tx, apiKeyID, tokenCount int64) (bool, error) {
+	var exhausted bool
+	err := tx.QueryRowContext(ctx, `
+		UPDATE api_keys
+		SET token_used = token_used + $1,
+			status = CASE
+				WHEN token_quota > 0 AND token_used + $1 >= token_quota THEN $2
+				ELSE status
+			END,
+			updated_at = NOW()
+		WHERE id = $3 AND deleted_at IS NULL
+		RETURNING token_quota > 0 AND token_used >= token_quota
+	`, tokenCount, service.StatusAPIKeyQuotaExhausted, apiKeyID).Scan(&exhausted)
+	if errors.Is(err, sql.ErrNoRows) {
+		return false, service.ErrAPIKeyNotFound
+	}
+	return exhausted, err
 }
 
 func incrementUsageBillingSubscription(ctx context.Context, tx *sql.Tx, subscriptionID int64, costUSD float64) error {

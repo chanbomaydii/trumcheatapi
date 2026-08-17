@@ -69,6 +69,32 @@ func (APIKey) Fields() []ent.Field {
 			SchemaType(map[string]string{dialect.Postgres: "decimal(20,8)"}).
 			Default(0).
 			Comment("Used quota amount in USD"),
+		field.Int64("token_quota").
+			Default(0).
+			Min(0).
+			Comment("Token quota snapshot for token groups; 0 = unlimited"),
+		field.Int64("token_used").
+			Default(0).
+			Min(0).
+			Comment("Billable tokens consumed by this API key"),
+		field.Float("token_unit_price").
+			SchemaType(map[string]string{dialect.Postgres: "decimal(20,8)"}).
+			Default(0).
+			Min(0).
+			Comment("Snapshot USD price per million tokens per day"),
+		field.Int("token_duration_days").
+			Default(0).
+			Min(0).
+			Comment("Purchased validity in days"),
+		field.Float("token_purchase_price").
+			SchemaType(map[string]string{dialect.Postgres: "decimal(20,8)"}).
+			Default(0).
+			Min(0).
+			Comment("Total USD charged when the prepaid token key was created"),
+		field.Time("token_purchased_at").
+			Optional().
+			Nillable().
+			Comment("Time the prepaid token key purchase committed"),
 		// Expiration time (nil = never expires)
 		field.Time("expires_at").
 			Optional().
@@ -143,6 +169,7 @@ func (APIKey) Indexes() []ent.Index {
 		index.Fields("last_used_at"),
 		// Index for quota queries
 		index.Fields("quota", "quota_used"),
+		index.Fields("token_quota", "token_used"),
 		index.Fields("expires_at"),
 	}
 }

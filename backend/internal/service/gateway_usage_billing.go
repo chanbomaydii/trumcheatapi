@@ -310,17 +310,24 @@ func buildUsageBillingCommand(requestID string, usageLog *UsageLog, p *postUsage
 	// user-specific) rate multiplier consumes subscription quota at the expected
 	// speed. TotalCost remains the raw (pre-multiplier) value; downstream guards
 	// on "> 0" still correctly skip free subscriptions (RateMultiplier == 0).
-	if p.IsSubscriptionBill && p.Subscription != nil && p.Cost.TotalCost > 0 {
+	isPrepaidTokenKey := p.APIKey != nil && p.APIKey.Group != nil && p.APIKey.Group.IsTokenType()
+	if isPrepaidTokenKey {
+		// Prepaid token keys charge the wallet once at purchase time. Runtime
+		// requests consume only the key's raw token allowance.
+	} else if p.IsSubscriptionBill && p.Subscription != nil && p.Cost.TotalCost > 0 {
 		cmd.SubscriptionID = &p.Subscription.ID
 		cmd.SubscriptionCost = p.Cost.ActualCost
 	} else if p.Cost.ActualCost > 0 {
 		cmd.BalanceCost = p.Cost.ActualCost
 	}
 
-	if p.shouldDeductAPIKeyQuota() {
+	if !isPrepaidTokenKey && p.shouldDeductAPIKeyQuota() {
 		cmd.APIKeyQuotaCost = p.Cost.ActualCost
 	}
-	if p.shouldUpdateRateLimits() {
+	if isPrepaidTokenKey && usageLog != nil {
+		cmd.APIKeyTokenCount = int64(usageLog.TotalTokens())
+	}
+	if !isPrepaidTokenKey && p.shouldUpdateRateLimits() {
 		cmd.APIKeyRateLimitCost = p.Cost.ActualCost
 	}
 	if p.shouldUpdateAccountQuota() {
@@ -355,7 +362,7 @@ func applyUsageBilling(ctx context.Context, requestID string, usageLog *UsageLog
 		return false, nil
 	}
 
-	if result.APIKeyQuotaExhausted {
+	if result.APIKeyQuotaExhausted || result.APIKeyTokenExhausted {
 		if invalidator, ok := p.APIKeyService.(apiKeyAuthCacheInvalidator); ok && p.APIKey != nil && p.APIKey.Key != "" {
 			invalidator.InvalidateAuthCacheByKey(billingCtx, p.APIKey.Key)
 		}

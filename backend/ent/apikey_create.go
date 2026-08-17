@@ -167,6 +167,90 @@ func (_c *APIKeyCreate) SetNillableQuotaUsed(v *float64) *APIKeyCreate {
 	return _c
 }
 
+// SetTokenQuota sets the "token_quota" field.
+func (_c *APIKeyCreate) SetTokenQuota(v int64) *APIKeyCreate {
+	_c.mutation.SetTokenQuota(v)
+	return _c
+}
+
+// SetNillableTokenQuota sets the "token_quota" field if the given value is not nil.
+func (_c *APIKeyCreate) SetNillableTokenQuota(v *int64) *APIKeyCreate {
+	if v != nil {
+		_c.SetTokenQuota(*v)
+	}
+	return _c
+}
+
+// SetTokenUsed sets the "token_used" field.
+func (_c *APIKeyCreate) SetTokenUsed(v int64) *APIKeyCreate {
+	_c.mutation.SetTokenUsed(v)
+	return _c
+}
+
+// SetNillableTokenUsed sets the "token_used" field if the given value is not nil.
+func (_c *APIKeyCreate) SetNillableTokenUsed(v *int64) *APIKeyCreate {
+	if v != nil {
+		_c.SetTokenUsed(*v)
+	}
+	return _c
+}
+
+// SetTokenUnitPrice sets the "token_unit_price" field.
+func (_c *APIKeyCreate) SetTokenUnitPrice(v float64) *APIKeyCreate {
+	_c.mutation.SetTokenUnitPrice(v)
+	return _c
+}
+
+// SetNillableTokenUnitPrice sets the "token_unit_price" field if the given value is not nil.
+func (_c *APIKeyCreate) SetNillableTokenUnitPrice(v *float64) *APIKeyCreate {
+	if v != nil {
+		_c.SetTokenUnitPrice(*v)
+	}
+	return _c
+}
+
+// SetTokenDurationDays sets the "token_duration_days" field.
+func (_c *APIKeyCreate) SetTokenDurationDays(v int) *APIKeyCreate {
+	_c.mutation.SetTokenDurationDays(v)
+	return _c
+}
+
+// SetNillableTokenDurationDays sets the "token_duration_days" field if the given value is not nil.
+func (_c *APIKeyCreate) SetNillableTokenDurationDays(v *int) *APIKeyCreate {
+	if v != nil {
+		_c.SetTokenDurationDays(*v)
+	}
+	return _c
+}
+
+// SetTokenPurchasePrice sets the "token_purchase_price" field.
+func (_c *APIKeyCreate) SetTokenPurchasePrice(v float64) *APIKeyCreate {
+	_c.mutation.SetTokenPurchasePrice(v)
+	return _c
+}
+
+// SetNillableTokenPurchasePrice sets the "token_purchase_price" field if the given value is not nil.
+func (_c *APIKeyCreate) SetNillableTokenPurchasePrice(v *float64) *APIKeyCreate {
+	if v != nil {
+		_c.SetTokenPurchasePrice(*v)
+	}
+	return _c
+}
+
+// SetTokenPurchasedAt sets the "token_purchased_at" field.
+func (_c *APIKeyCreate) SetTokenPurchasedAt(v time.Time) *APIKeyCreate {
+	_c.mutation.SetTokenPurchasedAt(v)
+	return _c
+}
+
+// SetNillableTokenPurchasedAt sets the "token_purchased_at" field if the given value is not nil.
+func (_c *APIKeyCreate) SetNillableTokenPurchasedAt(v *time.Time) *APIKeyCreate {
+	if v != nil {
+		_c.SetTokenPurchasedAt(*v)
+	}
+	return _c
+}
+
 // SetExpiresAt sets the "expires_at" field.
 func (_c *APIKeyCreate) SetExpiresAt(v time.Time) *APIKeyCreate {
 	_c.mutation.SetExpiresAt(v)
@@ -395,6 +479,26 @@ func (_c *APIKeyCreate) defaults() error {
 		v := apikey.DefaultQuotaUsed
 		_c.mutation.SetQuotaUsed(v)
 	}
+	if _, ok := _c.mutation.TokenQuota(); !ok {
+		v := apikey.DefaultTokenQuota
+		_c.mutation.SetTokenQuota(v)
+	}
+	if _, ok := _c.mutation.TokenUsed(); !ok {
+		v := apikey.DefaultTokenUsed
+		_c.mutation.SetTokenUsed(v)
+	}
+	if _, ok := _c.mutation.TokenUnitPrice(); !ok {
+		v := apikey.DefaultTokenUnitPrice
+		_c.mutation.SetTokenUnitPrice(v)
+	}
+	if _, ok := _c.mutation.TokenDurationDays(); !ok {
+		v := apikey.DefaultTokenDurationDays
+		_c.mutation.SetTokenDurationDays(v)
+	}
+	if _, ok := _c.mutation.TokenPurchasePrice(); !ok {
+		v := apikey.DefaultTokenPurchasePrice
+		_c.mutation.SetTokenPurchasePrice(v)
+	}
 	if _, ok := _c.mutation.RateLimit5h(); !ok {
 		v := apikey.DefaultRateLimit5h
 		_c.mutation.SetRateLimit5h(v)
@@ -462,6 +566,46 @@ func (_c *APIKeyCreate) check() error {
 	}
 	if _, ok := _c.mutation.QuotaUsed(); !ok {
 		return &ValidationError{Name: "quota_used", err: errors.New(`ent: missing required field "APIKey.quota_used"`)}
+	}
+	if _, ok := _c.mutation.TokenQuota(); !ok {
+		return &ValidationError{Name: "token_quota", err: errors.New(`ent: missing required field "APIKey.token_quota"`)}
+	}
+	if v, ok := _c.mutation.TokenQuota(); ok {
+		if err := apikey.TokenQuotaValidator(v); err != nil {
+			return &ValidationError{Name: "token_quota", err: fmt.Errorf(`ent: validator failed for field "APIKey.token_quota": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.TokenUsed(); !ok {
+		return &ValidationError{Name: "token_used", err: errors.New(`ent: missing required field "APIKey.token_used"`)}
+	}
+	if v, ok := _c.mutation.TokenUsed(); ok {
+		if err := apikey.TokenUsedValidator(v); err != nil {
+			return &ValidationError{Name: "token_used", err: fmt.Errorf(`ent: validator failed for field "APIKey.token_used": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.TokenUnitPrice(); !ok {
+		return &ValidationError{Name: "token_unit_price", err: errors.New(`ent: missing required field "APIKey.token_unit_price"`)}
+	}
+	if v, ok := _c.mutation.TokenUnitPrice(); ok {
+		if err := apikey.TokenUnitPriceValidator(v); err != nil {
+			return &ValidationError{Name: "token_unit_price", err: fmt.Errorf(`ent: validator failed for field "APIKey.token_unit_price": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.TokenDurationDays(); !ok {
+		return &ValidationError{Name: "token_duration_days", err: errors.New(`ent: missing required field "APIKey.token_duration_days"`)}
+	}
+	if v, ok := _c.mutation.TokenDurationDays(); ok {
+		if err := apikey.TokenDurationDaysValidator(v); err != nil {
+			return &ValidationError{Name: "token_duration_days", err: fmt.Errorf(`ent: validator failed for field "APIKey.token_duration_days": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.TokenPurchasePrice(); !ok {
+		return &ValidationError{Name: "token_purchase_price", err: errors.New(`ent: missing required field "APIKey.token_purchase_price"`)}
+	}
+	if v, ok := _c.mutation.TokenPurchasePrice(); ok {
+		if err := apikey.TokenPurchasePriceValidator(v); err != nil {
+			return &ValidationError{Name: "token_purchase_price", err: fmt.Errorf(`ent: validator failed for field "APIKey.token_purchase_price": %w`, err)}
+		}
 	}
 	if _, ok := _c.mutation.RateLimit5h(); !ok {
 		return &ValidationError{Name: "rate_limit_5h", err: errors.New(`ent: missing required field "APIKey.rate_limit_5h"`)}
@@ -554,6 +698,30 @@ func (_c *APIKeyCreate) createSpec() (*APIKey, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.QuotaUsed(); ok {
 		_spec.SetField(apikey.FieldQuotaUsed, field.TypeFloat64, value)
 		_node.QuotaUsed = value
+	}
+	if value, ok := _c.mutation.TokenQuota(); ok {
+		_spec.SetField(apikey.FieldTokenQuota, field.TypeInt64, value)
+		_node.TokenQuota = value
+	}
+	if value, ok := _c.mutation.TokenUsed(); ok {
+		_spec.SetField(apikey.FieldTokenUsed, field.TypeInt64, value)
+		_node.TokenUsed = value
+	}
+	if value, ok := _c.mutation.TokenUnitPrice(); ok {
+		_spec.SetField(apikey.FieldTokenUnitPrice, field.TypeFloat64, value)
+		_node.TokenUnitPrice = value
+	}
+	if value, ok := _c.mutation.TokenDurationDays(); ok {
+		_spec.SetField(apikey.FieldTokenDurationDays, field.TypeInt, value)
+		_node.TokenDurationDays = value
+	}
+	if value, ok := _c.mutation.TokenPurchasePrice(); ok {
+		_spec.SetField(apikey.FieldTokenPurchasePrice, field.TypeFloat64, value)
+		_node.TokenPurchasePrice = value
+	}
+	if value, ok := _c.mutation.TokenPurchasedAt(); ok {
+		_spec.SetField(apikey.FieldTokenPurchasedAt, field.TypeTime, value)
+		_node.TokenPurchasedAt = &value
 	}
 	if value, ok := _c.mutation.ExpiresAt(); ok {
 		_spec.SetField(apikey.FieldExpiresAt, field.TypeTime, value)
@@ -880,6 +1048,114 @@ func (u *APIKeyUpsert) UpdateQuotaUsed() *APIKeyUpsert {
 // AddQuotaUsed adds v to the "quota_used" field.
 func (u *APIKeyUpsert) AddQuotaUsed(v float64) *APIKeyUpsert {
 	u.Add(apikey.FieldQuotaUsed, v)
+	return u
+}
+
+// SetTokenQuota sets the "token_quota" field.
+func (u *APIKeyUpsert) SetTokenQuota(v int64) *APIKeyUpsert {
+	u.Set(apikey.FieldTokenQuota, v)
+	return u
+}
+
+// UpdateTokenQuota sets the "token_quota" field to the value that was provided on create.
+func (u *APIKeyUpsert) UpdateTokenQuota() *APIKeyUpsert {
+	u.SetExcluded(apikey.FieldTokenQuota)
+	return u
+}
+
+// AddTokenQuota adds v to the "token_quota" field.
+func (u *APIKeyUpsert) AddTokenQuota(v int64) *APIKeyUpsert {
+	u.Add(apikey.FieldTokenQuota, v)
+	return u
+}
+
+// SetTokenUsed sets the "token_used" field.
+func (u *APIKeyUpsert) SetTokenUsed(v int64) *APIKeyUpsert {
+	u.Set(apikey.FieldTokenUsed, v)
+	return u
+}
+
+// UpdateTokenUsed sets the "token_used" field to the value that was provided on create.
+func (u *APIKeyUpsert) UpdateTokenUsed() *APIKeyUpsert {
+	u.SetExcluded(apikey.FieldTokenUsed)
+	return u
+}
+
+// AddTokenUsed adds v to the "token_used" field.
+func (u *APIKeyUpsert) AddTokenUsed(v int64) *APIKeyUpsert {
+	u.Add(apikey.FieldTokenUsed, v)
+	return u
+}
+
+// SetTokenUnitPrice sets the "token_unit_price" field.
+func (u *APIKeyUpsert) SetTokenUnitPrice(v float64) *APIKeyUpsert {
+	u.Set(apikey.FieldTokenUnitPrice, v)
+	return u
+}
+
+// UpdateTokenUnitPrice sets the "token_unit_price" field to the value that was provided on create.
+func (u *APIKeyUpsert) UpdateTokenUnitPrice() *APIKeyUpsert {
+	u.SetExcluded(apikey.FieldTokenUnitPrice)
+	return u
+}
+
+// AddTokenUnitPrice adds v to the "token_unit_price" field.
+func (u *APIKeyUpsert) AddTokenUnitPrice(v float64) *APIKeyUpsert {
+	u.Add(apikey.FieldTokenUnitPrice, v)
+	return u
+}
+
+// SetTokenDurationDays sets the "token_duration_days" field.
+func (u *APIKeyUpsert) SetTokenDurationDays(v int) *APIKeyUpsert {
+	u.Set(apikey.FieldTokenDurationDays, v)
+	return u
+}
+
+// UpdateTokenDurationDays sets the "token_duration_days" field to the value that was provided on create.
+func (u *APIKeyUpsert) UpdateTokenDurationDays() *APIKeyUpsert {
+	u.SetExcluded(apikey.FieldTokenDurationDays)
+	return u
+}
+
+// AddTokenDurationDays adds v to the "token_duration_days" field.
+func (u *APIKeyUpsert) AddTokenDurationDays(v int) *APIKeyUpsert {
+	u.Add(apikey.FieldTokenDurationDays, v)
+	return u
+}
+
+// SetTokenPurchasePrice sets the "token_purchase_price" field.
+func (u *APIKeyUpsert) SetTokenPurchasePrice(v float64) *APIKeyUpsert {
+	u.Set(apikey.FieldTokenPurchasePrice, v)
+	return u
+}
+
+// UpdateTokenPurchasePrice sets the "token_purchase_price" field to the value that was provided on create.
+func (u *APIKeyUpsert) UpdateTokenPurchasePrice() *APIKeyUpsert {
+	u.SetExcluded(apikey.FieldTokenPurchasePrice)
+	return u
+}
+
+// AddTokenPurchasePrice adds v to the "token_purchase_price" field.
+func (u *APIKeyUpsert) AddTokenPurchasePrice(v float64) *APIKeyUpsert {
+	u.Add(apikey.FieldTokenPurchasePrice, v)
+	return u
+}
+
+// SetTokenPurchasedAt sets the "token_purchased_at" field.
+func (u *APIKeyUpsert) SetTokenPurchasedAt(v time.Time) *APIKeyUpsert {
+	u.Set(apikey.FieldTokenPurchasedAt, v)
+	return u
+}
+
+// UpdateTokenPurchasedAt sets the "token_purchased_at" field to the value that was provided on create.
+func (u *APIKeyUpsert) UpdateTokenPurchasedAt() *APIKeyUpsert {
+	u.SetExcluded(apikey.FieldTokenPurchasedAt)
+	return u
+}
+
+// ClearTokenPurchasedAt clears the value of the "token_purchased_at" field.
+func (u *APIKeyUpsert) ClearTokenPurchasedAt() *APIKeyUpsert {
+	u.SetNull(apikey.FieldTokenPurchasedAt)
 	return u
 }
 
@@ -1322,6 +1598,132 @@ func (u *APIKeyUpsertOne) AddQuotaUsed(v float64) *APIKeyUpsertOne {
 func (u *APIKeyUpsertOne) UpdateQuotaUsed() *APIKeyUpsertOne {
 	return u.Update(func(s *APIKeyUpsert) {
 		s.UpdateQuotaUsed()
+	})
+}
+
+// SetTokenQuota sets the "token_quota" field.
+func (u *APIKeyUpsertOne) SetTokenQuota(v int64) *APIKeyUpsertOne {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.SetTokenQuota(v)
+	})
+}
+
+// AddTokenQuota adds v to the "token_quota" field.
+func (u *APIKeyUpsertOne) AddTokenQuota(v int64) *APIKeyUpsertOne {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.AddTokenQuota(v)
+	})
+}
+
+// UpdateTokenQuota sets the "token_quota" field to the value that was provided on create.
+func (u *APIKeyUpsertOne) UpdateTokenQuota() *APIKeyUpsertOne {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.UpdateTokenQuota()
+	})
+}
+
+// SetTokenUsed sets the "token_used" field.
+func (u *APIKeyUpsertOne) SetTokenUsed(v int64) *APIKeyUpsertOne {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.SetTokenUsed(v)
+	})
+}
+
+// AddTokenUsed adds v to the "token_used" field.
+func (u *APIKeyUpsertOne) AddTokenUsed(v int64) *APIKeyUpsertOne {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.AddTokenUsed(v)
+	})
+}
+
+// UpdateTokenUsed sets the "token_used" field to the value that was provided on create.
+func (u *APIKeyUpsertOne) UpdateTokenUsed() *APIKeyUpsertOne {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.UpdateTokenUsed()
+	})
+}
+
+// SetTokenUnitPrice sets the "token_unit_price" field.
+func (u *APIKeyUpsertOne) SetTokenUnitPrice(v float64) *APIKeyUpsertOne {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.SetTokenUnitPrice(v)
+	})
+}
+
+// AddTokenUnitPrice adds v to the "token_unit_price" field.
+func (u *APIKeyUpsertOne) AddTokenUnitPrice(v float64) *APIKeyUpsertOne {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.AddTokenUnitPrice(v)
+	})
+}
+
+// UpdateTokenUnitPrice sets the "token_unit_price" field to the value that was provided on create.
+func (u *APIKeyUpsertOne) UpdateTokenUnitPrice() *APIKeyUpsertOne {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.UpdateTokenUnitPrice()
+	})
+}
+
+// SetTokenDurationDays sets the "token_duration_days" field.
+func (u *APIKeyUpsertOne) SetTokenDurationDays(v int) *APIKeyUpsertOne {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.SetTokenDurationDays(v)
+	})
+}
+
+// AddTokenDurationDays adds v to the "token_duration_days" field.
+func (u *APIKeyUpsertOne) AddTokenDurationDays(v int) *APIKeyUpsertOne {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.AddTokenDurationDays(v)
+	})
+}
+
+// UpdateTokenDurationDays sets the "token_duration_days" field to the value that was provided on create.
+func (u *APIKeyUpsertOne) UpdateTokenDurationDays() *APIKeyUpsertOne {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.UpdateTokenDurationDays()
+	})
+}
+
+// SetTokenPurchasePrice sets the "token_purchase_price" field.
+func (u *APIKeyUpsertOne) SetTokenPurchasePrice(v float64) *APIKeyUpsertOne {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.SetTokenPurchasePrice(v)
+	})
+}
+
+// AddTokenPurchasePrice adds v to the "token_purchase_price" field.
+func (u *APIKeyUpsertOne) AddTokenPurchasePrice(v float64) *APIKeyUpsertOne {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.AddTokenPurchasePrice(v)
+	})
+}
+
+// UpdateTokenPurchasePrice sets the "token_purchase_price" field to the value that was provided on create.
+func (u *APIKeyUpsertOne) UpdateTokenPurchasePrice() *APIKeyUpsertOne {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.UpdateTokenPurchasePrice()
+	})
+}
+
+// SetTokenPurchasedAt sets the "token_purchased_at" field.
+func (u *APIKeyUpsertOne) SetTokenPurchasedAt(v time.Time) *APIKeyUpsertOne {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.SetTokenPurchasedAt(v)
+	})
+}
+
+// UpdateTokenPurchasedAt sets the "token_purchased_at" field to the value that was provided on create.
+func (u *APIKeyUpsertOne) UpdateTokenPurchasedAt() *APIKeyUpsertOne {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.UpdateTokenPurchasedAt()
+	})
+}
+
+// ClearTokenPurchasedAt clears the value of the "token_purchased_at" field.
+func (u *APIKeyUpsertOne) ClearTokenPurchasedAt() *APIKeyUpsertOne {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.ClearTokenPurchasedAt()
 	})
 }
 
@@ -1960,6 +2362,132 @@ func (u *APIKeyUpsertBulk) AddQuotaUsed(v float64) *APIKeyUpsertBulk {
 func (u *APIKeyUpsertBulk) UpdateQuotaUsed() *APIKeyUpsertBulk {
 	return u.Update(func(s *APIKeyUpsert) {
 		s.UpdateQuotaUsed()
+	})
+}
+
+// SetTokenQuota sets the "token_quota" field.
+func (u *APIKeyUpsertBulk) SetTokenQuota(v int64) *APIKeyUpsertBulk {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.SetTokenQuota(v)
+	})
+}
+
+// AddTokenQuota adds v to the "token_quota" field.
+func (u *APIKeyUpsertBulk) AddTokenQuota(v int64) *APIKeyUpsertBulk {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.AddTokenQuota(v)
+	})
+}
+
+// UpdateTokenQuota sets the "token_quota" field to the value that was provided on create.
+func (u *APIKeyUpsertBulk) UpdateTokenQuota() *APIKeyUpsertBulk {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.UpdateTokenQuota()
+	})
+}
+
+// SetTokenUsed sets the "token_used" field.
+func (u *APIKeyUpsertBulk) SetTokenUsed(v int64) *APIKeyUpsertBulk {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.SetTokenUsed(v)
+	})
+}
+
+// AddTokenUsed adds v to the "token_used" field.
+func (u *APIKeyUpsertBulk) AddTokenUsed(v int64) *APIKeyUpsertBulk {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.AddTokenUsed(v)
+	})
+}
+
+// UpdateTokenUsed sets the "token_used" field to the value that was provided on create.
+func (u *APIKeyUpsertBulk) UpdateTokenUsed() *APIKeyUpsertBulk {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.UpdateTokenUsed()
+	})
+}
+
+// SetTokenUnitPrice sets the "token_unit_price" field.
+func (u *APIKeyUpsertBulk) SetTokenUnitPrice(v float64) *APIKeyUpsertBulk {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.SetTokenUnitPrice(v)
+	})
+}
+
+// AddTokenUnitPrice adds v to the "token_unit_price" field.
+func (u *APIKeyUpsertBulk) AddTokenUnitPrice(v float64) *APIKeyUpsertBulk {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.AddTokenUnitPrice(v)
+	})
+}
+
+// UpdateTokenUnitPrice sets the "token_unit_price" field to the value that was provided on create.
+func (u *APIKeyUpsertBulk) UpdateTokenUnitPrice() *APIKeyUpsertBulk {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.UpdateTokenUnitPrice()
+	})
+}
+
+// SetTokenDurationDays sets the "token_duration_days" field.
+func (u *APIKeyUpsertBulk) SetTokenDurationDays(v int) *APIKeyUpsertBulk {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.SetTokenDurationDays(v)
+	})
+}
+
+// AddTokenDurationDays adds v to the "token_duration_days" field.
+func (u *APIKeyUpsertBulk) AddTokenDurationDays(v int) *APIKeyUpsertBulk {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.AddTokenDurationDays(v)
+	})
+}
+
+// UpdateTokenDurationDays sets the "token_duration_days" field to the value that was provided on create.
+func (u *APIKeyUpsertBulk) UpdateTokenDurationDays() *APIKeyUpsertBulk {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.UpdateTokenDurationDays()
+	})
+}
+
+// SetTokenPurchasePrice sets the "token_purchase_price" field.
+func (u *APIKeyUpsertBulk) SetTokenPurchasePrice(v float64) *APIKeyUpsertBulk {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.SetTokenPurchasePrice(v)
+	})
+}
+
+// AddTokenPurchasePrice adds v to the "token_purchase_price" field.
+func (u *APIKeyUpsertBulk) AddTokenPurchasePrice(v float64) *APIKeyUpsertBulk {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.AddTokenPurchasePrice(v)
+	})
+}
+
+// UpdateTokenPurchasePrice sets the "token_purchase_price" field to the value that was provided on create.
+func (u *APIKeyUpsertBulk) UpdateTokenPurchasePrice() *APIKeyUpsertBulk {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.UpdateTokenPurchasePrice()
+	})
+}
+
+// SetTokenPurchasedAt sets the "token_purchased_at" field.
+func (u *APIKeyUpsertBulk) SetTokenPurchasedAt(v time.Time) *APIKeyUpsertBulk {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.SetTokenPurchasedAt(v)
+	})
+}
+
+// UpdateTokenPurchasedAt sets the "token_purchased_at" field to the value that was provided on create.
+func (u *APIKeyUpsertBulk) UpdateTokenPurchasedAt() *APIKeyUpsertBulk {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.UpdateTokenPurchasedAt()
+	})
+}
+
+// ClearTokenPurchasedAt clears the value of the "token_purchased_at" field.
+func (u *APIKeyUpsertBulk) ClearTokenPurchasedAt() *APIKeyUpsertBulk {
+	return u.Update(func(s *APIKeyUpsert) {
+		s.ClearTokenPurchasedAt()
 	})
 }
 

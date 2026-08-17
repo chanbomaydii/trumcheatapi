@@ -83,3 +83,38 @@ func TestBuildUsageBillingCommand_SubscriptionAppliesRateMultiplier(t *testing.T
 		})
 	}
 }
+
+func TestBuildUsageBillingCommand_PrepaidTokenGroupOnlyCountsTokens(t *testing.T) {
+	t.Parallel()
+
+	groupID := int64(7)
+	p := &postUsageBillingParams{
+		Cost:    &CostBreakdown{TotalCost: 1, ActualCost: 1.25},
+		User:    &User{ID: 1},
+		APIKey:  &APIKey{ID: 2, GroupID: &groupID, Group: &Group{SubscriptionType: SubscriptionTypeToken}},
+		Account: &Account{ID: 3},
+	}
+	usage := &UsageLog{
+		InputTokens:         600,
+		OutputTokens:        200,
+		CacheCreationTokens: 100,
+		CacheReadTokens:     50,
+	}
+
+	cmd := buildUsageBillingCommand("req-token", usage, p)
+	if cmd == nil {
+		t.Fatal("buildUsageBillingCommand returned nil")
+	}
+	if cmd.BalanceCost != 0 {
+		t.Fatalf("BalanceCost = %v, want 0", cmd.BalanceCost)
+	}
+	if cmd.SubscriptionCost != 0 {
+		t.Fatalf("SubscriptionCost = %v, want 0", cmd.SubscriptionCost)
+	}
+	if cmd.APIKeyTokenCount != 950 {
+		t.Fatalf("APIKeyTokenCount = %v, want 950", cmd.APIKeyTokenCount)
+	}
+	if cmd.APIKeyQuotaCost != 0 || cmd.APIKeyRateLimitCost != 0 {
+		t.Fatalf("prepaid request must not consume USD key limits: quota=%v rate=%v", cmd.APIKeyQuotaCost, cmd.APIKeyRateLimitCost)
+	}
+}

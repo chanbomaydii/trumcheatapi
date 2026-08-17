@@ -229,7 +229,7 @@ func apiKeyAuthWithSubscription(apiKeyService *service.APIKeyService, subscripti
 				AbortWithError(c, 403, "API_KEY_EXPIRED", "API key 已过期")
 				return
 			}
-			if apiKey.IsQuotaExhausted() {
+			if apiKey.IsQuotaExhausted() || apiKey.IsTokenQuotaExhausted() {
 				abortWithAPIKeyQuotaError(c)
 				return
 			}
