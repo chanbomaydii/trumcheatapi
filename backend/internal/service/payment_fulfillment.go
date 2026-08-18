@@ -163,6 +163,10 @@ func (s *PaymentService) toPaid(ctx context.Context, o *dbent.PaymentOrder, trad
 		),
 	).SetStatus(OrderStatusPaid).SetPayAmount(paid).SetPaymentTradeNo(tradeNo).SetPaidAt(now).ClearFailedAt().ClearFailedReason().Save(ctx)
 	if err != nil {
+		if dbent.IsConstraintError(err) {
+			s.writeAuditLog(ctx, o.ID, "PAYMENT_TRADE_REUSED", pk, map[string]any{"tradeNo": tradeNo})
+			return fmt.Errorf("provider transaction %q was already used by another order", tradeNo)
+		}
 		return fmt.Errorf("update to PAID: %w", err)
 	}
 	if c == 0 {
